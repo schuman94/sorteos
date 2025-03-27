@@ -1,12 +1,13 @@
-import { Head, Link } from '@inertiajs/react';
 import React, { useState } from 'react';
+import { router, Head, Link, usePage } from '@inertiajs/react';
 
 export default function Home({ auth }) {
-    const [videoUrl, setVideoUrl] = useState('');
+    const [url, setUrl] = useState('');
+    const { errors } = usePage().props;
 
     const handleSearch = (e) => {
         e.preventDefault();
-        console.log('Buscando video:', videoUrl);
+        router.post(route('publicacion.buscar'), { url });
     };
 
     return (
@@ -43,16 +44,16 @@ export default function Home({ auth }) {
                     </h1>
 
                     <p className="mb-6 text-center max-w-md">
-                        Introduce la URL de un video para realizar un sorteo.
+                        Introduce la URL de un video o publicación para realizar un sorteo.
                     </p>
 
                     <form onSubmit={handleSearch} className="w-full max-w-sm flex gap-2">
                         <input
                             type="text"
-                            value={videoUrl}
-                            onChange={(e) => setVideoUrl(e.target.value)}
+                            value={url}
+                            onChange={(e) => setUrl(e.target.value)}
                             className="flex-1 rounded border px-3 py-2"
-                            placeholder="URL del video de YouTube"
+                            placeholder="URL de YouTube o Instagram"
                         />
                         <button
                             type="submit"
@@ -61,10 +62,18 @@ export default function Home({ auth }) {
                             Buscar
                         </button>
                     </form>
+
+                    {/* Muestra el error si existe */}
+                    {errors.url && (
+                        <div className="mt-4 text-red-600">
+                            {errors.url}
+                        </div>
+                    )}
+
                 </main>
 
                 <footer className="text-center py-4 text-sm">
-
+                    {/* Pie de página opcional */}
                 </footer>
             </div>
         </>
