@@ -20,12 +20,20 @@ export default function Home({ auth }) {
             const response = await axios.post('/buscar-publicacion', { url });
             setPublicacionData(response.data);
         } catch (err) {
-            if (err.response && err.response.data && err.response.data.error) {
-                setError(err.response.data.error);
+            if (err.response && err.response.data) {
+                // Errores del validate del controlador
+                if (err.response.data.errors && err.response.data.errors.url) {
+                    setError(err.response.data.errors.url[0]);
+                }
+                // Errores personalizados del try/catch del controlador
+                else if (err.response.data.error) {
+                    setError(err.response.data.error);
+                }
             } else {
                 setError('Error desconocido al buscar la publicación');
             }
-        } finally {
+        }
+         finally {
             setLoading(false);
         }
     };
@@ -59,10 +67,10 @@ export default function Home({ auth }) {
                 </header>
 
                 <main className="flex flex-col items-center justify-center py-16">
-                    <h1 className="text-3xl font-semibold mb-4">Sorteo en YouTube</h1>
+                    <h1 className="text-3xl font-semibold mb-4">Sorteo en redes</h1>
 
                     <p className="mb-6 text-center max-w-md">
-                        Introduce la URL de un video o publicación para realizar un sorteo.
+                        Introduce la URL de una publicación para realizar un sorteo.
                     </p>
 
                     <form onSubmit={handleSearch} className="w-full max-w-md flex gap-2">
@@ -82,8 +90,9 @@ export default function Home({ auth }) {
                         </button>
                     </form>
 
-                    {/* Errores de validación o de backend */}
+                    {/* Errores de validación en el controlador*/}
                     {errors.url && <div className="mt-4 text-red-600">{errors.url}</div>}
+                    {/* Errores obtenidos del try/catch del controlador o algo desconocido */}
                     {error && <div className="mt-4 text-red-600">{error}</div>}
 
                     {/* Mostrar los datos de la publicación si existen */}
@@ -95,7 +104,7 @@ export default function Home({ auth }) {
                 </main>
 
                 <footer className="text-center py-4 text-sm">
-                    {/* Pie de página opcional */}
+
                 </footer>
             </div>
         </>
