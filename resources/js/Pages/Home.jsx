@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { router, Head, Link, usePage } from '@inertiajs/react';
 
-export default function Home({ auth }) {
+export default function Home({ auth, publicacionData }) {
     const [url, setUrl] = useState('');
     const { errors } = usePage().props;
 
     const handleSearch = (e) => {
         e.preventDefault();
-        router.post(route('publicacion.buscar'), { url });
+        router.get(route('publicacion.buscar'), { url });
     };
 
     return (
@@ -70,10 +70,38 @@ export default function Home({ auth }) {
                         </div>
                     )}
 
+                    {/* Si se han recibido datos de la publicación, se muestran en esta sección */}
+                    {publicacionData && (
+                        <div className="mt-8 max-w-md p-4 border rounded">
+                            {publicacionData.titulo && (
+                                <p>
+                                    <strong>Título:</strong> {publicacionData.titulo}
+                                </p>
+                            )}
+                            <p>
+                                <strong>Autor:</strong> {publicacionData.autor}
+                            </p>
+                            <p>
+                                <strong>Comentarios:</strong> {publicacionData.numComentarios}
+                            </p>
+                            <p>
+                                <strong>Likes:</strong> {publicacionData.likes}
+                            </p>
+                            <p>
+                                <strong>Fecha:</strong> {publicacionData.fechaPublicacion}
+                            </p>
+                            {publicacionData.visualizaciones && (
+                                <p>
+                                    <strong>Visualizaciones:</strong> {publicacionData.visualizaciones}
+                                </p>
+                            )}
+                        </div>
+                    )}
+
                 </main>
 
                 <footer className="text-center py-4 text-sm">
-                    {/* Pie de página opcional */}
+                    {/* Pie de página */}
                 </footer>
             </div>
         </>

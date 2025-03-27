@@ -1,3 +1,4 @@
+// no se está usando
 import React from 'react';
 
 export default function Show({ autor, numComentarios, likes, fechaPublicacion, titulo, visualizaciones }) {
