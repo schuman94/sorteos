@@ -20,6 +20,6 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::get('/buscar-publicacion', [PublicacionController::class, 'buscar'])->name('publicacion.buscar');
+Route::post('/buscar-publicacion', [PublicacionController::class, 'buscar'])->name('publicacion.buscar');
 
 require __DIR__.'/auth.php';

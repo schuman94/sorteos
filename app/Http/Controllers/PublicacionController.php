@@ -4,9 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Domain\Publicacion;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Route;
 
 class PublicacionController extends Controller
 {
@@ -28,21 +25,17 @@ class PublicacionController extends Controller
             $publicacion->cargarDatosDesdeApi();
 
             // Retornar el componente Home con la información adicional en el prop 'publicacionData'
-            return Inertia::render('Home', [
-                'publicacionData' => [
-                    'autor'             => $publicacion->getAutor(),
-                    'numComentarios'    => $publicacion->getNumComentarios(),
-                    'likes'             => $publicacion->getLikes(),
-                    'fechaPublicacion'  => $publicacion->getFechaPublicacion()->toDateTimeString(),
-                    // Atributos específicos de YouTubeVideo
-                    'titulo'            => method_exists($publicacion, 'getTitulo') ? $publicacion->getTitulo() : null,
-                    'visualizaciones'   => method_exists($publicacion, 'getVisualizaciones') ? $publicacion->getVisualizaciones() : null,
-                ],
+            return response()->json([
+                'autor' => $publicacion->getAutor(),
+                'numComentarios' => $publicacion->getNumComentarios(),
+                'likes' => $publicacion->getLikes(),
+                'fechaPublicacion' => $publicacion->getFechaPublicacion()->toDateTimeString(),
+                'titulo' => method_exists($publicacion, 'getTitulo') ? $publicacion->getTitulo() : null,
+                'visualizaciones' => method_exists($publicacion, 'getVisualizaciones') ? $publicacion->getVisualizaciones() : null,
             ]);
 
         } catch (\Exception $e) {
-            // Manejo de errores: redirigimos atrás con un mensaje de error
-            return Redirect::back()->withErrors(['url' => $e->getMessage()]);
+            return response()->json(['error' => $e->getMessage()], 422);
         }
     }
 }
