@@ -21,5 +21,8 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::post('/buscar-publicacion', [PublicacionController::class, 'buscar'])->name('publicacion.buscar');
+Route::post('/comentarios', [PublicacionController::class, 'cargarComentarios'])->name('publicacion.comentarios');
+
+
 
 require __DIR__.'/auth.php';

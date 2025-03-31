@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Domain\Publicacion;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+
 
 class PublicacionController extends Controller
 {
@@ -44,6 +46,7 @@ class PublicacionController extends Controller
                 'fechaPublicacion' => $publicacion->getFechaPublicacion()->toDateTimeString(),
                 'titulo' => method_exists($publicacion, 'getTitulo') ? $publicacion->getTitulo() : null,
                 'visualizaciones' => method_exists($publicacion, 'getVisualizaciones') ? $publicacion->getVisualizaciones() : null,
+                'url' => $publicacion->getUrl(),
             ]);
 
         } catch (\InvalidArgumentException $e) {
@@ -54,4 +57,31 @@ class PublicacionController extends Controller
             return response()->json(['error' => 'Ha ocurrido un error inesperado. Inténtalo de nuevo más tarde.'], 500);
         }
     }
+
+    public function cargarComentarios(Request $request)
+    {
+        $request->validate([
+            'url' => ['required', 'url'],
+        ]);
+
+        try {
+            $publicacion = Publicacion::crear($request->input('url'));
+            $publicacion->cargarDatosDesdeApi();
+
+            return Inertia::render('Publicacion/Comentarios', [
+                'autor' => $publicacion->getAutor(),
+                'numComentarios' => $publicacion->getNumComentarios(),
+                'likes' => $publicacion->getLikes(),
+                'fechaPublicacion' => $publicacion->getFechaPublicacion()->toDateTimeString(),
+                'titulo' => method_exists($publicacion, 'getTitulo') ? $publicacion->getTitulo() : null,
+                'visualizaciones' => method_exists($publicacion, 'getVisualizaciones') ? $publicacion->getVisualizaciones() : null,
+                'url' => $publicacion->getUrl(),
+            ]);
+        } catch (\Exception $e) {
+            return redirect()->route('home')->withErrors([
+                'url' => 'Error al cargar los comentarios: ' . $e->getMessage()
+            ]);
+        }
+    }
+
 }
