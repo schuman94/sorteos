@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Domain\Publicacion;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Illuminate\Support\Facades\Session;
+
 
 class PublicacionController extends Controller
 {
@@ -36,15 +39,19 @@ class PublicacionController extends Controller
             // Cargar los datos desde la API correspondiente
             $publicacion->cargarDatosDesdeApi();
 
-            // Retornar el componente Home con la información adicional en el prop 'publicacionData'
-            return response()->json([
+            // Almacenar los datos de la publicación en la sesión
+            Session::put('publicacion', [
                 'autor' => $publicacion->getAutor(),
                 'numComentarios' => $publicacion->getNumComentarios(),
                 'likes' => $publicacion->getLikes(),
                 'fechaPublicacion' => $publicacion->getFechaPublicacion()->toDateTimeString(),
                 'titulo' => method_exists($publicacion, 'getTitulo') ? $publicacion->getTitulo() : null,
                 'visualizaciones' => method_exists($publicacion, 'getVisualizaciones') ? $publicacion->getVisualizaciones() : null,
+                'url' => $publicacion->getUrl()
             ]);
+
+            // Retornar la respuesta o vista correspondiente
+            return response()->json(Session::get('publicacion'));
 
         } catch (\InvalidArgumentException $e) {
             return response()->json(['error' => 'La URL no corresponde a una publicación válida.'], 422);
@@ -54,4 +61,30 @@ class PublicacionController extends Controller
             return response()->json(['error' => 'Ha ocurrido un error inesperado. Inténtalo de nuevo más tarde.'], 500);
         }
     }
+
+    public function cargarComentarios(Request $request)
+    {
+        $request->validate([
+            'url' => ['required', 'url'],
+        ]);
+
+        try {
+            $publicacion = Session::get('publicacion');
+
+            return Inertia::render('Publicacion/Comentarios', [
+                'autor' => $publicacion->getAutor(),
+                'numComentarios' => $publicacion->getNumComentarios(),
+                'likes' => $publicacion->getLikes(),
+                'fechaPublicacion' => $publicacion->getFechaPublicacion()->toDateTimeString(),
+                'titulo' => method_exists($publicacion, 'getTitulo') ? $publicacion->getTitulo() : null,
+                'visualizaciones' => method_exists($publicacion, 'getVisualizaciones') ? $publicacion->getVisualizaciones() : null,
+                'url' => $publicacion->getUrl(),
+            ]);
+        } catch (\Exception $e) {
+            return redirect()->route('home')->withErrors([
+                'url' => 'Error al cargar los comentarios: ' . $e->getMessage()
+            ]);
+        }
+    }
+
 }

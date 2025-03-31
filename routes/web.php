@@ -2,12 +2,13 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicacionController;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Session;
 
 Route::get('/', function () {
-    return Inertia::render('Home');
+    $publicacion = Session::get('publicacion', null);
+    return Inertia::render('Home', ['publicacion' => $publicacion]);
 })->name('home');
 
 Route::get('/dashboard', function () {
@@ -21,5 +22,8 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::post('/buscar-publicacion', [PublicacionController::class, 'buscar'])->name('publicacion.buscar');
+Route::post('/comentarios', [PublicacionController::class, 'cargarComentarios'])->name('publicacion.comentarios')->middleware('auth');
+
+
 
 require __DIR__.'/auth.php';
