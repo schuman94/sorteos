@@ -12,7 +12,7 @@ abstract class Publicacion
     protected ?string $autor = null;          // nombre del canal de YouTube o usuario de Instagram
     protected ?int $numComentarios = null;    // número de comentarios
     protected ?int $likes = null;             // likes (YouTube) o "me gusta" (Instagram)
-    protected ?\DateTime $fechaPublicacion = null;
+    protected ?Carbon $fechaPublicacion = null;
 
     public function __construct(string $url)
     {
@@ -105,5 +105,19 @@ abstract class Publicacion
         */
 
         throw new \InvalidArgumentException('La URL no corresponde a una red soportada.');
+    }
+
+    // Devuelve un array asociativo con los datos que el cliente necesita para visualizar los datos de la publicación
+    public function arrayData() {
+        return [
+            'autor' => $this->getAutor(),
+            'numComentarios' => $this->getNumComentarios(),
+            'likes' => $this->getLikes(),
+            'fechaPublicacion' => $this->getFechaPublicacion()->toDateTimeString(),
+            'titulo' => method_exists($this, 'getTitulo') ? $this->getTitulo() : null,
+            'visualizaciones' => method_exists($this, 'getVisualizaciones') ? $this->getVisualizaciones() : null,
+            'url' => $this->getUrl(),
+            'tipo' => $this::class,
+        ];
     }
 }

@@ -3,9 +3,9 @@ import { Head, Link, usePage } from '@inertiajs/react';
 import axios from '../lib/axios';
 import Show from './Publicacion/Show';
 
-export default function Home({ auth, publicacion}) {
+export default function Home({ auth, publicacionDataSession}) {
     const [url, setUrl] = useState('');
-    const [publicacionData, setPublicacionData] = useState(publicacion);
+    const [publicacionData, setPublicacionData] = useState(publicacionDataSession);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const { errors } = usePage().props;

@@ -7,8 +7,10 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\Session;
 
 Route::get('/', function () {
-    $publicacion = Session::get('publicacion', null);
-    return Inertia::render('Home', ['publicacion' => $publicacion]);
+    // Rescatamos los datos de la publicación de la sesión en caso de que existan
+    $publicacionData = Session::get('publicacionData', null);
+
+    return Inertia::render('Home', ['publicacionDataSession' => $publicacionData]);
 })->name('home');
 
 Route::get('/dashboard', function () {
@@ -23,7 +25,5 @@ Route::middleware('auth')->group(function () {
 
 Route::post('/buscar-publicacion', [PublicacionController::class, 'buscar'])->name('publicacion.buscar');
 Route::post('/comentarios', [PublicacionController::class, 'cargarComentarios'])->name('publicacion.comentarios')->middleware('auth');
-
-
 
 require __DIR__.'/auth.php';
