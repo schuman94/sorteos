@@ -94,4 +94,49 @@ class YouTubeVideo extends Publicacion
             ? (int) $statistics['viewCount']
             : null;
     }
+
+    public function cargarComentariosDesdeApi(): void
+    {
+        $youtubeService = app(YouTubeService::class); //Pendiente optimizar esto, para que no se ejecute dos veces
+        $response = $youtubeService->getComentarios($this->id);
+
+        foreach ($response as $item) {
+            $topComment = $item['snippet']['topLevelComment']['snippet'] ?? null;
+
+            if ($topComment) {
+                $this->comentarios[] = [
+                    'autor' => $topComment['authorDisplayName'] ?? 'Anónimo',
+                    'texto' => $topComment['textDisplay'] ?? '',
+                    'fecha' => $topComment['publishedAt'] ?? null,
+                    'likes' => $topComment['likeCount'] ?? 0,
+                ];
+            }
+
+            // Añadir respuestas si existen
+            if (isset($item['replies']['comments'])) {
+                foreach ($item['replies']['comments'] as $reply) {
+                    $replySnippet = $reply['snippet'] ?? null;
+
+                    if ($replySnippet) {
+                        $this->comentarios[] = [
+                            'autor' => $replySnippet['authorDisplayName'] ?? 'Anónimo',
+                            'texto' => $replySnippet['textDisplay'] ?? '',
+                            'fecha' => $replySnippet['publishedAt'] ?? null,
+                            'likes' => $replySnippet['likeCount'] ?? 0,
+                        ];
+                    }
+                }
+            }
+        }
+
+        // Ordenar los comentarios empezando por el más reciente (ya no importa el nivel)
+        usort($this->comentarios, function ($a, $b) {
+            return strtotime($b['fecha']) <=> strtotime($a['fecha']);
+        });
+
+        // Si no se cargó ningún comentario
+        if (empty($this->comentarios)) {
+            throw new \RuntimeException('El video no tiene comentarios aún.');
+        }
+    }
 }

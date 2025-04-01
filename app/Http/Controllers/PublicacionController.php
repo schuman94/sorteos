@@ -40,18 +40,10 @@ class PublicacionController extends Controller
             $publicacion->cargarDatosDesdeApi();
 
             // Almacenar los datos de la publicación en la sesión
-            Session::put('publicacion', [
-                'autor' => $publicacion->getAutor(),
-                'numComentarios' => $publicacion->getNumComentarios(),
-                'likes' => $publicacion->getLikes(),
-                'fechaPublicacion' => $publicacion->getFechaPublicacion()->toDateTimeString(),
-                'titulo' => method_exists($publicacion, 'getTitulo') ? $publicacion->getTitulo() : null,
-                'visualizaciones' => method_exists($publicacion, 'getVisualizaciones') ? $publicacion->getVisualizaciones() : null,
-                'url' => $publicacion->getUrl()
-            ]);
+            Session::put('publicacionData', $publicacion->arrayData());
 
-            // Retornar la respuesta o vista correspondiente
-            return response()->json(Session::get('publicacion'));
+            // Retornar la respuesta con los datos
+            return response()->json($publicacion->arrayData());
 
         } catch (\InvalidArgumentException $e) {
             return response()->json(['error' => 'La URL no corresponde a una publicación válida.'], 422);
@@ -69,17 +61,24 @@ class PublicacionController extends Controller
         ]);
 
         try {
-            $publicacion = Session::get('publicacion');
+            // Crear la instancia adecuada (YouTubeVideo, InstagramPost, etc.)
+            $publicacion = Publicacion::crear($request->input('url'));
 
-            return Inertia::render('Publicacion/Comentarios', [
-                'autor' => $publicacion->getAutor(),
-                'numComentarios' => $publicacion->getNumComentarios(),
-                'likes' => $publicacion->getLikes(),
-                'fechaPublicacion' => $publicacion->getFechaPublicacion()->toDateTimeString(),
-                'titulo' => method_exists($publicacion, 'getTitulo') ? $publicacion->getTitulo() : null,
-                'visualizaciones' => method_exists($publicacion, 'getVisualizaciones') ? $publicacion->getVisualizaciones() : null,
-                'url' => $publicacion->getUrl(),
-            ]);
+            // Cargar los datos desde la API correspondiente
+            $publicacion->cargarDatosDesdeApi();
+
+            // Almacenar los datos de la publicación en la sesión
+            Session::put('publicacionData', $publicacion->arrayData());
+
+            // Cargar los comentarios desde la API correspondiente
+            $publicacion->cargarComentariosDesdeApi();
+
+            // Retornar la vista con los datos
+            return Inertia::render('Publicacion/Comentarios', array_merge(
+                $publicacion->arrayData(),
+                ['comentarios' => $publicacion->getComentarios()]
+            ));
+
         } catch (\Exception $e) {
             return redirect()->route('home')->withErrors([
                 'url' => 'Error al cargar los comentarios: ' . $e->getMessage()
