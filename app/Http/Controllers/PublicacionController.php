@@ -70,8 +70,14 @@ class PublicacionController extends Controller
             // Almacenar los datos de la publicación en la sesión
             Session::put('publicacionData', $publicacion->arrayData());
 
+            // Cargar los comentarios desde la API correspondiente
+            $publicacion->cargarComentariosDesdeApi();
+
             // Retornar la vista con los datos
-            return Inertia::render('Publicacion/Comentarios', $publicacion->arrayData());
+            return Inertia::render('Publicacion/Comentarios', array_merge(
+                $publicacion->arrayData(),
+                ['comentarios' => $publicacion->getComentarios()]
+            ));
 
         } catch (\Exception $e) {
             return redirect()->route('home')->withErrors([

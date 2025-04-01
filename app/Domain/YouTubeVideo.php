@@ -94,4 +94,40 @@ class YouTubeVideo extends Publicacion
             ? (int) $statistics['viewCount']
             : null;
     }
+
+    public function cargarComentariosDesdeApi(): void
+    {
+        $youtubeService = app(YouTubeService::class); //Pendiente optimizar esto, para que no se ejecute dos veces
+        $response = $youtubeService->getComentarios($this->id);
+
+        // Verificar si hay error en la respuesta
+        if (isset($response['error'])) {
+            $message = $response['error']['message'];
+
+            if (str_contains($message, 'has disabled comments')) {
+                throw new \RuntimeException('Los comentarios de este video están desactivados.');
+            }
+
+            throw new \RuntimeException('Error al obtener los comentarios: ' . $message);
+        }
+
+
+        foreach ($response['items'] ?? [] as $item) {
+            $snippet = $item['snippet']['topLevelComment']['snippet'] ?? null;
+
+            if ($snippet) {
+                $this->comentarios[] = [
+                    'autor' => $snippet['authorDisplayName'] ?? 'Anónimo',
+                    'texto' => $snippet['textDisplay'] ?? '',
+                    'fecha' => $snippet['publishedAt'] ?? null,
+                    'likes' => $snippet['likeCount'] ?? 0,
+                ];
+            }
+        }
+
+        // Si no se cargó ningún comentario
+        if (empty($this->comentarios)) {
+            throw new \RuntimeException('El video no tiene comentarios aún.');
+        }
+    }
 }

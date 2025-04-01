@@ -9,10 +9,13 @@ abstract class Publicacion
     protected string $id;
 
     // Atributos "comunes" a ambas redes
-    protected ?string $autor = null;          // nombre del canal de YouTube o usuario de Instagram
-    protected ?int $numComentarios = null;    // número de comentarios
-    protected ?int $likes = null;             // likes (YouTube) o "me gusta" (Instagram)
-    protected ?Carbon $fechaPublicacion = null;
+    protected ?string $autor = null;            // nombre del canal de YouTube o usuario de Instagram
+    protected ?int $numComentarios = null;      // número de comentarios
+    protected ?int $likes = null;               // likes (YouTube) o "me gusta" (Instagram)
+    protected ?Carbon $fechaPublicacion = null; // fecha de publicación
+
+    // array donde se cargan los comentarios
+    protected array $comentarios = [];
 
     public function __construct(string $url)
     {
@@ -70,8 +73,16 @@ abstract class Publicacion
         $this->fechaPublicacion = $fecha;
     }
 
+    public function getComentarios()
+    {
+        return $this->comentarios;
+    }
+
     // Método abstracto para cargar datos desde la API
     abstract public function cargarDatosDesdeApi(): void;
+
+    // Método abstracto para cargar comentarios desde la API
+    abstract public function cargarComentariosDesdeApi(): void;
 
     // Método *factory* estático para crear la subclase adecuada según la URL
     public static function crear(string $url): Publicacion
