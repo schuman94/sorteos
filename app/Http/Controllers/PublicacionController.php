@@ -54,6 +54,11 @@ class PublicacionController extends Controller
         }
     }
 
+    /**
+     * Vuelve a obtener la información de la publicación (para que esté actualizada).
+     * Obtiene los comentarios y los almacena en la sesión
+     * Redirige a la vista sorteos
+     */
     public function cargarComentarios(Request $request)
     {
         $request->validate([
@@ -73,10 +78,13 @@ class PublicacionController extends Controller
             // Cargar los comentarios desde la API correspondiente
             $publicacion->cargarComentariosDesdeApi();
 
+            // Almacenar los comentarios en la sesión
+            Session::put('comentarios', $publicacion->getComentarios());
+
             // Retornar la vista con los datos
-            return Inertia::render('Publicacion/Comentarios', array_merge(
+            return Inertia::render('Sorteo/Sorteo', array_merge(
                 $publicacion->arrayData(),
-                ['comentarios' => $publicacion->getComentarios()]
+                //['comentarios' => $publicacion->getComentarios()]
             ));
 
         } catch (\Exception $e) {
@@ -84,6 +92,16 @@ class PublicacionController extends Controller
                 'url' => 'Error al cargar los comentarios: ' . $e->getMessage()
             ]);
         }
+    }
+
+    /**
+     * Obtiene los comentarios de la sesión.
+     */
+    public function visualizarComentarios()
+    {
+        $comentarios = Session::get('comentarios', []);
+
+        return response()->json($comentarios);
     }
 
 }

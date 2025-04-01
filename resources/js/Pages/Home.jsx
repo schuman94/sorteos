@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
 import axios from '../lib/axios';
-import Show from './Publicacion/Show';
+import Data from './Publicacion/Data';
 
 export default function Home({ auth, publicacionDataSession}) {
     const [url, setUrl] = useState('');
@@ -98,7 +98,7 @@ export default function Home({ auth, publicacionDataSession}) {
                     {/* Mostrar los datos de la publicación si existen */}
                     {publicacionData && (
                         <div className="mt-8">
-                            <Show {...publicacionData} />
+                            <Data {...publicacionData} />
                         </div>
                     )}
                 </main>
