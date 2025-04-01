@@ -61,7 +61,7 @@ class YoutubeService
             $response = Http::get($url, [
                 'videoId' => $videoId,
                 'part' => 'snippet,replies',
-                'maxResults' => 5,
+                'maxResults' => 100,
                 'order' => 'time',
                 'key' => $this->apiKey,
                 'pageToken' => $nextPageToken,
