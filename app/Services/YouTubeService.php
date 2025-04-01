@@ -45,25 +45,46 @@ class YoutubeService
     *
     * Este método envía una petición GET a la API, pasando como parámetros:
     *  - videoId: id del video del que se quieren obtener los comentarios.
-    *  - part: parte de la información que se desea recibir. En este caso, 'snippet'.
+    *  - part: parte de la información que se desea recibir. Snippet recupera los comentarios. Replies tambien recupera las respuestas.
     *  - key: API KEY obtenida del archivo .env
     *
     * @param  string  $videoId  Identificador único del video en YouTube.
     * @return array   Array asociativo con la respuesta JSON decodificada.
     */
-    public function getComentarios($videoId)
+    public function getComentarios(string $videoId): array
     {
         $url = 'https://www.googleapis.com/youtube/v3/commentThreads';
+        $comentarios = [];
+        $nextPageToken = null;
 
-        $response = Http::get($url, [
-            'videoId' => $videoId,
-            'part' => 'snippet',
-            'maxResults' => 10,
-            'order' => 'time',
-            'key' => $this->apiKey,
-        ]);
+        do {
+            $response = Http::get($url, [
+                'videoId' => $videoId,
+                'part' => 'snippet,replies',
+                'maxResults' => 5,
+                'order' => 'time',
+                'key' => $this->apiKey,
+                'pageToken' => $nextPageToken,
+            ]);
 
-        return $response->json();
+            $json = $response->json();
+
+            // Verificar errores
+            if (isset($json['error'])) {
+                $message = $json['error']['message'];
+                if (str_contains($message, 'has disabled comments')) {
+                    throw new \RuntimeException('Los comentarios de este video están desactivados.');
+                }
+
+                throw new \RuntimeException('Error al obtener los comentarios: ' . $message);
+            }
+
+            $comentarios = array_merge($comentarios, $json['items'] ?? []);
+            $nextPageToken = $json['nextPageToken'] ?? null;
+
+        } while ($nextPageToken);
+
+        return $comentarios;
     }
 
 }
