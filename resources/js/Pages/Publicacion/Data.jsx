@@ -23,7 +23,7 @@ export default function Show({ autor, numComentarios, likes, fechaPublicacion, t
             )}
 
             {/* Renderiza el botón solo si no estás en la ruta de comentarios */}
-            {rutaActual !== '/comentarios' && (
+            {rutaActual !== '/sorteo' && (
                 <button
                     onClick={cargarComentarios}
                     className="mt-4 px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"

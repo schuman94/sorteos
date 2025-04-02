@@ -6,6 +6,8 @@ use App\Domain\Publicacion;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 
 
 class PublicacionController extends Controller
@@ -54,6 +56,11 @@ class PublicacionController extends Controller
         }
     }
 
+    /**
+     * Vuelve a obtener la información de la publicación (para que esté actualizada).
+     * Obtiene los comentarios y los almacena en la sesión
+     * Redirige a la vista sorteos
+     */
     public function cargarComentarios(Request $request)
     {
         $request->validate([
@@ -73,10 +80,13 @@ class PublicacionController extends Controller
             // Cargar los comentarios desde la API correspondiente
             $publicacion->cargarComentariosDesdeApi();
 
+            // Almacenar los comentarios en la sesión
+            Session::put('comentarios', $publicacion->getComentarios());
+
             // Retornar la vista con los datos
-            return Inertia::render('Publicacion/Comentarios', array_merge(
+            return Inertia::render('Sorteo/Sorteo', array_merge(
                 $publicacion->arrayData(),
-                ['comentarios' => $publicacion->getComentarios()]
+                //['comentarios' => $publicacion->getComentarios()]
             ));
 
         } catch (\Exception $e) {
@@ -84,6 +94,34 @@ class PublicacionController extends Controller
                 'url' => 'Error al cargar los comentarios: ' . $e->getMessage()
             ]);
         }
+    }
+
+    /**
+     * Obtiene los comentarios de la sesión.
+     */
+    public function visualizarComentarios()
+    {
+        $comentarios = Session::get('comentarios', []);
+
+        // Obtenemos la página actual
+        $paginaActual = LengthAwarePaginator::resolveCurrentPage();
+
+        // Número de elementos por página
+        $porPagina = 50;
+
+        // Convertimos a colección para usar slice
+        $coleccion = new Collection($comentarios);
+
+        // Hacemos la paginación
+        $comentariosPaginados = new LengthAwarePaginator(
+            $coleccion->slice(($paginaActual - 1) * $porPagina, $porPagina)->values(),
+            $coleccion->count(),
+            $porPagina,
+            $paginaActual,
+            ['path' => route('comentarios.visualizar')]
+        );
+
+        return response()->json($comentariosPaginados);
     }
 
 }

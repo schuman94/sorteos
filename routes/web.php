@@ -24,6 +24,7 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::post('/buscar-publicacion', [PublicacionController::class, 'buscar'])->name('publicacion.buscar');
-Route::post('/comentarios', [PublicacionController::class, 'cargarComentarios'])->name('publicacion.comentarios')->middleware('auth');
+Route::post('/sorteo', [PublicacionController::class, 'cargarComentarios'])->name('publicacion.comentarios')->middleware('auth');
+Route::get('/comentarios', [PublicacionController::class, 'visualizarComentarios'])->name('comentarios.visualizar');
 
 require __DIR__.'/auth.php';
