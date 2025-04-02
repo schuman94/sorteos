@@ -6,6 +6,8 @@ use App\Domain\Publicacion;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 
 
 class PublicacionController extends Controller
@@ -101,7 +103,25 @@ class PublicacionController extends Controller
     {
         $comentarios = Session::get('comentarios', []);
 
-        return response()->json($comentarios);
+        // Obtenemos la página actual
+        $paginaActual = LengthAwarePaginator::resolveCurrentPage();
+
+        // Número de elementos por página
+        $porPagina = 50;
+
+        // Convertimos a colección para usar slice
+        $coleccion = new Collection($comentarios);
+
+        // Hacemos la paginación
+        $comentariosPaginados = new LengthAwarePaginator(
+            $coleccion->slice(($paginaActual - 1) * $porPagina, $porPagina)->values(),
+            $coleccion->count(),
+            $porPagina,
+            $paginaActual,
+            ['path' => route('comentarios.visualizar')]
+        );
+
+        return response()->json($comentariosPaginados);
     }
 
 }

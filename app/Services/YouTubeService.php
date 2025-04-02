@@ -65,6 +65,7 @@ class YoutubeService
                 'order' => 'time',
                 'key' => $this->apiKey,
                 'pageToken' => $nextPageToken,
+                'textFormat' => 'plainText',
             ]);
 
             $json = $response->json();

@@ -106,7 +106,7 @@ class YouTubeVideo extends Publicacion
             if ($topComment) {
                 $this->comentarios[] = [
                     'autor' => $topComment['authorDisplayName'] ?? 'Anónimo',
-                    'texto' => $topComment['textDisplay'] ?? '',
+                    'texto' => $topComment['textOriginal'] ?? '',
                     'fecha' => $topComment['publishedAt'] ?? null,
                     'likes' => $topComment['likeCount'] ?? 0,
                 ];
@@ -120,7 +120,7 @@ class YouTubeVideo extends Publicacion
                     if ($replySnippet) {
                         $this->comentarios[] = [
                             'autor' => $replySnippet['authorDisplayName'] ?? 'Anónimo',
-                            'texto' => $replySnippet['textDisplay'] ?? '',
+                            'texto' => $replySnippet['textOriginal'] ?? '',
                             'fecha' => $replySnippet['publishedAt'] ?? null,
                             'likes' => $replySnippet['likeCount'] ?? 0,
                         ];
