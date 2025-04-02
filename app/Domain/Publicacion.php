@@ -14,6 +14,10 @@ abstract class Publicacion
     protected ?int $likes = null;               // likes (YouTube) o "me gusta" (Instagram)
     protected ?Carbon $fechaPublicacion = null; // fecha de publicación
 
+    // Atributos específicos
+    protected ?string $titulo = null; // YouTubeVideo
+    protected ?int $visualizaciones = null; // YouTubeVideo
+
     // array donde se cargan los comentarios
     protected array $comentarios = [];
 
@@ -78,6 +82,26 @@ abstract class Publicacion
         return $this->comentarios;
     }
 
+    public function getTitulo(): ?string
+    {
+        return $this->titulo;
+    }
+
+    protected function setTitulo(?string $titulo): void
+    {
+        $this->titulo = $titulo;
+    }
+
+    public function getVisualizaciones(): ?int
+    {
+        return $this->visualizaciones;
+    }
+
+    protected function setVisualizaciones(?int $visualizaciones): void
+    {
+        $this->visualizaciones = $visualizaciones;
+    }
+
     // Método abstracto para cargar datos desde la API
     abstract public function cargarDatosDesdeApi(): void;
 
@@ -125,8 +149,8 @@ abstract class Publicacion
             'numComentarios' => $this->getNumComentarios(),
             'likes' => $this->getLikes(),
             'fechaPublicacion' => $this->getFechaPublicacion()->toDateTimeString(),
-            'titulo' => method_exists($this, 'getTitulo') ? $this->getTitulo() : null,
-            'visualizaciones' => method_exists($this, 'getVisualizaciones') ? $this->getVisualizaciones() : null,
+            'titulo' => $this->getTitulo(),
+            'visualizaciones' => $this->getVisualizaciones(),
             'url' => $this->getUrl(),
             'tipo' => $this::class,
         ];
