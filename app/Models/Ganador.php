@@ -21,4 +21,8 @@ class Ganador extends Model
     public function comentario() {
         return $this->hasOne(Comentario::class);
     }
+
+    public function sorteo() {
+        return $this->belongsTo(Sorteo::class);
+    }
 }

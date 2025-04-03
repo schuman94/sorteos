@@ -17,19 +17,19 @@ export default function Comentarios() {
         axios.get(route('comentarios.visualizar'), {
             params: { page: paginaActual }
         })
-        .then(response => {
-            const nuevosComentarios = response.data.data;
-            setComentarios(prev => [...prev, ...nuevosComentarios]);
+            .then(response => {
+                const nuevosComentarios = response.data.data;
+                setComentarios(prev => [...prev, ...nuevosComentarios]);
 
-            // Si estamos en la última página, no hay más comentarios
-            if (paginaActual >= response.data.last_page) {
-                setHasMore(false);
-            }
-        })
-        .catch(() => {
-            setError('No se pudieron cargar los comentarios');
-        })
-        .finally(() => setLoading(false));
+                // Si estamos en la última página, no hay más comentarios
+                if (paginaActual >= response.data.last_page) {
+                    setHasMore(false);
+                }
+            })
+            .catch(() => {
+                setError('No se pudieron cargar los comentarios');
+            })
+            .finally(() => setLoading(false));
     };
 
     const mostrarMas = () => {
@@ -59,7 +59,7 @@ export default function Comentarios() {
                                 </p>
                                 <p className="mt-1">{comentario.texto}</p>
                                 <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                                    Likes: {comentario.likes}
+                                    👍 {comentario.likes}
                                 </p>
                             </li>
                         ))}
