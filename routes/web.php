@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicacionController;
+use App\Http\Controllers\SorteoController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Session;
@@ -26,5 +27,7 @@ Route::middleware('auth')->group(function () {
 Route::post('/buscar-publicacion', [PublicacionController::class, 'buscar'])->name('publicacion.buscar');
 Route::post('/sorteo', [PublicacionController::class, 'cargarComentarios'])->name('publicacion.comentarios')->middleware('auth');
 Route::get('/comentarios', [PublicacionController::class, 'visualizarComentarios'])->name('comentarios.visualizar');
+Route::post('/sorteo/iniciar', [SorteoController::class, 'iniciar'])->name('sorteo.iniciar');
+
 
 require __DIR__.'/auth.php';
