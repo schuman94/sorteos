@@ -7,13 +7,14 @@ import axios from '@/lib/axios';
 
 export default function Sorteo(props) {
     const [formData, setFormData] = useState({
+        url: props.url ?? '',
         num_ganadores: 1,
         num_suplentes: 0,
         permitir_comentarios_duplicados: false,
         permitir_autores_duplicados: false,
         hashtag: '',
         mencion: false,
-        participantes_extra: '',
+        participantes_manuales: '',
         usuarios_excluidos: '',
     });
 
@@ -135,12 +136,12 @@ export default function Sorteo(props) {
 
                                 {/* Participantes extra */}
                                 <div>
-                                    <label htmlFor="participantes_extra" className="block mb-1 font-medium">Añadir participantes</label>
+                                    <label htmlFor="participantes_manuales" className="block mb-1 font-medium">Añadir participantes</label>
                                     <textarea
-                                        name="participantes_extra"
-                                        id="participantes_extra"
+                                        name="participantes_manuales"
+                                        id="participantes_manuales"
                                         placeholder="Lista de participantes que quieres añadir además de los comentarios"
-                                        value={formData.participantes_extra}
+                                        value={formData.participantes_manuales}
                                         onChange={handleChange}
                                         className="input w-full"
                                     />

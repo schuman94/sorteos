@@ -10,13 +10,9 @@ class Comentario extends Model
     /** @use HasFactory<\Database\Factories\ComentarioFactory> */
     use HasFactory;
 
-    protected $fillable = ['autor', 'texto', 'fecha_hora'];
+    protected $fillable = ['autor', 'texto', 'fecha', 'likes'];
 
     public function ganador() {
         return $this->belongsTo(Ganador::class);
-    }
-
-    public function sorteo() {
-        return $this->belongsTo(Sorteo::class);
     }
 }

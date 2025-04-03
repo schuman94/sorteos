@@ -16,7 +16,8 @@ return new class extends Migration
             $table->foreignId('ganador_id')->constrained('ganadores');
             $table->string('autor');
             $table->text('texto');
-            $table->timestamp('fecha_hora');
+            $table->timestamp('fecha');
+            $table->integer('likes');
             $table->timestamps();
         });
     }
