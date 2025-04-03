@@ -7,10 +7,6 @@ use Carbon\Carbon;
 
 class YouTubeVideo extends Publicacion
 {
-    // Atributos específicos de un video de YouTube (tradicional o short)
-    protected ?string $titulo = null;
-    protected ?int $visualizaciones = null;
-
     public function __construct(string $url)
     {
         parent::__construct($url);
@@ -35,16 +31,6 @@ class YouTubeVideo extends Publicacion
 
         // En caso de no poder extraerlo, lanza excepción
         throw new \InvalidArgumentException('No se pudo extraer el ID de YouTube');
-    }
-
-    public function getTitulo(): ?string
-    {
-        return $this->titulo;
-    }
-
-    public function getVisualizaciones(): ?int
-    {
-        return $this->visualizaciones;
     }
 
     public function cargarDatosDesdeApi(): void
@@ -88,11 +74,12 @@ class YouTubeVideo extends Publicacion
         }
 
         // Asignar atributos específicos
-        $this->titulo = $snippet['title'] ?? null;
+        $this->setTitulo($snippet['title'] ?? null);
 
-        $this->visualizaciones = isset($statistics['viewCount'])
+        $this->setVisualizaciones(
+            isset($statistics['viewCount'])
             ? (int) $statistics['viewCount']
-            : null;
+            : null);
     }
 
     public function cargarComentariosDesdeApi(): void

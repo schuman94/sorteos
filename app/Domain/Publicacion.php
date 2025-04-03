@@ -8,11 +8,15 @@ abstract class Publicacion
     protected string $url;
     protected string $id;
 
-    // Atributos "comunes" a ambas redes
+    // Atributos comunes a todas las redes
     protected ?string $autor = null;            // nombre del canal de YouTube o usuario de Instagram
     protected ?int $numComentarios = null;      // número de comentarios
     protected ?int $likes = null;               // likes (YouTube) o "me gusta" (Instagram)
     protected ?Carbon $fechaPublicacion = null; // fecha de publicación
+
+    // Atributos específicos de redes
+    protected ?string $titulo = null; // YouTubeVideo
+    protected ?int $visualizaciones = null; // YouTubeVideo, Reels
 
     // array donde se cargan los comentarios
     protected array $comentarios = [];
@@ -78,13 +82,33 @@ abstract class Publicacion
         return $this->comentarios;
     }
 
+    public function getTitulo(): ?string
+    {
+        return $this->titulo;
+    }
+
+    protected function setTitulo(?string $titulo): void
+    {
+        $this->titulo = $titulo;
+    }
+
+    public function getVisualizaciones(): ?int
+    {
+        return $this->visualizaciones;
+    }
+
+    protected function setVisualizaciones(?int $visualizaciones): void
+    {
+        $this->visualizaciones = $visualizaciones;
+    }
+
     // Método abstracto para cargar datos desde la API
     abstract public function cargarDatosDesdeApi(): void;
 
     // Método abstracto para cargar comentarios desde la API
     abstract public function cargarComentariosDesdeApi(): void;
 
-    // Método *factory* estático para crear la subclase adecuada según la URL
+    // Método estático para crear la subclase adecuada según la URL
     public static function crear(string $url): Publicacion
     {
         $host = parse_url($url, PHP_URL_HOST) ?? '';
@@ -125,8 +149,8 @@ abstract class Publicacion
             'numComentarios' => $this->getNumComentarios(),
             'likes' => $this->getLikes(),
             'fechaPublicacion' => $this->getFechaPublicacion()->toDateTimeString(),
-            'titulo' => method_exists($this, 'getTitulo') ? $this->getTitulo() : null,
-            'visualizaciones' => method_exists($this, 'getVisualizaciones') ? $this->getVisualizaciones() : null,
+            'titulo' => $this->getTitulo(),
+            'visualizaciones' => $this->getVisualizaciones(),
             'url' => $this->getUrl(),
             'tipo' => $this::class,
         ];
