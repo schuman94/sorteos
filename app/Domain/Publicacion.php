@@ -8,15 +8,15 @@ abstract class Publicacion
     protected string $url;
     protected string $id;
 
-    // Atributos "comunes" a ambas redes
+    // Atributos comunes a todas las redes
     protected ?string $autor = null;            // nombre del canal de YouTube o usuario de Instagram
     protected ?int $numComentarios = null;      // número de comentarios
     protected ?int $likes = null;               // likes (YouTube) o "me gusta" (Instagram)
     protected ?Carbon $fechaPublicacion = null; // fecha de publicación
 
-    // Atributos específicos
+    // Atributos específicos de redes
     protected ?string $titulo = null; // YouTubeVideo
-    protected ?int $visualizaciones = null; // YouTubeVideo
+    protected ?int $visualizaciones = null; // YouTubeVideo, Reels
 
     // array donde se cargan los comentarios
     protected array $comentarios = [];
@@ -108,7 +108,7 @@ abstract class Publicacion
     // Método abstracto para cargar comentarios desde la API
     abstract public function cargarComentariosDesdeApi(): void;
 
-    // Método *factory* estático para crear la subclase adecuada según la URL
+    // Método estático para crear la subclase adecuada según la URL
     public static function crear(string $url): Publicacion
     {
         $host = parse_url($url, PHP_URL_HOST) ?? '';

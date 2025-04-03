@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('sorteos', function (Blueprint $table) {
+        Schema::create('clasificaciones', function (Blueprint $table) {
             $table->id();
+            $table->string('nombre')->unique();
             $table->timestamps();
         });
     }
@@ -22,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('sorteos');
+        Schema::dropIfExists('clasificaciones');
     }
 };
