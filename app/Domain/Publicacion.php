@@ -121,21 +121,7 @@ abstract class Publicacion
 
         /*
         // Comprobar si es Instagram
-        if (str_contains($host, 'instagram.com')) {
-            // Parsear el path: /p/ o /reel/
-            $path = parse_url($url, PHP_URL_PATH) ?? '';
-            $segments = explode('/', trim($path, '/'));
 
-            // Determinar si es post o reel
-            if (!empty($segments[0])) {
-                if ($segments[0] === 'p') {
-                    return new InstagramPost($url);
-                } elseif ($segments[0] === 'reel') {
-                    return new InstagramReel($url);
-                }
-            }
-
-            throw new \InvalidArgumentException('URL de Instagram no reconocida (no es /p/ ni /reel/).');
         }
         */
 

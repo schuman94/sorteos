@@ -24,7 +24,7 @@ class SorteoController extends Controller
             'hashtag' => 'nullable|string',
             'mencion' => 'required|boolean',
             'participantes_manuales' => 'nullable|string|required_without:url',
-            'excluir_usuarios' => 'nullable|string',
+            'usuarios_excluidos' => 'nullable|string',
         ]);
 
 
@@ -35,7 +35,7 @@ class SorteoController extends Controller
         $comentariosFiltrados = $this->filtrarComentarios($comentarios, $request);
 
         // Obtener los participantes manuales
-        $participantesManuales = array_filter(array_map('trim', explode("\n", $request->input('participantes_manuales', ''))));
+        $participantesManuales = array_filter(array_map('trim', explode("\n", (string) $request->input('participantes_manuales', ''))));
 
         // Array con todos los participantes
         $participantes = array_merge($comentariosFiltrados, $participantesManuales);
@@ -51,7 +51,6 @@ class SorteoController extends Controller
         $sorteo->filtro()->create([
             'mencion' => $request->boolean('mencion'),
             'hashtag' => $request->input('hashtag'),
-            'permitir_comentarios_duplicados' => $request->boolean('permitir_comentarios_duplicados'),
             'permitir_autores_duplicados' => $request->boolean('permitir_autores_duplicados'),
         ]);
 
@@ -99,12 +98,13 @@ class SorteoController extends Controller
         $permitirAutoresDuplicados = $request->boolean('permitir_autores_duplicados');
 
         // 1. Excluir usuarios
-        $usuariosExcluidos = collect(explode("\n", $request->input('excluir_usuarios', '')))
-        ->map(fn($u) => strtolower(trim($u)))
-        ->filter();
+        $usuariosExcluidos = collect(explode("\n", (string) $request->input('usuarios_excluidos', '')))
+            ->map(fn($u) => ltrim(strtolower(trim($u)), '@')) // quitamos el @ si lo hay
+            ->filter();
 
         $comentarios = array_filter($comentarios, function ($comentario) use ($usuariosExcluidos) {
-            return !$usuariosExcluidos->contains(strtolower($comentario['autor']));
+            $autor = ltrim(strtolower($comentario['autor']), '@');
+            return !$usuariosExcluidos->contains($autor);
         });
 
         // 2. Filtro por hashtag (si hay uno indicado)
