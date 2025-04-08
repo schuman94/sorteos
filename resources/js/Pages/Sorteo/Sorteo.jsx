@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import Data from '../Publicacion/Data';
-import Comentarios from '../Publicacion/Comentarios';
+import Data from '@/Components/Publicacion/Data';
+import Comentarios from '@/Components/Publicacion/Comentarios';
 import Ganadores from './Ganadores';
 import { Head } from '@inertiajs/react';
 import axios from '@/lib/axios';

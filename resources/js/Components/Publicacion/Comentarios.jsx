@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from '../../lib/axios';
+import Comentario from '@/Components/Publicacion/Comentario';
 
 export default function Comentarios() {
     const [comentarios, setComentarios] = useState([]);
@@ -52,16 +53,7 @@ export default function Comentarios() {
                 <>
                     <ul className="space-y-4">
                         {comentarios.map((comentario, index) => (
-                            <li key={index} className="border-b pb-4">
-                                <p className="font-semibold">{comentario.autor}</p>
-                                <p className="text-sm text-gray-500 dark:text-gray-400">
-                                    {new Date(comentario.fecha).toLocaleString()}
-                                </p>
-                                <p className="mt-1">{comentario.texto}</p>
-                                <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                                    👍 {comentario.likes}
-                                </p>
-                            </li>
+                            <Comentario key={index} {...comentario} />
                         ))}
                     </ul>
 
