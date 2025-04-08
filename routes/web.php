@@ -5,7 +5,6 @@ use App\Http\Controllers\PublicacionController;
 use App\Http\Controllers\SorteoController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use Illuminate\Support\Facades\Session;
 
 Route::get('/', function () {
     return Inertia::render('Home');
@@ -25,6 +24,10 @@ Route::post('/buscar-publicacion', [PublicacionController::class, 'buscar'])->na
 Route::post('/sorteo', [PublicacionController::class, 'cargarComentarios'])->name('publicacion.comentarios')->middleware('auth');
 Route::get('/comentarios', [PublicacionController::class, 'visualizarComentarios'])->name('comentarios.visualizar');
 Route::post('/sorteo/iniciar', [SorteoController::class, 'iniciar'])->name('sorteo.iniciar');
+
+Route::get('/sorteo', function () {
+    return redirect()->route('home');
+});
 
 
 require __DIR__.'/auth.php';
