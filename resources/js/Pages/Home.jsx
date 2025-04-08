@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, usePage, router } from '@inertiajs/react';
 import axios from '../lib/axios';
-import Data from './Publicacion/Data';
+import Data from '@/Components/Publicacion/Data';
 
-export default function Home({ auth, publicacionDataSession}) {
+export default function Home({ auth, publicacionDataSession }) {
     const [url, setUrl] = useState('');
     const [publicacionData, setPublicacionData] = useState(publicacionDataSession);
     const [loading, setLoading] = useState(false);
@@ -33,9 +33,13 @@ export default function Home({ auth, publicacionDataSession}) {
                 setError('Error desconocido al buscar la publicación');
             }
         }
-         finally {
+        finally {
             setLoading(false);
         }
+    };
+
+    const cargarComentarios = () => {
+        router.post(route('publicacion.comentarios'), { url });
     };
 
     return (
@@ -97,14 +101,23 @@ export default function Home({ auth, publicacionDataSession}) {
 
                     {/* Mostrar los datos de la publicación si existen */}
                     {publicacionData && (
-                        <div className="mt-8">
-                            <Data {...publicacionData} />
-                        </div>
+                        <>
+                            <div className="mt-8">
+                                <Data {...publicacionData} />
+                            </div>
+
+                            <button
+                                onClick={() => cargarComentarios(publicacionData.url)}
+                                className="mt-4 px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+                            >
+                                Cargar comentarios
+                            </button>
+                        </>
                     )}
                 </main>
 
                 <footer className="text-center py-4 text-sm">
-
+                    {/* Nada por ahora */}
                 </footer>
             </div>
         </>
