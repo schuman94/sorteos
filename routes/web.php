@@ -8,10 +8,7 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\Session;
 
 Route::get('/', function () {
-    // Rescatamos los datos de la publicación de la sesión en caso de que existan y los borramos de la sesión
-    $publicacionData = Session::pull('publicacionData', null);
-
-    return Inertia::render('Home', ['publicacionDataSession' => $publicacionData]);
+    return Inertia::render('Home');
 })->name('home');
 
 Route::get('/dashboard', function () {
