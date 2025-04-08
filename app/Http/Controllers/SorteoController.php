@@ -6,9 +6,9 @@ use App\Http\Requests\StoreSorteoRequest;
 use App\Http\Requests\UpdateSorteoRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\DB;
 use App\Models\Sorteo;
 use App\Models\Ganador;
-use App\Models\Filtro;
 use App\Models\Comentario;
 use App\Models\Clasificacion;
 
@@ -40,22 +40,35 @@ class SorteoController extends Controller
         // Array con todos los participantes
         $participantes = array_merge($comentariosFiltrados, $participantesManuales);
 
-        // Creamos el sorteo. Pendiente implementar una transaccion
-        $sorteo = new Sorteo();
-        $sorteo->user()->associate(auth()->user());
-        $sorteo->url = $request->url;
-        $sorteo->num_participantes = count($participantes);
-        $sorteo->save();
+        // Iniciamos la transacción
+        DB::beginTransaction();
 
-        // Guardar el filtro aplicado
-        $sorteo->filtro()->create([
-            'mencion' => $request->boolean('mencion'),
-            'hashtag' => $request->input('hashtag'),
-            'permitir_autores_duplicados' => $request->boolean('permitir_autores_duplicados'),
-        ]);
+        try {
+            // Creamos el sorteo. Pendiente implementar una transaccion
+            $sorteo = new Sorteo();
+            $sorteo->user()->associate(auth()->user());
+            $sorteo->url = $request->url;
+            $sorteo->num_participantes = count($participantes);
+            $sorteo->save();
 
-        // Seleccionar y guardar los ganadores y comentarios
-        $this->seleccionarGanadores($participantes, $request, $sorteo);
+            // Guardar el filtro aplicado
+            $sorteo->filtro()->create([
+                'mencion' => $request->boolean('mencion'),
+                'hashtag' => $request->input('hashtag'),
+                'permitir_autores_duplicados' => $request->boolean('permitir_autores_duplicados'),
+            ]);
+
+            // Seleccionar y guardar los ganadores y comentarios
+            $this->seleccionarGanadores($participantes, $request, $sorteo);
+
+            // Confirmar transacción
+            DB::commit();
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return response()->json(['error' => 'Error al guardar el sorteo'], 500);
+        }
+
 
         // Obtener los ganadores recién creados para devolverlos como JSON
         $ganadores = $sorteo->ganadores()
@@ -91,7 +104,7 @@ class SorteoController extends Controller
         ]);
     }
 
-    public function filtrarComentarios(array $comentarios, Request $request): array
+    private function filtrarComentarios(array $comentarios, Request $request): array
     {
         $comentarios = $this->excluirUsuarios($comentarios, $request);
         $comentarios = $this->filtroPalabra($comentarios, $request);
@@ -172,7 +185,7 @@ class SorteoController extends Controller
         }
     }
 
-    public function seleccionarGanadores(array $participantes, Request $request, Sorteo $sorteo): void
+    private function seleccionarGanadores(array $participantes, Request $request, Sorteo $sorteo): void
     {
         $numGanadores = $request->num_ganadores;
         $numSuplentes = $request->num_suplentes;
