@@ -39,7 +39,7 @@ class SorteoController extends Controller
         $participantesManuales = array_filter(array_map('trim', explode("\n", $request->input('participantes_manuales', ''))));
 
         // Array con todos los participantes
-        $participantes = array_merge($comentarios, $participantesManuales);
+        $participantes = array_merge($comentariosFiltrados, $participantesManuales);
 
         // Creamos el sorteo. Pendiente implementar una transaccion
         $sorteo = new Sorteo();
@@ -58,8 +58,6 @@ class SorteoController extends Controller
 
         // Seleccionar y guardar los ganadores y comentarios
         $this->seleccionarGanadores($participantes, $request, $sorteo);
-
-        $ganadoresResponse = [];
 
         // Obtener los ganadores recién creados para devolverlos como JSON
         $ganadores = $sorteo->ganadores()
