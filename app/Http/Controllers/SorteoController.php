@@ -20,7 +20,6 @@ class SorteoController extends Controller
             'url' => 'nullable|url|required_without:participantes_manuales',
             'num_ganadores' => 'required|integer|min:1',
             'num_suplentes' => 'required|integer|min:0',
-            'permitir_comentarios_duplicados' => 'required|boolean',
             'permitir_autores_duplicados' => 'required|boolean',
             'hashtag' => 'nullable|string',
             'mencion' => 'required|boolean',
@@ -98,7 +97,6 @@ class SorteoController extends Controller
         $hashtag = $request->input('hashtag');
         $mencion = $request->boolean('mencion');
         $permitirAutoresDuplicados = $request->boolean('permitir_autores_duplicados');
-        $permitirComentariosDuplicados = $request->boolean('permitir_comentarios_duplicados');
 
         // 1. Excluir usuarios
         $usuariosExcluidos = collect(explode("\n", $request->input('excluir_usuarios', '')))
@@ -137,10 +135,7 @@ class SorteoController extends Controller
             }
 
             $comentarios = $comentariosUnicos;
-        }
-
-        // 5. Eliminar comentarios duplicados (si no se ha aplicado ya el filtro anterior)
-        if (!$permitirComentariosDuplicados && $permitirAutoresDuplicados) {
+        } else { // Eliminar comentarios duplicados
             $comentariosUnicos = [];
             $comentariosVistos = [];
 
@@ -158,7 +153,6 @@ class SorteoController extends Controller
         // Reinciamos los indices del array antes de devolverlo
         return array_values($comentarios);
     }
-
 
 
     public function seleccionarGanadores(array $participantes, Request $request, Sorteo $sorteo): void
