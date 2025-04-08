@@ -93,36 +93,56 @@ class SorteoController extends Controller
 
     public function filtrarComentarios(array $comentarios, Request $request): array
     {
-        $hashtag = $request->input('hashtag');
-        $mencion = $request->boolean('mencion');
-        $permitirAutoresDuplicados = $request->boolean('permitir_autores_duplicados');
+        $comentarios = $this->excluirUsuarios($comentarios, $request);
+        $comentarios = $this->filtroPalabra($comentarios, $request);
+        $comentarios = $this->filtroMencion($comentarios, $request);
+        $comentarios = $this->filtroDuplicados($comentarios, $request);
 
-        // 1. Excluir usuarios
+        return array_values($comentarios);
+    }
+
+    private function excluirUsuarios(array $comentarios, Request $request): array
+    {
         $usuariosExcluidos = collect(explode("\n", (string) $request->input('usuarios_excluidos', '')))
             ->map(fn($u) => ltrim(strtolower(trim($u)), '@')) // quitamos el @ si lo hay
             ->filter();
 
-        $comentarios = array_filter($comentarios, function ($comentario) use ($usuariosExcluidos) {
+        return array_filter($comentarios, function ($comentario) use ($usuariosExcluidos) {
             $autor = ltrim(strtolower($comentario['autor']), '@');
             return !$usuariosExcluidos->contains($autor);
         });
+    }
 
-        // 2. Filtro por texto (palabra clave o #hashtag)
+    // Filtro por texto (palabra clave o #hashtag)
+    private function filtroPalabra(array $comentarios, Request $request): array
+    {
+        $hashtag = $request->input('hashtag');
+
         if (!empty($hashtag)) {
-            $comentarios = array_filter($comentarios, function ($comentario) use ($hashtag) {
+            return array_filter($comentarios, function ($comentario) use ($hashtag) {
                 return str_contains(strtolower($comentario['texto']), strtolower($hashtag));
             });
         }
 
-        // 3. Filtro por mención
-        if ($mencion) {
-            $comentarios = array_filter($comentarios, function ($comentario) {
+        return $comentarios;
+    }
+
+    private function filtroMencion(array $comentarios, Request $request): array
+    {
+        if ($request->boolean('mencion')) {
+            return array_filter($comentarios, function ($comentario) {
                 return preg_match('/(^|\s)@\w+/', $comentario['texto']);
             });
         }
 
-        // 4. Eliminar autores duplicados
-        if (!$permitirAutoresDuplicados) {
+        return $comentarios;
+    }
+
+    private function filtroDuplicados(array $comentarios, Request $request): array
+    {
+        $permitirAutoresDuplicados = $request->boolean('permitir_autores_duplicados');
+
+        if (!$permitirAutoresDuplicados) { // Eliminar autores duplicados
             $comentariosUnicos = [];
             $autoresVistos = [];
 
@@ -134,7 +154,8 @@ class SorteoController extends Controller
                 }
             }
 
-            $comentarios = $comentariosUnicos;
+            return $comentariosUnicos;
+
         } else { // Eliminar comentarios duplicados
             $comentariosUnicos = [];
             $comentariosVistos = [];
@@ -147,13 +168,9 @@ class SorteoController extends Controller
                 }
             }
 
-            $comentarios = $comentariosUnicos;
+            return $comentariosUnicos;
         }
-
-        // Reinciamos los indices del array antes de devolverlo
-        return array_values($comentarios);
     }
-
 
     public function seleccionarGanadores(array $participantes, Request $request, Sorteo $sorteo): void
     {
