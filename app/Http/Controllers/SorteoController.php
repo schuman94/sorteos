@@ -107,7 +107,7 @@ class SorteoController extends Controller
             return !$usuariosExcluidos->contains($autor);
         });
 
-        // 2. Filtro por hashtag (si hay uno indicado)
+        // 2. Filtro por texto (palabra clave o #hashtag)
         if (!empty($hashtag)) {
             $comentarios = array_filter($comentarios, function ($comentario) use ($hashtag) {
                 return str_contains(strtolower($comentario['texto']), strtolower($hashtag));

@@ -97,7 +97,7 @@ export default function Sorteo(props) {
 
                                 {/* Hashtag */}
                                 <div>
-                                    <label htmlFor="hashtag" className="block mb-1 font-medium">Filtrar por hashtag</label>
+                                    <label htmlFor="hashtag" className="block mb-1 font-medium">Filtrar por palabra o #hashtag</label>
                                     <input
                                         type="text"
                                         name="hashtag"
