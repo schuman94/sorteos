@@ -1,7 +1,7 @@
 import React from 'react';
 import GanadorCard from '@/Components/Sorteo/GanadorCard';
 
-export default function Ganadores({ ganadores }) {
+export default function Ganadores({ ganadores, tipo }) {
     // Separar titulares y suplentes
     const titulares = ganadores.filter(g => g.clasificacion === 'titular');
     const suplentes = ganadores.filter(g => g.clasificacion === 'suplente');
@@ -21,6 +21,7 @@ export default function Ganadores({ ganadores }) {
                                 comentario={g.comentario}
                                 likes={g.likes}
                                 fecha={g.fecha}
+                                tipo={tipo}
                             />
                         ))}
                     </div>
@@ -40,6 +41,7 @@ export default function Ganadores({ ganadores }) {
                                 comentario={g.comentario}
                                 likes={g.likes}
                                 fecha={g.fecha}
+                                tipo={tipo}
                             />
                         ))}
                     </div>

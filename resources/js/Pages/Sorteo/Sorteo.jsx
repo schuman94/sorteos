@@ -162,7 +162,8 @@ export default function Sorteo(props) {
                         </div>
                     </>
                 ) : (
-                    <Ganadores ganadores={ganadores} />
+                    <Ganadores ganadores={ganadores} tipo={props.tipo} />
+
                 )}
             </div>
         </>
