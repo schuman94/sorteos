@@ -10,7 +10,6 @@ export default function Sorteo(props) {
         url: props.url ?? '',
         num_ganadores: 1,
         num_suplentes: 0,
-        permitir_comentarios_duplicados: false,
         permitir_autores_duplicados: false,
         hashtag: '',
         mencion: false,
@@ -84,18 +83,6 @@ export default function Sorteo(props) {
                                     />
                                 </div>
 
-                                {/* Permitir comentarios duplicados */}
-                                <div className="flex items-center gap-2">
-                                    <input
-                                        type="checkbox"
-                                        name="permitir_comentarios_duplicados"
-                                        id="permitir_comentarios_duplicados"
-                                        checked={formData.permitir_comentarios_duplicados}
-                                        onChange={handleChange}
-                                    />
-                                    <label htmlFor="permitir_comentarios_duplicados">Permitir comentarios duplicados</label>
-                                </div>
-
                                 {/* Permitir autores duplicados */}
                                 <div className="flex items-center gap-2">
                                     <input
@@ -105,7 +92,7 @@ export default function Sorteo(props) {
                                         checked={formData.permitir_autores_duplicados}
                                         onChange={handleChange}
                                     />
-                                    <label htmlFor="permitir_autores_duplicados">Permitir usuarios duplicados</label>
+                                    <label htmlFor="permitir_autores_duplicados">Permitir usuarios duplicados (mismo usuario con comentarios distintos)</label>
                                 </div>
 
                                 {/* Hashtag */}
