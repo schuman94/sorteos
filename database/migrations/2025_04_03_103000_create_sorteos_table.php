@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained();
             $table->integer('num_participantes');
+            $table->string('titulo')->nullable();
+            $table->string('tipo')->nullable();
             $table->string('url')->nullable();
             $table->timestamps();
         });

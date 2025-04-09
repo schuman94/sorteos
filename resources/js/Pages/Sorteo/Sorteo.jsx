@@ -9,6 +9,8 @@ import axios from '@/lib/axios';
 export default function Sorteo(props) {
     const [formData, setFormData] = useState({
         url: props.url ?? '',
+        titulo: props.titulo ?? '',
+        tipo: props.tipo ?? '',
         num_ganadores: 1,
         num_suplentes: 0,
         permitir_autores_duplicados: false,

@@ -1,4 +1,3 @@
-import ApplicationLogo from '@/Components/ApplicationLogo';
 import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import Dropdown from '@/Components/Dropdown';
@@ -27,10 +26,10 @@ export default function MainLayout({ header, children }) {
                                 </NavLink>
                                 {user && (
                                     <NavLink
-                                        href={route('dashboard')}
-                                        active={route().current('dashboard')}
+                                        href={route('sorteo.historial')}
+                                        active={route().current('sorteo.historial')}
                                     >
-                                        Dashboard
+                                        Historial de Sorteos
                                     </NavLink>
                                 )}
                             </div>
