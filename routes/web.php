@@ -21,14 +21,16 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::post('/buscar-publicacion', [PublicacionController::class, 'buscar'])->name('publicacion.buscar');
-Route::post('/sorteo', [PublicacionController::class, 'cargarComentarios'])->name('publicacion.comentarios')->middleware('auth');
-Route::get('/comentarios', [PublicacionController::class, 'visualizarComentarios'])->name('comentarios.visualizar');
-Route::post('/sorteo/iniciar', [SorteoController::class, 'iniciar'])->name('sorteo.iniciar');
+Route::post('/sorteo', [PublicacionController::class, 'cargarComentarios'])->middleware('auth')->name('publicacion.comentarios');
+Route::get('/comentarios', [PublicacionController::class, 'visualizarComentarios'])->middleware('auth')->name('comentarios.visualizar');
+Route::post('/sorteo/iniciar', [SorteoController::class, 'iniciar'])->middleware('auth')->name('sorteo.iniciar');
 
 Route::get('/sorteo', function () {
     return redirect()->route('home');
 });
 
-Route::get('/historial', [SorteoController::class, 'historial'])->middleware(['auth', 'verified'])->name('sorteo.historial');
+Route::get('/historial', [SorteoController::class, 'historial'])->middleware('auth')->name('sorteo.historial');
+
+Route::get('/sorteo/{sorteo}', [SorteoController::class, 'show'])->middleware('auth')->name('sorteo.show');
 
 require __DIR__.'/auth.php';

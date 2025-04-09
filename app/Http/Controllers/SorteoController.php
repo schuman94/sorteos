@@ -282,38 +282,44 @@ class SorteoController extends Controller
         ]);
     }
 
-
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreSorteoRequest $request)
-    {
-        //
-    }
-
     /**
      * Display the specified resource.
      */
     public function show(Sorteo $sorteo)
     {
-        //
+        $sorteo->load([
+            'filtro',
+            'ganadores.clasificacion',
+            'ganadores.comentario',
+        ]);
+
+        return Inertia::render('Sorteo/Show', [
+            'sorteo' => [
+                'id' => $sorteo->id,
+                'url' => $sorteo->url,
+                'titulo' => $sorteo->titulo,
+                'tipo' => $sorteo->tipo,
+                'num_participantes' => $sorteo->num_participantes,
+                'created_at' => $sorteo->created_at->toDateTimeString(),
+                'filtro' => [
+                    'mencion' => $sorteo->filtro->mencion,
+                    'hashtag' => $sorteo->filtro->hashtag,
+                    'permitir_autores_duplicados' => $sorteo->filtro->permitir_autores_duplicados,
+                ],
+                'ganadores' => $sorteo->ganadores->map(function ($g) {
+                    return [
+                        'nombre' => $g->nombre_manual ?? $g->comentario?->autor,
+                        'clasificacion' => $g->clasificacion->nombre,
+                        'posicion' => $g->posicion,
+                        'comentario' => $g->comentario?->texto,
+                        'likes' => $g->comentario?->likes,
+                        'fecha' => $g->comentario?->fecha,
+                    ];
+                }),
+            ],
+        ]);
     }
+
 
     /**
      * Show the form for editing the specified resource.
