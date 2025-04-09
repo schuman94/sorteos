@@ -1,3 +1,4 @@
+import MainLayout from '@/Layouts/MainLayout';
 import React, { useState } from 'react';
 import { Head, Link, usePage, router } from '@inertiajs/react';
 import axios from '../lib/axios';
@@ -47,29 +48,6 @@ export default function Home({ auth }) {
             <Head title="Home" />
 
             <div className="min-h-screen bg-gray-50 dark:bg-black text-black/70 dark:text-white/70">
-                <header className="flex justify-between items-center p-4">
-                    <div className="flex items-center gap-2">
-                        <span className="font-bold text-xl">Mi App de Sorteos</span>
-                    </div>
-
-                    <nav>
-                        {auth.user ? (
-                            <Link href={route('dashboard')} className="px-4 py-2">
-                                Dashboard
-                            </Link>
-                        ) : (
-                            <>
-                                <Link href={route('login')} className="px-4 py-2">
-                                    Log in
-                                </Link>
-                                <Link href={route('register')} className="px-4 py-2">
-                                    Register
-                                </Link>
-                            </>
-                        )}
-                    </nav>
-                </header>
-
                 <main className="flex flex-col items-center justify-center py-16">
                     <h1 className="text-3xl font-semibold mb-4">Sorteo en redes</h1>
 
@@ -123,3 +101,5 @@ export default function Home({ auth }) {
         </>
     );
 }
+
+Home.layout = (page) => <MainLayout>{page}</MainLayout>;
