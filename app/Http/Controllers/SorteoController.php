@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreSorteoRequest;
 use App\Http\Requests\UpdateSorteoRequest;
+use Inertia\Inertia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Sorteo;
 use App\Models\Ganador;
 use App\Models\Comentario;
@@ -18,6 +20,8 @@ class SorteoController extends Controller
     {
         $request->validate([
             'url' => 'nullable|url|required_without:participantes_manuales',
+            'titulo' => 'nullable|string|required_without:participantes_manuales',
+            'tipo' => 'nullable|string',
             'num_ganadores' => 'required|integer|min:1',
             'num_suplentes' => 'required|integer|min:0',
             'permitir_autores_duplicados' => 'required|boolean',
@@ -46,8 +50,10 @@ class SorteoController extends Controller
         try {
             // Creamos el sorteo. Pendiente implementar una transaccion
             $sorteo = new Sorteo();
-            $sorteo->user()->associate(auth()->user());
+            $sorteo->user()->associate(Auth::user());
             $sorteo->url = $request->url;
+            $sorteo->tipo = $request->tipo;
+            $sorteo->titulo = $request->titulo;
             $sorteo->num_participantes = count($participantes);
             $sorteo->save();
 
@@ -63,7 +69,6 @@ class SorteoController extends Controller
 
             // Confirmar transacción
             DB::commit();
-
         } catch (\Throwable $e) {
             DB::rollBack();
             return response()->json(['error' => 'Error al guardar el sorteo'], 500);
@@ -168,7 +173,6 @@ class SorteoController extends Controller
             }
 
             return $comentariosUnicos;
-
         } else { // Eliminar comentarios duplicados
             $comentariosUnicos = [];
             $comentariosVistos = [];
@@ -228,6 +232,54 @@ class SorteoController extends Controller
                 $comentario->save();
             }
         }
+    }
+
+    public function historial(Request $request)
+    {
+        $query = Auth::user()->sorteos();
+
+        // Filtrar por año
+        if ($request->filled('anyo')) {
+            $query->whereYear('created_at', $request->anyo);
+        } else {
+            $anyoMasReciente = Auth::user()
+                ->sorteos()
+                ->selectRaw('EXTRACT(YEAR FROM created_at) as anyo')
+                ->orderByDesc('anyo')
+                ->limit(1)
+                ->value('anyo');
+            $request->merge(['anyo' => $anyoMasReciente]);
+            $query->whereYear('created_at', $anyoMasReciente);
+        }
+
+        // Filtrar por tipo si está indicado
+        if ($request->filled('tipo')) {
+            $query->where('tipo', $request->tipo);
+        }
+
+        $sorteos = $query->orderByDesc('created_at')->get()->map(function ($sorteo) {
+            return [
+                'id' => $sorteo->id,
+                'url' => $sorteo->url,
+                'titulo' => $sorteo->titulo,
+                'tipo' => $sorteo->tipo,
+                'num_participantes' => $sorteo->num_participantes,
+                'created_at' => $sorteo->created_at->toDateTimeString(),
+            ];
+        });
+
+        $anyos = Auth::user()->sorteos()
+            ->selectRaw('EXTRACT(YEAR FROM created_at) as anyo')
+            ->groupBy('anyo')
+            ->orderByDesc('anyo')
+            ->pluck('anyo');
+
+        return Inertia::render('Sorteo/Historial', [
+            'sorteos' => $sorteos,
+            'anyos' => $anyos,
+            'anyoSeleccionado' => $request->anyo,
+            'tipoSeleccionado' => $request->tipo,
+        ]);
     }
 
 

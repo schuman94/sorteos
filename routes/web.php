@@ -29,5 +29,6 @@ Route::get('/sorteo', function () {
     return redirect()->route('home');
 });
 
+Route::get('/historial', [SorteoController::class, 'historial'])->middleware(['auth', 'verified'])->name('sorteo.historial');
 
 require __DIR__.'/auth.php';
