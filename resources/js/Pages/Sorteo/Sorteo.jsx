@@ -1,3 +1,4 @@
+import MainLayout from '@/Layouts/MainLayout';
 import React, { useState } from 'react';
 import Data from '@/Components/Publicacion/Data';
 import Comentarios from '@/Components/Publicacion/Comentarios';
@@ -169,3 +170,5 @@ export default function Sorteo(props) {
         </>
     );
 }
+
+Sorteo.layout = (page) => <MainLayout>{page}</MainLayout>;
