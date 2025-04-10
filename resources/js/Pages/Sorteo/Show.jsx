@@ -31,7 +31,7 @@ export default function Show({ sorteo }) {
 
                 <Filtro filtro={sorteo.filtro} />
 
-                <Ganadores ganadores={sorteo.ganadores} tipo={sorteo.tipo} />
+                <Ganadores ganadores={sorteo.ganadores} urlHost={sorteo.urlHost} />
             </div>
         </>
     );

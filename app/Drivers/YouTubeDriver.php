@@ -1,29 +1,32 @@
 <?php
 
-namespace App\Domain;
+namespace App\Drivers;
+
+use App\Interfaces\PublicacionDriver;
+use App\Models\Publicacion;
 use App\Services\YouTubeService;
-use Illuminate\Support\Facades\App;
 use Carbon\Carbon;
 
-class YouTubeVideo extends Publicacion
+class YouTubeDriver implements PublicacionDriver
 {
+    private string $url;
+    private string $id;
+
     public function __construct(string $url)
     {
-        parent::__construct($url);
-        $this->id = $this->extraerVideoId($url);
+        $this->url = $url;
+        $this->id = $this->getId($url);
     }
 
-    private function extraerVideoId(string $url): string
+    private function getId(string $url): string
     {
-        // Formato tradicional: youtube.com/watch?v=id
-        $queryString = parse_url($url, PHP_URL_QUERY);
-        parse_str($queryString, $params);
+        $query = parse_url($url, PHP_URL_QUERY);
+        parse_str($query, $params);
 
         if (isset($params['v'])) {
             return $params['v'];
         }
 
-        // Formato simplificado: youtu.be/id
         $path = parse_url($url, PHP_URL_PATH);
         if ($path) {
             return ltrim($path, '/'); // quita la barra inicial
@@ -33,10 +36,10 @@ class YouTubeVideo extends Publicacion
         throw new \InvalidArgumentException('No se pudo extraer el ID de YouTube');
     }
 
-    public function cargarDatosDesdeApi(): void
+    public function cargarDatos(Publicacion $publicacion): void
     {
-        $youtubeService = app(YouTubeService::class);
-        $response = $youtubeService->getVideoData($this->id);
+        $service = app(YouTubeService::class);
+        $response = $service->getVideoData($this->id);
 
         // Verificar si hay algún error o si la estructura es la esperada
         if (isset($response['error'])) {
@@ -51,47 +54,40 @@ class YouTubeVideo extends Publicacion
             throw new \RuntimeException('No se encontró información para el video con ID ' . $this->id);
         }
 
-        $video = $items[0];
+        $video = $response['items'][0];
         $snippet = $video['snippet'] ?? [];
         $statistics = $video['statistics'] ?? [];
 
-        // Asignar atributos comunes
-        $this->setAutor($snippet['channelTitle'] ?? null);
+        // Asignar atributos
+        $publicacion->autor = $snippet['channelTitle'] ?? null;
+        $publicacion->fecha_publicacion = new Carbon($snippet['publishedAt']);
+        $publicacion->titulo = $snippet['title'] ?? null;
 
-        $this->setNumComentarios(
-            isset($statistics['commentCount'])
-                ? (int) $statistics['commentCount']
-                : null
-        );
+        $publicacion->likes = isset($statistics['likeCount'])
+            ? (int) $statistics['likeCount']
+            : null;
 
-        $this->setLikes(
-            isset($statistics['likeCount'])
-                ? (int) $statistics['likeCount']
-                : null);
+        $publicacion->num_comentarios = isset($statistics['commentCount'])
+            ? (int) $statistics['commentCount']
+            : null;
 
-        if (isset($snippet['publishedAt'])) {
-            $this->setFechaPublicacion(new Carbon($snippet['publishedAt']));
-        }
-
-        // Asignar atributos específicos
-        $this->setTitulo($snippet['title'] ?? null);
-
-        $this->setVisualizaciones(
-            isset($statistics['viewCount'])
+        $publicacion->visualizaciones = isset($statistics['viewCount'])
             ? (int) $statistics['viewCount']
-            : null);
+            : null;
     }
 
-    public function cargarComentariosDesdeApi(): void
+    public function cargarComentarios(Publicacion $publicacion): void
     {
-        $youtubeService = app(YouTubeService::class); //Pendiente optimizar esto, para que no se ejecute dos veces
-        $response = $youtubeService->getComentarios($this->id);
+        $service = app(YouTubeService::class);
+        $response = $service->getComentarios($this->id);
+
+        $comentarios = [];
 
         foreach ($response as $item) {
             $topComment = $item['snippet']['topLevelComment']['snippet'] ?? null;
 
             if ($topComment) {
-                $this->comentarios[] = [
+                $comentarios[] = [
                     'autor' => $topComment['authorDisplayName'] ?? 'Anónimo',
                     'texto' => $topComment['textOriginal'] ?? '',
                     'fecha' => $topComment['publishedAt'] ?? null,
@@ -105,7 +101,7 @@ class YouTubeVideo extends Publicacion
                     $replySnippet = $reply['snippet'] ?? null;
 
                     if ($replySnippet) {
-                        $this->comentarios[] = [
+                        $comentarios[] = [
                             'autor' => $replySnippet['authorDisplayName'] ?? 'Anónimo',
                             'texto' => $replySnippet['textOriginal'] ?? '',
                             'fecha' => $replySnippet['publishedAt'] ?? null,
@@ -116,14 +112,16 @@ class YouTubeVideo extends Publicacion
             }
         }
 
-        // Ordenar los comentarios empezando por el más reciente (ya no importa el nivel)
-        usort($this->comentarios, function ($a, $b) {
+        // Ordenar los comentarios por fecha descendente
+        usort($comentarios, function ($a, $b) {
             return strtotime($b['fecha']) <=> strtotime($a['fecha']);
         });
 
-        // Si no se cargó ningún comentario
-        if (empty($this->comentarios)) {
+        if (empty($comentarios)) {
             throw new \RuntimeException('El video no tiene comentarios aún.');
         }
+
+        // Asignar los comentarios al modelo
+        $publicacion->comentarios = $comentarios;
     }
 }

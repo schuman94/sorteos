@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Domain\Publicacion;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+
+
+use App\Models\Publicacion;
 
 
 class PublicacionController extends Controller
@@ -35,17 +37,17 @@ class PublicacionController extends Controller
         ]);
 
         try {
-            // Crear la instancia adecuada (YouTubeVideo, InstagramPost, etc.)
-            $publicacion = Publicacion::crear($request->input('url'));
+            // Crear la instancia de publicacion
+            $publicacion = new Publicacion(['url' => $request->input('url')]);
 
             // Cargar los datos desde la API correspondiente
             $publicacion->cargarDatosDesdeApi();
 
-            // Almacenar los datos de la publicación en la sesión
-            Session::put('publicacionData', $publicacion->arrayData());
+            // NO SE USA ACTUALMENTE: Almacenar los datos de la publicación en la sesión
+            //Session::put('publicacionData', $publicacion->toArray());
 
             // Retornar la respuesta con los datos
-            return response()->json($publicacion->arrayData());
+            return response()->json($publicacion);
 
         } catch (\InvalidArgumentException $e) {
             return response()->json(['error' => 'La URL no corresponde a una publicación válida.'], 422);
@@ -68,8 +70,8 @@ class PublicacionController extends Controller
         ]);
 
         try {
-            // Crear la instancia adecuada (YouTubeVideo, InstagramPost, etc.)
-            $publicacion = Publicacion::crear($request->input('url'));
+            // Crear la instancia de publicacion
+            $publicacion = new Publicacion(['url' => $request->input('url')]);
 
             // Cargar los datos desde la API correspondiente
             $publicacion->cargarDatosDesdeApi();
@@ -77,13 +79,15 @@ class PublicacionController extends Controller
             // Cargar los comentarios desde la API correspondiente
             $publicacion->cargarComentariosDesdeApi();
 
+            // Almacenar los datos de la publicacion en la sesión
+            Session::put('publicacionData', $publicacion->toArray());
+
             // Almacenar los comentarios en la sesión
-            Session::put('comentarios', $publicacion->getComentarios());
+            Session::put('comentarios', $publicacion->comentarios);
+
 
             // Retornar la vista con los datos
-            return Inertia::render('Sorteo/Sorteo', array_merge(
-                $publicacion->arrayData(),
-            ));
+            return Inertia::render('Sorteo/Sorteo', $publicacion->toArray());
 
         } catch (\Exception $e) {
             return redirect()->route('home')->withErrors([
