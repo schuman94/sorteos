@@ -28,6 +28,7 @@ export default function SorteoCard({ sorteo }) {
             <div className="mt-2 text-sm text-gray-700 dark:text-gray-300">
                 <p><strong>Participantes:</strong> {sorteo.num_participantes}</p>
                 <p><strong>Fecha:</strong> {new Date(sorteo.created_at).toLocaleString()}</p>
+                <p><strong>Tipo:</strong> {sorteo.tipo}</p>
             </div>
         </div>
     );

@@ -13,27 +13,32 @@ use App\Models\Sorteo;
 use App\Models\Ganador;
 use App\Models\Comentario;
 use App\Models\Clasificacion;
+use App\Models\Host;
+use App\Models\Publicacion;
 
 class SorteoController extends Controller
 {
     public function iniciar(Request $request)
     {
         $request->validate([
-            'url' => 'nullable|url|required_without:participantes_manuales',
-            'titulo' => 'nullable|string|required_without:participantes_manuales',
-            'tipo' => 'nullable|string',
             'num_ganadores' => 'required|integer|min:1',
             'num_suplentes' => 'required|integer|min:0',
             'permitir_autores_duplicados' => 'required|boolean',
             'hashtag' => 'nullable|string',
             'mencion' => 'required|boolean',
-            'participantes_manuales' => 'nullable|string|required_without:url',
+            'participantes_manuales' => 'nullable|string',
             'usuarios_excluidos' => 'nullable|string',
         ]);
 
 
-        // Obtener comentarios de la sesión
+        // Obtener los datos y comentarios de la sesión
+        $publicacionData = Session::get('publicacionData');
         $comentarios = Session::get('comentarios', []);
+
+        if (!$comentarios || !$publicacionData) {
+            return response()->json(['error' => 'No hay datos de la publicación disponibles.'], 422);
+        }
+
 
         // Aplicar los filtros definidos
         $comentariosFiltrados = $this->filtrarComentarios($comentarios, $request);
@@ -48,12 +53,15 @@ class SorteoController extends Controller
         DB::beginTransaction();
 
         try {
-            // Creamos el sorteo. Pendiente implementar una transaccion
+            // Crear y guardar el modelo Publicacion
+            $publicacion = new Publicacion($publicacionData);
+            $publicacion->host()->associate($publicacion->getHost());
+            $publicacion->save();
+
+            // Crear y guardar el modelo Sorteo
             $sorteo = new Sorteo();
             $sorteo->user()->associate(Auth::user());
-            $sorteo->url = $request->url;
-            $sorteo->tipo = $request->tipo;
-            $sorteo->titulo = $request->titulo;
+            $sorteo->publicacion()->associate($publicacion);
             $sorteo->num_participantes = count($participantes);
             $sorteo->save();
 
@@ -106,6 +114,7 @@ class SorteoController extends Controller
 
         return response()->json([
             'ganadores' => $ganadores,
+            'urlHost' => $publicacion->host->url,
         ]);
     }
 
@@ -236,7 +245,7 @@ class SorteoController extends Controller
 
     public function historial(Request $request)
     {
-        $query = Auth::user()->sorteos();
+        $query = Auth::user()->sorteos()->with('publicacion.host');
 
         // Filtrar por año
         if ($request->filled('anyo')) {
@@ -252,17 +261,20 @@ class SorteoController extends Controller
             $query->whereYear('created_at', $anyoMasReciente);
         }
 
-        // Filtrar por tipo si está indicado
+        // Filtrar por tipo/host si está indicado
         if ($request->filled('tipo')) {
-            $query->where('tipo', $request->tipo);
+            $query->whereHas('publicacion', function ($q) use ($request) {
+                $q->where('host_id', $request->tipo);
+            });
         }
 
+        // Mapear resultados
         $sorteos = $query->orderByDesc('created_at')->get()->map(function ($sorteo) {
             return [
                 'id' => $sorteo->id,
-                'url' => $sorteo->url,
-                'titulo' => $sorteo->titulo,
-                'tipo' => $sorteo->tipo,
+                'url' => $sorteo->publicacion?->url,
+                'titulo' => $sorteo->publicacion?->titulo,
+                'tipo' => $sorteo->publicacion?->host?->nombre ?? 'Manual',
                 'num_participantes' => $sorteo->num_participantes,
                 'created_at' => $sorteo->created_at->toDateTimeString(),
             ];
@@ -274,11 +286,14 @@ class SorteoController extends Controller
             ->orderByDesc('anyo')
             ->pluck('anyo');
 
+        $hosts = Host::select('id', 'nombre')->get();
+
         return Inertia::render('Sorteo/Historial', [
             'sorteos' => $sorteos,
             'anyos' => $anyos,
             'anyoSeleccionado' => $request->anyo,
             'tipoSeleccionado' => $request->tipo,
+            'hosts' => $hosts,
         ]);
     }
 
@@ -289,16 +304,20 @@ class SorteoController extends Controller
     {
         $sorteo->load([
             'filtro',
+            'publicacion.host',
             'ganadores.clasificacion',
             'ganadores.comentario',
         ]);
 
+        $publicacion = $sorteo->publicacion;
+
         return Inertia::render('Sorteo/Show', [
             'sorteo' => [
                 'id' => $sorteo->id,
-                'url' => $sorteo->url,
-                'titulo' => $sorteo->titulo,
-                'tipo' => $sorteo->tipo,
+                'url' => $publicacion?->url,
+                'urlHost' => $publicacion?->host?->url, // 👈 para generar enlaces a perfiles
+                'titulo' => $publicacion?->titulo,
+                'tipo' => $publicacion?->host?->nombre ?? 'Manual',
                 'num_participantes' => $sorteo->num_participantes,
                 'created_at' => $sorteo->created_at->toDateTimeString(),
                 'filtro' => [

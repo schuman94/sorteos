@@ -40,7 +40,7 @@ export default function Home({ auth }) {
     };
 
     const cargarComentarios = () => {
-        router.post(route('publicacion.comentarios'), { url });
+        router.post(route('publicacion.comentarios'), { url: publicacionData.url });
     };
 
     return (

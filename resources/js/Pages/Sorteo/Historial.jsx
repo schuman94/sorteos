@@ -3,7 +3,7 @@ import MainLayout from '@/Layouts/MainLayout';
 import { Head, router } from '@inertiajs/react';
 import SorteoCard from '@/Components/Sorteo/SorteoCard';
 
-export default function Historial({ sorteos, anyos, anyoSeleccionado, tipoSeleccionado }) {
+export default function Historial({ sorteos, hosts, anyos, anyoSeleccionado, tipoSeleccionado }) {
     const handleFilterChange = (e) => {
         const name = e.target.name;
         const value = e.target.value;
@@ -47,9 +47,13 @@ export default function Historial({ sorteos, anyos, anyoSeleccionado, tipoSelecc
                             className="rounded border-gray-300 text-sm shadow-sm"
                         >
                             <option value="">Todos</option>
-                            <option value="App\Domain\YouTubeVideo">YouTube</option>
-                            <option value="App\Domain\InstagramPost">Instagram</option>
+                            {hosts.map((host) => (
+                                <option value={host.id}>
+                                    {host.nombre}
+                                </option>
+                            ))}
                         </select>
+
                     </div>
                 </div>
 

@@ -1,20 +1,21 @@
 import React from 'react';
 
-export default function GanadorCard({ nombre, posicion, comentario, likes, fecha, tipo }) {
+export default function GanadorCard({ nombre, posicion, comentario, likes, fecha, urlHost }) {
     const construirPerfil = () => {
+        if (!comentario || !urlHost) return null;
+
         const username = nombre.startsWith('@') ? nombre.slice(1) : nombre;
 
-        if (!comentario) return null; // Solo si tiene comentario
+        // Aseguramos que no haya doble barra
+        const base = urlHost.endsWith('/') ? urlHost.slice(0, -1) : urlHost;
 
-        if (tipo.includes('YouTube')) {
-            return `https://www.youtube.com/@${username}`;
+        // Si la plataforma es YouTube, incluimos @ en la URL
+        if (base.includes('youtube')) {
+            return `${base}/@${username}`;
         }
 
-        if (tipo.includes('Instagram')) {
-            return `https://www.instagram.com/${username}`;
-        }
-
-        return null;
+        // En otras plataformas como Instagram, sin @
+        return `${base}/${username}`;
     };
 
     const perfilUrl = construirPerfil();

@@ -8,9 +8,6 @@ import axios from '@/lib/axios';
 
 export default function Sorteo(props) {
     const [formData, setFormData] = useState({
-        url: props.url ?? '',
-        titulo: props.titulo ?? '',
-        tipo: props.tipo ?? '',
         num_ganadores: 1,
         num_suplentes: 0,
         permitir_autores_duplicados: false,
@@ -20,6 +17,7 @@ export default function Sorteo(props) {
         usuarios_excluidos: '',
     });
 
+    const [urlHost, setUrlHost] = useState('');
     const [cargando, setCargando] = useState(false);
     const [ganadores, setGanadores] = useState(null);
 
@@ -36,9 +34,17 @@ export default function Sorteo(props) {
         try {
             const response = await axios.post(route('sorteo.iniciar'), formData);
             setGanadores(response.data.ganadores); // Suponemos que devuelve un array de ganadores
+            setUrlHost(response.data.urlHost);
         } catch (error) {
             console.error("Error al iniciar el sorteo:", error);
-            alert('Ocurrió un error al iniciar el sorteo');
+
+            if (error.response?.data?.error) {
+                alert(error.response.data.error);
+            } else if (error.response?.data?.message) {
+                alert(error.response.data.message);
+            } else {
+                alert('Ocurrió un error al iniciar el sorteo');
+            }
         } finally {
             setCargando(false);
         }
@@ -165,7 +171,7 @@ export default function Sorteo(props) {
                         </div>
                     </>
                 ) : (
-                    <Ganadores ganadores={ganadores} tipo={props.tipo} />
+                    <Ganadores ganadores={ganadores} urlHost={urlHost} />
 
                 )}
             </div>
