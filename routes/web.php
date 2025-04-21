@@ -39,6 +39,8 @@ Route::delete('/sorteos/{sorteo}', [SorteoController::class, 'destroy'])->name('
 Route::middleware(['auth',AdminMiddleware::class])->group(function () {
     Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users.index');
     Route::get('/admin/users/{user}', [UserController::class, 'show'])->name('admin.users.show');
+    Route::get('/admin/users/{user}/historial', [UserController::class, 'historial'])->name('admin.users.historial');
+
 });
 
 

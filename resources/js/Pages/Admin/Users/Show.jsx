@@ -2,7 +2,7 @@
 
 import React from 'react';
 import MainLayout from '@/Layouts/MainLayout';
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 
 export default function Show({ user }) {
     return (
@@ -16,26 +16,13 @@ export default function Show({ user }) {
                 </div>
 
                 <div className="bg-white rounded shadow p-6">
-                    <h2 className="text-xl font-bold mb-4">Sorteos Realizados</h2>
-                    {user.sorteos.length > 0 ? (
-                        <ul className="space-y-3">
-                            {user.sorteos.map((s) => (
-                                <li key={s.id} className="border p-3 rounded">
-                                    <a
-                                        href={route('sorteo.show', s.id)}
-                                        className="text-blue-600 hover:underline font-semibold"
-                                    >
-                                        {s.titulo}
-                                    </a>
-                                    <div className="text-sm text-gray-600">
-                                        {s.tipo} | {new Date(s.created_at).toLocaleString()} | {s.num_participantes} participantes
-                                    </div>
-                                </li>
-                            ))}
-                        </ul>
-                    ) : (
-                        <p className="text-gray-500">Este usuario aún no ha realizado sorteos.</p>
-                    )}
+                    <h2 className="text-xl font-bold mb-4">Acciones</h2>
+                    <Link
+                        href={route('admin.users.historial', user.id)}
+                        className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded"
+                    >
+                        Ver historial de sorteos
+                    </Link>
                 </div>
             </div>
         </>

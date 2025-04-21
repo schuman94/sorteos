@@ -1,11 +1,13 @@
 import React from 'react';
 import MainLayout from '@/Layouts/MainLayout';
-import { Head, router } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import Ganadores from '@/Components/Sorteo/Ganadores';
 import Filtro from '@/Components/Sorteo/Filtro';
 
 
 export default function Show({ sorteo }) {
+    const { auth } = usePage().props;
+    const isOwner = auth.user.id === sorteo.user_id;
     const handleDelete = () => {
         if (confirm('¿Estás seguro de que deseas eliminar este sorteo?')) {
             router.delete(route('sorteo.destroy', sorteo.id));
@@ -38,9 +40,14 @@ export default function Show({ sorteo }) {
 
                 <Filtro filtro={sorteo.filtro} />
 
-                <button onClick={handleDelete} className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded">
-                    Eliminar sorteo
-                </button>
+                {isOwner && (
+                    <button
+                        onClick={handleDelete}
+                        className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded"
+                    >
+                        Eliminar sorteo
+                    </button>
+                )}
 
                 <Ganadores ganadores={sorteo.ganadores} urlHost={sorteo.urlHost} />
             </div>

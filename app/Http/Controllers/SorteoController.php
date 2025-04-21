@@ -323,6 +323,7 @@ class SorteoController extends Controller
                 'tipo' => $publicacion?->host?->nombre ?? 'Manual',
                 'num_participantes' => $sorteo->num_participantes,
                 'created_at' => $sorteo->created_at->toDateTimeString(),
+                'user_id' =>$sorteo->user_id,
                 'filtro' => [
                     'mencion' => $sorteo->filtro->mencion,
                     'hashtag' => $sorteo->filtro->hashtag,
