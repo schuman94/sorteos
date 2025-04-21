@@ -21,7 +21,7 @@ class SorteoPolicy
      */
     public function view(User $user, Sorteo $sorteo): bool
     {
-        return false;
+        return $user->id === $sorteo->user_id;
     }
 
     /**
@@ -45,7 +45,7 @@ class SorteoPolicy
      */
     public function delete(User $user, Sorteo $sorteo): bool
     {
-        return false;
+        return $sorteo->user_id === $user->id;
     }
 
     /**

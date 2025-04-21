@@ -1,10 +1,17 @@
 import React from 'react';
 import MainLayout from '@/Layouts/MainLayout';
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import Ganadores from '@/Components/Sorteo/Ganadores';
 import Filtro from '@/Components/Sorteo/Filtro';
 
+
 export default function Show({ sorteo }) {
+    const handleDelete = () => {
+        if (confirm('¿Estás seguro de que deseas eliminar este sorteo?')) {
+            router.delete(route('sorteo.destroy', sorteo.id));
+        }
+    };
+
     return (
         <>
             <Head title={`Sorteo: ${sorteo.titulo}`} />
@@ -30,6 +37,10 @@ export default function Show({ sorteo }) {
                 </div>
 
                 <Filtro filtro={sorteo.filtro} />
+
+                <button onClick={handleDelete} className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded">
+                    Eliminar sorteo
+                </button>
 
                 <Ganadores ganadores={sorteo.ganadores} urlHost={sorteo.urlHost} />
             </div>
