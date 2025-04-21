@@ -4,19 +4,21 @@ import { Head, router } from '@inertiajs/react';
 import SorteoCard from '@/Components/Sorteo/SorteoCard';
 import FiltroHistorial from '@/Components/Sorteo/FiltroHistorial';
 
-export default function Historial({ sorteos, hosts, anyos, anyoSeleccionado, tipoSeleccionado }) {
-    const handleFilterChange = () => {
+export default function Historial({ user, sorteos, hosts, anyos, anyoSeleccionado, tipoSeleccionado }) {
+    const handleFilterChange = (e) => {
         const params = {
             anyo: document.getElementById('anyo').value,
             tipo: document.getElementById('tipo').value,
         };
 
-        router.get(route('sorteo.historial'), params, { preserveScroll: true });
+        router.get(route('admin.users.historial', user.id), params, {
+            preserveScroll: true,
+        });
     };
 
     return (
         <>
-            <Head title="Historial" />
+            <Head title={`Historial de Sorteos - ${user.name}`} />
 
             <div className="max-w-5xl mx-auto py-12 px-4">
                 <FiltroHistorial
@@ -34,7 +36,7 @@ export default function Historial({ sorteos, hosts, anyos, anyoSeleccionado, tip
                         ))}
                     </div>
                 ) : (
-                    <p className="text-center text-gray-500">No hay sorteos disponibles.</p>
+                    <p className="text-center text-gray-500">No hay sorteos disponibles para este usuario.</p>
                 )}
             </div>
         </>

@@ -21,7 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role',
+        'isAdmin',
     ];
 
     /**
@@ -52,8 +52,14 @@ class User extends Authenticatable
         return $this->role === 'admin';
     }
 
-    public function sorteos() {
+    public function sorteos()
+    {
         return $this->hasMany(Sorteo::class);
     }
 
+    // Por ahora no se usa
+    public function sorteosConEliminados()
+    {
+        return $this->hasMany(Sorteo::class)->withTrashed();
+    }
 }
