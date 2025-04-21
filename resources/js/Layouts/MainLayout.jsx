@@ -32,6 +32,15 @@ export default function MainLayout({ header, children }) {
                                         Historial de Sorteos
                                     </NavLink>
                                 )}
+                                {user?.is_admin && (
+                                    <NavLink
+                                        href={route('admin.users.index')}
+                                        active={route().current('admin.users.index')}
+                                    >
+                                        Panel de Administración
+                                    </NavLink>
+                                )}
+
                             </div>
                         </div>
 
@@ -125,6 +134,15 @@ export default function MainLayout({ header, children }) {
                                 <ResponsiveNavLink href={route('dashboard')} active={route().current('dashboard')}>
                                     Dashboard
                                 </ResponsiveNavLink>
+                                {user?.is_admin && (
+                                    <ResponsiveNavLink
+                                        href={route('admin.users.index')}
+                                        active={route().current('admin.users.index')}
+                                    >
+                                        Panel de Administración
+                                    </ResponsiveNavLink>
+                                )}
+
                             </div>
                             <div className="border-t border-gray-200 pb-1 pt-4">
                                 <div className="px-4">
