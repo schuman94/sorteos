@@ -334,7 +334,7 @@ class SorteoController extends Controller
                         'likes' => $g->comentario?->likes,
                         'fecha' => $g->comentario?->fecha,
                     ];
-                }),
+                })->sortBy('posicion')->values()
             ],
         ]);
     }
