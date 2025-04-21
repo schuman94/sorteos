@@ -32,5 +32,7 @@ Route::get('/sorteo', function () {
 Route::get('/historial', [SorteoController::class, 'historial'])->middleware('auth')->name('sorteo.historial');
 
 Route::get('/sorteo/{sorteo}', [SorteoController::class, 'show'])->middleware('auth')->name('sorteo.show');
+Route::delete('/sorteos/{sorteo}', [SorteoController::class, 'destroy'])->name('sorteo.destroy');
+
 
 require __DIR__.'/auth.php';

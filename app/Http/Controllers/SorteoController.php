@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreSorteoRequest;
 use App\Http\Requests\UpdateSorteoRequest;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
@@ -302,6 +303,8 @@ class SorteoController extends Controller
      */
     public function show(Sorteo $sorteo)
     {
+        Gate::authorize('view', $sorteo);
+
         $sorteo->load([
             'filtro',
             'publicacion.host',
@@ -361,6 +364,9 @@ class SorteoController extends Controller
      */
     public function destroy(Sorteo $sorteo)
     {
-        //
+        Gate::authorize('delete', $sorteo);
+
+        $sorteo->delete();
+        return Inertia::location(route('sorteo.historial'));
     }
 }
