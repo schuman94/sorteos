@@ -19,7 +19,7 @@ class UserSeeder extends Seeder
             'name' => 'admin',
             'email' => 'admin@admin.com',
             'password' => Hash::make('adminadmin'),
-            'role' => 'admin'
+            'isAdmin' => true,
         ]);
 
         // Crea un usuario un usuario normal
@@ -27,7 +27,7 @@ class UserSeeder extends Seeder
             'name' => 'sergio',
             'email' => 'sergio@sergio.com',
             'password' => Hash::make('sergiosergio'),
-            'role' => 'user'
+            'isAdmin' => false,
         ]);
     }
 }
