@@ -27,6 +27,12 @@ Route::post('/sorteo', [PublicacionController::class, 'cargarComentarios'])->mid
 Route::get('/comentarios', [PublicacionController::class, 'visualizarComentarios'])->middleware('auth')->name('comentarios.visualizar');
 Route::post('/sorteo/iniciar', [SorteoController::class, 'iniciar'])->middleware('auth')->name('sorteo.iniciar');
 
+Route::get('/sorteo-manual', function () {
+    return Inertia::render('Sorteo/Manual');
+})->middleware('auth')->name('sorteo.manual');
+
+Route::post('/sorteo-manual/iniciar', [SorteoController::class, 'iniciar_manual'])->middleware('auth')->name('sorteo.manual.iniciar');
+
 Route::get('/sorteo', function () {
     return redirect()->route('home');
 });

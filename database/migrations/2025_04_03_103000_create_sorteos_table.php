@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('sorteos', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained();
-            $table->foreignId('publicacion_id')->constrained('publicaciones')->nullable();
+            $table->foreignId('publicacion_id')->nullable()->constrained('publicaciones');
             $table->integer('num_participantes');
             $table->timestamps();
         });

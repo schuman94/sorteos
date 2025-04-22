@@ -19,6 +19,74 @@ use App\Models\Publicacion;
 
 class SorteoController extends Controller
 {
+    public function iniciar_manual(Request $request)
+    {
+        $request->validate([
+            'num_ganadores' => 'required|integer|min:1',
+            'num_suplentes' => 'required|integer|min:0',
+            'participantes' => 'required|string',
+            'eliminar_duplicados' => 'required|boolean',
+        ]);
+
+        $participantes = array_filter(array_map('trim', explode("\n", (string) $request->input('participantes', ''))));
+        if ($request->boolean('eliminar_duplicados')) {
+            $participantes = array_values(array_unique($participantes));
+        }
+
+        // Iniciamos la transacción
+        DB::beginTransaction();
+
+        try {
+            // Crear y guardar el modelo Sorteo
+            $sorteo = new Sorteo();
+            $sorteo->user()->associate(Auth::user());
+            $sorteo->num_participantes = count($participantes);
+            $sorteo->save();
+
+            // Seleccionar y guardar los ganadores
+            $this->seleccionarGanadores($participantes, $request, $sorteo);
+
+            // Confirmar transacción
+            DB::commit();
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return response()->json(['error' => 'Error al guardar el sorteo'], 500);
+        }
+
+        // Obtener los ganadores recién creados para devolverlos como JSON
+        $ganadores = $sorteo->ganadores()
+            ->with('clasificacion')
+            ->leftJoin('comentarios', 'ganadores.id', '=', 'comentarios.ganador_id')
+            ->select(
+                'ganadores.nombre_manual',
+                'ganadores.posicion',
+                'clasificaciones.nombre as clasificacion',
+                'comentarios.autor',
+                'comentarios.texto',
+                'comentarios.likes',
+                'comentarios.fecha'
+            )
+            ->join('clasificaciones', 'clasificaciones.id', '=', 'ganadores.clasificacion_id')
+            ->orderByRaw("clasificaciones.nombre = 'titular' DESC")
+            ->orderBy('posicion')
+            ->get()
+            ->map(function ($g) {
+                return [
+                    'nombre' => $g->nombre_manual ?? $g->autor,
+                    'clasificacion' => $g->clasificacion,
+                    'posicion' => $g->posicion,
+                    'comentario' => $g->texto ?? null,
+                    'likes' => $g->likes ?? null,
+                    'fecha' => $g->fecha ?? null,
+                ];
+            });
+
+        return response()->json([
+            'ganadores' => $ganadores,
+            'urlHost' => null // Hay que gestionar esto
+        ]);
+    }
+
     public function iniciar(Request $request)
     {
         $request->validate([
@@ -264,9 +332,13 @@ class SorteoController extends Controller
 
         // Filtrar por tipo/host si está indicado
         if ($request->filled('tipo')) {
-            $query->whereHas('publicacion', function ($q) use ($request) {
-                $q->where('host_id', $request->tipo);
-            });
+            if ($request->tipo === 'manual') {
+                $query->whereNull('publicacion_id');
+            } else {
+                $query->whereHas('publicacion', function ($q) use ($request) {
+                    $q->where('host_id', $request->tipo);
+                });
+            }
         }
 
         // Mapear resultados
@@ -323,12 +395,12 @@ class SorteoController extends Controller
                 'tipo' => $publicacion?->host?->nombre ?? 'Manual',
                 'num_participantes' => $sorteo->num_participantes,
                 'created_at' => $sorteo->created_at->toDateTimeString(),
-                'user_id' =>$sorteo->user_id,
-                'filtro' => [
+                'user_id' => $sorteo->user_id,
+                'filtro' => $sorteo->filtro ? [
                     'mencion' => $sorteo->filtro->mencion,
                     'hashtag' => $sorteo->filtro->hashtag,
                     'permitir_autores_duplicados' => $sorteo->filtro->permitir_autores_duplicados,
-                ],
+                ] : null,
                 'ganadores' => $sorteo->ganadores->map(function ($g) {
                     return [
                         'nombre' => $g->nombre_manual ?? $g->comentario?->autor,

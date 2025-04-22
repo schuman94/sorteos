@@ -28,6 +28,7 @@ export default function FiltroHistorial({ anyoSeleccionado, tipoSeleccionado, an
                     className="rounded border-gray-300 text-sm shadow-sm"
                 >
                     <option value="">Todos</option>
+                    <option value="manual">Manual</option>
                     {hosts.map((host) => (
                         <option key={host.id} value={host.id}>
                             {host.nombre}
