@@ -92,6 +92,15 @@ export default function Home({ auth }) {
                             </button>
                         </>
                     )}
+
+                    <div className="mt-12 text-center">
+                        <Link
+                            href={route('sorteo.manual')}
+                            className="text-blue-600 hover:underline text-sm"
+                        >
+                            También puedes realizar un sorteo manual.
+                        </Link>
+                    </div>
                 </main>
 
                 <footer className="text-center py-4 text-sm">

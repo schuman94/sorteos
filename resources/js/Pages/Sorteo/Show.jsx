@@ -38,7 +38,7 @@ export default function Show({ sorteo }) {
                     </div>
                 </div>
 
-                <Filtro filtro={sorteo.filtro} />
+                {sorteo.filtro && <Filtro filtro={sorteo.filtro} />}
 
                 {isOwner && (
                     <button
