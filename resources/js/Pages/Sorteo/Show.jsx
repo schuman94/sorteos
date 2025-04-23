@@ -16,7 +16,7 @@ export default function Show({ sorteo }) {
 
     return (
         <>
-            <Head title={`Sorteo: ${sorteo.titulo}`} />
+            <Head title={`Sorteo`} />
 
             <div className="max-w-4xl mx-auto py-12 px-4 space-y-8">
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
@@ -35,6 +35,17 @@ export default function Show({ sorteo }) {
                         <p><strong>Fecha:</strong> {new Date(sorteo.created_at).toLocaleString()}</p>
                         <p><strong>Participantes:</strong> {sorteo.num_participantes}</p>
                         <p><strong>Tipo:</strong> {sorteo.tipo.split('\\').pop()}</p>
+                        <p>
+                            <strong>Certificado:</strong>{' '}
+                            <a
+                                href={`/certificado/${sorteo.certificado}`}
+                                className="text-blue-600 hover:underline"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                {sorteo.certificado}
+                            </a>
+                        </p>
                     </div>
                 </div>
 

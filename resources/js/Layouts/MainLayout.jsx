@@ -24,6 +24,12 @@ export default function MainLayout({ header, children }) {
                                 >
                                     Home
                                 </NavLink>
+                                <NavLink
+                                    href={route('sorteo.manual')}
+                                    active={route().current('sorteo.manual')}
+                                >
+                                    Sorteo Manual
+                                </NavLink>
                                 {user && (
                                     <NavLink
                                         href={route('sorteo.historial')}
