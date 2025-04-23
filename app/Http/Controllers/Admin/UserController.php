@@ -93,9 +93,13 @@ class UserController extends Controller
 
     // Filtro por host
     if ($request->filled('tipo')) {
-        $query->whereHas('publicacion', function ($q) use ($request) {
-            $q->where('host_id', $request->tipo);
-        });
+        if ($request->tipo === 'manual') {
+            $query->whereNull('publicacion_id');
+        } else {
+            $query->whereHas('publicacion', function ($q) use ($request) {
+                $q->where('host_id', $request->tipo);
+            });
+        }
     }
 
     $sorteos = $query->orderByDesc('created_at')->get()->map(function ($sorteo) {

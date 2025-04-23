@@ -15,11 +15,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('sorteo_id')->constrained();
             $table->string('nombre_manual')->nullable();
-            $table->foreignId('clasificacion_id')->constrained('clasificaciones');
+            $table->boolean('esSuplente');
             $table->integer('posicion');
             $table->timestamps();
-            $table->unique(['sorteo_id', 'posicion', 'clasificacion_id']);
-            $table->unique(['sorteo_id', 'nombre_manual']); // Pueden coexistir nulos
+            $table->unique(['sorteo_id', 'posicion', 'esSuplente']); // No puede haber dos ganadores en la misma posicion para un sorteo
+            $table->unique(['sorteo_id', 'nombre_manual']); // Un participante manual no puede aparecer ganador dos veces en el mismo sorteo. Postgres permite coexistir nulos
         });
     }
 
