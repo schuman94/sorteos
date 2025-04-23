@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicacionController;
 use App\Http\Controllers\SorteoController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\CertificadoController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Middleware\AdminMiddleware;
@@ -48,6 +49,8 @@ Route::middleware(['auth',AdminMiddleware::class])->group(function () {
     Route::get('/admin/users/{user}/historial', [UserController::class, 'historial'])->name('admin.users.historial');
 
 });
+
+Route::get('/certificado/{codigo}', [CertificadoController::class, 'show'])->name('certificado.show');
 
 
 require __DIR__.'/auth.php';

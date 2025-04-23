@@ -15,6 +15,7 @@ use App\Models\Ganador;
 use App\Models\Comentario;
 use App\Models\Host;
 use App\Models\Publicacion;
+use Illuminate\Support\Str;
 
 class SorteoController extends Controller
 {
@@ -40,6 +41,7 @@ class SorteoController extends Controller
             $sorteo = new Sorteo();
             $sorteo->user()->associate(Auth::user());
             $sorteo->num_participantes = count($participantes);
+            $sorteo->codigo_certificado = $this->generarCodigoCertificado();
             $sorteo->save();
 
             // Seleccionar y guardar los ganadores
@@ -103,6 +105,7 @@ class SorteoController extends Controller
             $sorteo->user()->associate(Auth::user());
             $sorteo->publicacion()->associate($publicacion);
             $sorteo->num_participantes = count($participantes);
+            $sorteo->codigo_certificado = $this->generarCodigoCertificado();
             $sorteo->save();
 
             // Guardar el filtro aplicado
@@ -330,6 +333,7 @@ class SorteoController extends Controller
                 'tipo' => $sorteo->publicacion?->host?->nombre ?? 'Manual',
                 'num_participantes' => $sorteo->num_participantes,
                 'created_at' => $sorteo->created_at->toDateTimeString(),
+                'certificado' => $sorteo->codigo_certificado,
             ];
         });
 
@@ -369,12 +373,13 @@ class SorteoController extends Controller
             'sorteo' => [
                 'id' => $sorteo->id,
                 'url' => $publicacion?->url,
-                'urlHost' => $publicacion?->host?->url, // 👈 para generar enlaces a perfiles
+                'urlHost' => $publicacion?->host?->url,
                 'titulo' => $publicacion?->titulo,
                 'tipo' => $publicacion?->host?->nombre ?? 'Manual',
                 'num_participantes' => $sorteo->num_participantes,
                 'created_at' => $sorteo->created_at->toDateTimeString(),
                 'user_id' => $sorteo->user_id,
+                'certificado' => $sorteo->codigo_certificado,
                 'filtro' => $sorteo->filtro ? [
                     'mencion' => $sorteo->filtro->mencion,
                     'hashtag' => $sorteo->filtro->hashtag,
@@ -394,6 +399,14 @@ class SorteoController extends Controller
         ]);
     }
 
+    function generarCodigoCertificado(int $longitud = 7): string
+    {
+        do {
+            $codigo = Str::upper(Str::random($longitud));
+        } while (Sorteo::where('codigo_certificado', $codigo)->exists());
+
+        return $codigo;
+    }
 
     /**
      * Show the form for editing the specified resource.
