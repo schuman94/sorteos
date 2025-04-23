@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Sorteo;
 use App\Models\Ganador;
 use App\Models\Comentario;
-use App\Models\Clasificacion;
 use App\Models\Host;
 use App\Models\Publicacion;
 
@@ -53,37 +52,9 @@ class SorteoController extends Controller
             return response()->json(['error' => 'Error al guardar el sorteo'], 500);
         }
 
-        // Obtener los ganadores recién creados para devolverlos como JSON
-        $ganadores = $sorteo->ganadores()
-            ->with('clasificacion')
-            ->leftJoin('comentarios', 'ganadores.id', '=', 'comentarios.ganador_id')
-            ->select(
-                'ganadores.nombre_manual',
-                'ganadores.posicion',
-                'clasificaciones.nombre as clasificacion',
-                'comentarios.autor',
-                'comentarios.texto',
-                'comentarios.likes',
-                'comentarios.fecha'
-            )
-            ->join('clasificaciones', 'clasificaciones.id', '=', 'ganadores.clasificacion_id')
-            ->orderByRaw("clasificaciones.nombre = 'titular' DESC")
-            ->orderBy('posicion')
-            ->get()
-            ->map(function ($g) {
-                return [
-                    'nombre' => $g->nombre_manual ?? $g->autor,
-                    'clasificacion' => $g->clasificacion,
-                    'posicion' => $g->posicion,
-                    'comentario' => $g->texto ?? null,
-                    'likes' => $g->likes ?? null,
-                    'fecha' => $g->fecha ?? null,
-                ];
-            });
-
         return response()->json([
-            'ganadores' => $ganadores,
-            'urlHost' => null // Hay que gestionar esto
+            'ganadores' => $this->obtenerGanadores($sorteo),
+            'urlHost' => null
         ]);
     }
 
@@ -151,38 +122,8 @@ class SorteoController extends Controller
             return response()->json(['error' => 'Error al guardar el sorteo'], 500);
         }
 
-
-        // Obtener los ganadores recién creados para devolverlos como JSON
-        $ganadores = $sorteo->ganadores()
-            ->with('clasificacion')
-            ->leftJoin('comentarios', 'ganadores.id', '=', 'comentarios.ganador_id')
-            ->select(
-                'ganadores.nombre_manual',
-                'ganadores.posicion',
-                'clasificaciones.nombre as clasificacion',
-                'comentarios.autor',
-                'comentarios.texto',
-                'comentarios.likes',
-                'comentarios.fecha'
-            )
-            ->join('clasificaciones', 'clasificaciones.id', '=', 'ganadores.clasificacion_id')
-            ->orderByRaw("clasificaciones.nombre = 'titular' DESC")
-            ->orderBy('posicion')
-            ->get()
-            ->map(function ($g) {
-                return [
-                    'nombre' => $g->nombre_manual ?? $g->autor,
-                    'clasificacion' => $g->clasificacion,
-                    'posicion' => $g->posicion,
-                    'comentario' => $g->texto ?? null,
-                    'likes' => $g->likes ?? null,
-                    'fecha' => $g->fecha ?? null,
-                ];
-            });
-
-
         return response()->json([
-            'ganadores' => $ganadores,
+            'ganadores' => $this->obtenerGanadores($sorteo),
             'urlHost' => $publicacion->host->url,
         ]);
     }
@@ -273,32 +214,41 @@ class SorteoController extends Controller
         $numSuplentes = $request->num_suplentes;
         $totalNecesarios = $numGanadores + $numSuplentes;
 
-        // Mezclar aleatoriamente los participantes
         shuffle($participantes);
 
-        // Limitar a los necesarios
-        $seleccionados = array_slice(array_values($participantes), 0, $totalNecesarios);
+        $seleccionados = [];
+        $nombresYaGanadores = [];
+
+        foreach ($participantes as $participante) {
+            $nombre = is_array($participante) ? $participante['autor'] : $participante;
+
+            if (in_array(strtolower($nombre), $nombresYaGanadores)) {
+                continue; // Ya ha ganado, lo saltamos
+            }
+
+            $nombresYaGanadores[] = strtolower($nombre); // Lo registramos como ya premiado
+            $seleccionados[] = $participante;
+
+            if (count($seleccionados) >= $totalNecesarios) {
+                break; // Ya tenemos todos los ganadores necesarios
+            }
+        }
 
         foreach ($seleccionados as $index => $participante) {
-            $esTitular = $index < $numGanadores;
-            $posicion = $esTitular ? $index + 1 : $index - $numGanadores + 1;
+            $esSuplente = $index >= $numGanadores;
+            $posicion = $esSuplente ? $index - $numGanadores + 1 : $index + 1;
 
             $nombre = is_array($participante) ? $participante['autor'] : $participante;
 
-            // Obtener la clasificación correspondiente
-            $clasificacion = Clasificacion::where('nombre', $esTitular ? 'titular' : 'suplente')->firstOrFail();
-
-            // Crear el ganador
             $ganador = new Ganador([
                 'nombre_manual' => is_array($participante) ? null : $nombre,
                 'posicion' => $posicion,
+                'esSuplente' => $esSuplente,
             ]);
 
             $ganador->sorteo()->associate($sorteo);
-            $ganador->clasificacion()->associate($clasificacion);
             $ganador->save();
 
-            // Si tiene comentario, crear el modelo Comentario
             if (is_array($participante)) {
                 $comentario = new Comentario([
                     'autor' => $participante['autor'],
@@ -311,6 +261,36 @@ class SorteoController extends Controller
             }
         }
     }
+
+    // Obtener los ganadores recién creados para devolverlos
+    private function obtenerGanadores(Sorteo $sorteo): array
+    {
+        return $sorteo->ganadores()
+            ->leftJoin('comentarios', 'ganadores.id', '=', 'comentarios.ganador_id')
+            ->select(
+                'ganadores.nombre_manual',
+                'ganadores.posicion',
+                'ganadores.esSuplente',
+                'comentarios.autor',
+                'comentarios.texto',
+                'comentarios.likes',
+                'comentarios.fecha'
+            )
+            ->orderBy('esSuplente') // primero titulares
+            ->orderBy('posicion')
+            ->get()
+            ->map(function ($g) {
+                return [
+                    'nombre' => $g->nombre_manual ?? $g->autor,
+                    'clasificacion' => $g->esSuplente ? 'suplente' : 'titular',
+                    'posicion' => $g->posicion,
+                    'comentario' => $g->texto ?? null,
+                    'likes' => $g->likes ?? null,
+                    'fecha' => $g->fecha ?? null,
+                ];
+            })->toArray();
+    }
+
 
     public function historial(Request $request)
     {

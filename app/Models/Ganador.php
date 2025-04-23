@@ -12,11 +12,7 @@ class Ganador extends Model
 
     protected $table = 'ganadores';
 
-    protected $fillable = ['posicion', 'nombre_manual'];
-
-    public function clasificacion() {
-        return $this->belongsTo(Clasificacion::class);
-    }
+    protected $fillable = ['posicion', 'nombre_manual', 'esSuplente'];
 
     public function comentario() {
         return $this->hasOne(Comentario::class);
