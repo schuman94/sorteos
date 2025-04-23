@@ -1,8 +1,11 @@
 import MainLayout from '@/Layouts/MainLayout';
-import React, { useState } from 'react';
-import Ganadores from '@/Components/Sorteo/Ganadores';
+import React, { useState, useEffect } from 'react';
 import { Head } from '@inertiajs/react';
 import axios from '@/lib/axios';
+import Ganadores from '@/Components/Sorteo/Ganadores';
+import CuentaRegresiva from '@/Components/Sorteo/CuentaRegresiva';
+
+
 
 export default function Manual() {
     const [formData, setFormData] = useState({
@@ -10,10 +13,28 @@ export default function Manual() {
         num_suplentes: 0,
         participantes: '',
         eliminar_duplicados: false,
+        cuenta_regresiva: 5,
     });
 
     const [cargando, setCargando] = useState(false);
     const [ganadores, setGanadores] = useState(null);
+
+    const [mostrarGanadores, setMostrarGanadores] = useState(false);
+    const [cuentaRegresiva, setCuentaRegresiva] = useState(null);
+
+    useEffect(() => {
+        if (cuentaRegresiva !== null && cuentaRegresiva > 0) {
+            const timer = setTimeout(() => {
+                setCuentaRegresiva(cuentaRegresiva - 1);
+            }, 1000);
+
+            return () => clearTimeout(timer);
+        }
+
+        if (cuentaRegresiva === 0) {
+            setMostrarGanadores(true);
+        }
+    }, [cuentaRegresiva]);
 
     const handleChange = (e) => {
         const { name, type, value, checked } = e.target;
@@ -28,6 +49,8 @@ export default function Manual() {
         try {
             const response = await axios.post(route('sorteo.manual.iniciar'), formData);
             setGanadores(response.data.ganadores);
+            setCuentaRegresiva(formData.cuenta_regresiva || 5);
+            setMostrarGanadores(false);
         } catch (error) {
             console.error("Error al iniciar el sorteo:", error);
             alert(error.response?.data?.message || 'Error al iniciar el sorteo');
@@ -35,6 +58,7 @@ export default function Manual() {
             setCargando(false);
         }
     };
+
 
     return (
         <>
@@ -92,6 +116,20 @@ export default function Manual() {
                                 />
                                 <label htmlFor="eliminar_duplicados">Eliminar nombres duplicados</label>
                             </div>
+
+                            <div>
+                                <label htmlFor="cuenta_regresiva" className="block mb-1 font-medium">Cuenta regresiva (segundos)</label>
+                                <input
+                                    type="number"
+                                    name="cuenta_regresiva"
+                                    id="cuenta_regresiva"
+                                    min={3}
+                                    max={15}
+                                    value={formData.cuenta_regresiva || 5}
+                                    onChange={handleChange}
+                                    className="input w-full"
+                                />
+                            </div>
                         </div>
 
                         <button
@@ -102,6 +140,11 @@ export default function Manual() {
                             {cargando ? 'Iniciando...' : 'Iniciar Sorteo'}
                         </button>
                     </div>
+                ) : !mostrarGanadores ? (
+                    <CuentaRegresiva
+                        segundos={cuentaRegresiva}
+                        onComplete={() => setMostrarGanadores(true)}
+                    />
                 ) : (
                     <Ganadores ganadores={ganadores} urlHost={null} />
                 )}

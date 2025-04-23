@@ -1,8 +1,9 @@
 import MainLayout from '@/Layouts/MainLayout';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Data from '@/Components/Publicacion/Data';
 import Comentarios from '@/Components/Publicacion/Comentarios';
 import Ganadores from '@/Components/Sorteo/Ganadores';
+import CuentaRegresiva from '@/Components/Sorteo/CuentaRegresiva';
 import { Head } from '@inertiajs/react';
 import axios from '@/lib/axios';
 
@@ -15,11 +16,28 @@ export default function Sorteo(props) {
         mencion: false,
         participantes_manuales: '',
         usuarios_excluidos: '',
+        cuenta_regresiva: 5,
     });
 
     const [urlHost, setUrlHost] = useState('');
     const [cargando, setCargando] = useState(false);
     const [ganadores, setGanadores] = useState(null);
+    const [mostrarGanadores, setMostrarGanadores] = useState(false);
+    const [cuentaRegresiva, setCuentaRegresiva] = useState(null);
+
+    useEffect(() => {
+        if (cuentaRegresiva !== null && cuentaRegresiva > 0) {
+            const timer = setTimeout(() => {
+                setCuentaRegresiva(cuentaRegresiva - 1);
+            }, 1000);
+
+            return () => clearTimeout(timer);
+        }
+
+        if (cuentaRegresiva === 0) {
+            setMostrarGanadores(true);
+        }
+    }, [cuentaRegresiva]);
 
     const handleChange = (e) => {
         const { name, type, value, checked } = e.target;
@@ -33,8 +51,10 @@ export default function Sorteo(props) {
         setCargando(true);
         try {
             const response = await axios.post(route('sorteo.iniciar'), formData);
-            setGanadores(response.data.ganadores); // Suponemos que devuelve un array de ganadores
+            setGanadores(response.data.ganadores);
             setUrlHost(response.data.urlHost);
+            setCuentaRegresiva(formData.cuenta_regresiva || 5);
+            setMostrarGanadores(false);
         } catch (error) {
             console.error("Error al iniciar el sorteo:", error);
 
@@ -61,7 +81,6 @@ export default function Sorteo(props) {
                             <Data {...props} />
                         </div>
 
-                        {/* Formulario de opciones */}
                         <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 p-6 rounded shadow mb-8">
                             <h2 className="text-2xl font-semibold mb-4">Opciones del sorteo</h2>
 
@@ -155,6 +174,21 @@ export default function Sorteo(props) {
                                         className="input w-full"
                                     />
                                 </div>
+
+                                {/* Cuenta regresiva */}
+                                <div>
+                                    <label htmlFor="cuenta_regresiva" className="block mb-1 font-medium">Cuenta regresiva (segundos)</label>
+                                    <input
+                                        type="number"
+                                        name="cuenta_regresiva"
+                                        id="cuenta_regresiva"
+                                        min={3}
+                                        max={15}
+                                        value={formData.cuenta_regresiva || 5}
+                                        onChange={handleChange}
+                                        className="input w-full"
+                                    />
+                                </div>
                             </div>
 
                             <button
@@ -170,9 +204,13 @@ export default function Sorteo(props) {
                             <Comentarios />
                         </div>
                     </>
+                ) : !mostrarGanadores ? (
+                    <CuentaRegresiva
+                        segundos={cuentaRegresiva}
+                        onComplete={() => setMostrarGanadores(true)}
+                    />
                 ) : (
                     <Ganadores ganadores={ganadores} urlHost={urlHost} />
-
                 )}
             </div>
         </>

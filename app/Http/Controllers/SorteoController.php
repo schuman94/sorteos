@@ -360,7 +360,6 @@ class SorteoController extends Controller
         $sorteo->load([
             'filtro',
             'publicacion.host',
-            'ganadores.clasificacion',
             'ganadores.comentario',
         ]);
 
@@ -384,7 +383,7 @@ class SorteoController extends Controller
                 'ganadores' => $sorteo->ganadores->map(function ($g) {
                     return [
                         'nombre' => $g->nombre_manual ?? $g->comentario?->autor,
-                        'clasificacion' => $g->clasificacion->nombre,
+                        'clasificacion' => $g->esSuplente ? 'suplente' : 'titular',
                         'posicion' => $g->posicion,
                         'comentario' => $g->comentario?->texto,
                         'likes' => $g->comentario?->likes,
