@@ -41,7 +41,7 @@ export default function GanadorCard({ nombre, posicion, comentario, likes, fecha
                 <div className="mt-2 text-sm text-gray-600 dark:text-gray-300">
                     <p className="mb-1 italic">{comentario}</p>
                     <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
-                        <span>👍 {likes ?? 0}</span>
+                        {likes != null && (<span>👍 {likes ?? 0}</span>)}
                         <span>{new Date(fecha).toLocaleString()}</span>
                     </div>
                 </div>

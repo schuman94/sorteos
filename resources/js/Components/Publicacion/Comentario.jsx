@@ -8,9 +8,11 @@ export default function Comentario({ autor, fecha, texto, likes }) {
                 {new Date(fecha).toLocaleString()}
             </p>
             <p className="mt-1">{texto}</p>
-            <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                👍 {likes}
-            </p>
+            {likes != null && (
+                <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                    👍 {likes}
+                </p>
+            )}
         </li>
     );
 }

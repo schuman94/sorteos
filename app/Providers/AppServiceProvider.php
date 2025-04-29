@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
+use App\Services\BlueskyService;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -12,7 +13,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Registramos BlueskyService como singleton.
+        $this->app->singleton(BlueskyService::class, function ($app) {
+            return new BlueskyService();
+        });
     }
 
     /**

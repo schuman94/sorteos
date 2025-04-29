@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Interfaces\PublicacionDriver;
 use App\Drivers\YouTubeDriver;
+use App\Drivers\BlueskyDriver;
 use App\Drivers\InstagramDriver;
 
 class Publicacion extends Model
@@ -59,6 +60,7 @@ class Publicacion extends Model
         return match ($host->nombre) {
             'YouTube' => new YouTubeDriver($this->url),
             'Instagram' => new InstagramDriver($this->url),
+            'Bluesky' => new BlueskyDriver($this->url),
             default => throw new \RuntimeException("La URL no corresponde a una red social soportada. Host analizado: '{$host->nombre}'"),
         };
     }
