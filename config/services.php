@@ -39,4 +39,9 @@ return [
         'api_key' => env('YOUTUBE_API_KEY'),
     ],
 
+    'bluesky' => [
+        'handle' => env('BSKY_HANDLE'),
+        'password' => env('BSKY_PASSWORD'),
+    ],
+
 ];

@@ -9,12 +9,10 @@ use Carbon\Carbon;
 
 class YouTubeDriver implements PublicacionDriver
 {
-    private string $url;
     private string $id;
 
     public function __construct(string $url)
     {
-        $this->url = $url;
         $this->id = $this->getId($url);
     }
 

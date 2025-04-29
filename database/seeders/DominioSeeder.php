@@ -11,6 +11,7 @@ class DominioSeeder extends Seeder
     public function run(): void
     {
         $youtube = Host::where('nombre', 'YouTube')->firstOrFail();
+        $bluesky = Host::where('nombre', 'Bluesky')->firstOrFail();
         $instagram = Host::where('nombre', 'Instagram')->firstOrFail();
 
         // Dominios conocidos de YouTube
@@ -24,6 +25,18 @@ class DominioSeeder extends Seeder
             Dominio::create([
                 'nombre' => $dominio,
                 'host_id' => $youtube->id,
+            ]);
+        }
+
+        // Dominios conocidos de Bluesky
+        $blueskyDominios = [
+            'bsky.app',
+        ];
+
+        foreach ($blueskyDominios as $dominio) {
+            Dominio::create([
+                'nombre' => $dominio,
+                'host_id' => $bluesky->id,
             ]);
         }
 
