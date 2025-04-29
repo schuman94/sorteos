@@ -22,7 +22,7 @@ export default function MainLayout({ header, children }) {
                                     href={route('home')}
                                     active={route().current('home')}
                                 >
-                                    Home
+                                    Inicio
                                 </NavLink>
                                 <NavLink
                                     href={route('sorteo.manual')}
@@ -157,7 +157,7 @@ export default function MainLayout({ header, children }) {
                                 </div>
                                 <div className="mt-3 space-y-1">
                                     <ResponsiveNavLink href={route('home')}>
-                                        Home
+                                        Inicio
                                     </ResponsiveNavLink>
                                     <ResponsiveNavLink href={route('profile.edit')}>
                                         Perfil

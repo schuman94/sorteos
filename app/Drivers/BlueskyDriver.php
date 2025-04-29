@@ -60,7 +60,7 @@ class BlueskyDriver implements PublicacionDriver
                 'autor' => $c['post']['author']['handle'] ?? 'Anónimo',
                 'texto' => $c['post']['record']['text'] ?? '',
                 'fecha' => $c['post']['record']['createdAt'] ?? null,
-                'likes' => 0, // Por ahora Bluesky no expone likes individuales
+                'likes' => null, // Por ahora Bluesky no expone likes individuales
             ];
         }, $comentarios);
 

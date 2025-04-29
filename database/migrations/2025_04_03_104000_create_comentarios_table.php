@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('autor');
             $table->text('texto');
             $table->timestamp('fecha');
-            $table->integer('likes');
+            $table->integer('likes')->nullable();
             $table->timestamps();
         });
     }

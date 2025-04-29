@@ -257,7 +257,7 @@ class SorteoController extends Controller
                     'autor' => $participante['autor'],
                     'texto' => $participante['texto'],
                     'fecha' => $participante['fecha'],
-                    'likes' => $participante['likes'] ?? 0,
+                    'likes' => $participante['likes'],
                 ]);
                 $comentario->ganador()->associate($ganador);
                 $comentario->save();

@@ -61,7 +61,7 @@ export default function Home({ auth }) {
                             value={url}
                             onChange={(e) => setUrl(e.target.value)}
                             className="flex-1 rounded-lg border border-gray-300 px-4 py-3 text-sm shadow-sm"
-                            placeholder="URL de YouTube o Instagram"
+                            placeholder="URL de YouTube o Bluesky"
                         />
                         <button
                             type="submit"
