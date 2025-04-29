@@ -14,9 +14,9 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         // Registramos BlueskyService como singleton.
-        //$this->app->singleton(BlueskyService::class, function ($app) {
-        //    return new BlueskyService();
-        //});
+        $this->app->singleton(BlueskyService::class, function ($app) {
+            return new BlueskyService();
+        });
     }
 
     /**
