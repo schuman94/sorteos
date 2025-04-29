@@ -19,7 +19,6 @@ class PublicacionController extends Controller
      */
     public function buscar(Request $request)
     {
-        dd('[1] Entrando a buscar()', $request->all());
         // Si la url no está vacia, se comprueba si hay que añadirle 'https://'
         $inputUrl = trim($request->input('url'));
         if (!empty($inputUrl) && !preg_match('#^https?://#i', $inputUrl)) {
@@ -73,7 +72,6 @@ class PublicacionController extends Controller
         try {
             // Crear la instancia de publicacion
             $publicacion = new Publicacion(['url' => $request->input('url')]);
-            dd('[2] Publicacion instanciada', $publicacion);
 
             // Cargar los datos desde la API correspondiente
             $publicacion->cargarDatosDesdeApi();
