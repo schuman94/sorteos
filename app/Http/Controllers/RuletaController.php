@@ -39,7 +39,7 @@ class RuletaController extends Controller
         $request->validate([
             'nombre' => 'required|string|max:255|unique:ruletas,nombre,NULL,id,user_id,' . Auth::id(),
             'entradas' => 'required|array|min:1',
-            'entradas.*' => 'required|string|max:255',
+            'entradas.*' => 'string|max:255',
         ]);
 
         $ruleta = new Ruleta();
@@ -48,21 +48,13 @@ class RuletaController extends Controller
         $ruleta->user()->associate(Auth::user());
         $ruleta->save();
 
-        return redirect()->back()->with('message', 'Ruleta guardada correctamente');
+        return response()->json(['message' => 'Ruleta guardada correctamente', 'ruleta' => $ruleta]);
     }
 
     /**
      * Display the specified resource.
      */
     public function show(Ruleta $ruleta)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Ruleta $ruleta)
     {
         //
     }
@@ -75,21 +67,14 @@ class RuletaController extends Controller
         $request->validate([
             'nombre' => 'required|string|max:255|unique:ruletas,nombre,' . $ruleta->id . ',id,user_id,' . Auth::id(),
             'entradas' => 'required|array|min:1',
-            'entradas.*' => 'string'
+            'entradas.*' => 'string|max:255',
         ]);
-
-        if ($ruleta->user_id !== Auth::id()) {
-            abort(403); // No permitir actualizar si no es el dueño. Pendiente de hacerlo con gate o policy
-        }
 
         $ruleta->nombre = $request->nombre;
         $ruleta->entradas = json_encode($request->entradas);
         $ruleta->save();
 
-        return response()->json([
-            'message' => 'Ruleta actualizada correctamente',
-            'ruleta' => $ruleta->only(['id', 'nombre', 'entradas', 'created_at']),
-        ]);
+        return response()->json(['message' => 'Ruleta actualizada correctamente', 'ruleta' => $ruleta]);
     }
 
 

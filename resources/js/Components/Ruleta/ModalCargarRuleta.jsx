@@ -28,7 +28,7 @@ export default function ModalCargarRuleta({ visible, onClose, onSeleccionar }) {
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
             <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-lg max-h-[80vh] overflow-y-auto">
-                <h2 className="text-xl font-semibold mb-4">Cargar una ruleta guardada</h2>
+                <h2 className="text-xl font-semibold mb-4">Mis ruletas</h2>
 
                 {cargando && <p className="text-gray-600">Cargando ruletas...</p>}
                 {error && <p className="text-red-600">{error}</p>}
