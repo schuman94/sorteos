@@ -5,6 +5,7 @@ use App\Http\Controllers\PublicacionController;
 use App\Http\Controllers\SorteoController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\CertificadoController;
+use App\Http\Controllers\RuletaController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Middleware\AdminMiddleware;
@@ -52,9 +53,7 @@ Route::middleware(['auth',AdminMiddleware::class])->group(function () {
 
 Route::get('/certificado/{codigo}', [CertificadoController::class, 'show'])->name('certificado.show');
 
-Route::get('/ruleta', function () {
-    return Inertia::render('Ruleta/Ruleta');
-})->name('ruleta');
+Route::get('/ruleta', [RuletaController::class, 'index'])->name('ruleta');
 
 
 require __DIR__.'/auth.php';

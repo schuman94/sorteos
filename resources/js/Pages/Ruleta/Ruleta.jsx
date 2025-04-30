@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
+import { Head } from '@inertiajs/react';
 import { Wheel } from 'react-custom-roulette';
+import MainLayout from '@/Layouts/MainLayout';
 
 export default function Ruleta() {
   const [input, setInput] = useState('');
@@ -32,63 +34,69 @@ export default function Ruleta() {
   );
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-8 text-center">Ruleta de Opciones</h1>
+    <>
+      <Head title="Ruleta" />
 
-      <div className="flex flex-col md:flex-row gap-32 justify-center items-start mb-8">
-        <textarea
-          className="w-full md:w-64 border rounded p-2 h-[500px] resize-none"
-          value={input}
-          onChange={(e) => {
-            const valor = e.target.value;
-            setInput(valor);
+      <div className="max-w-6xl mx-auto p-6">
+        <h1 className="text-2xl font-bold mb-8 text-center">Ruleta de Opciones</h1>
 
-            const lineas = valor
-              .split('\n')
-              .map((linea) => linea.trim())
-              .filter((linea) => linea.length > 0);
+        <div className="flex flex-col md:flex-row gap-32 justify-center items-start mb-8">
+          <textarea
+            className="w-full md:w-64 border rounded p-2 h-[500px] resize-none"
+            value={input}
+            onChange={(e) => {
+              const valor = e.target.value;
+              setInput(valor);
 
-            const nuevasOpciones = lineas
-              .map((linea) => ({ option: linea }))
-              .filter((op) => typeof op.option === 'string' && op.option.length > 0);
+              const lineas = valor
+                .split('\n')
+                .map((linea) => linea.trim())
+                .filter((linea) => linea.length > 0);
 
-            setOpciones(nuevasOpciones);
-          }}
-          placeholder="Escribe una opción por línea"
-        />
+              const nuevasOpciones = lineas
+                .map((linea) => ({ option: linea }))
+                .filter((op) => typeof op.option === 'string' && op.option.length > 0);
 
-        <div className="flex flex-col items-center">
-          <Wheel
-            mustStartSpinning={mustSpin}
-            prizeNumber={premioIndex}
-            data={opcionesRuleta}
-            onStopSpinning={() => {
-              setMustSpin(false);
-              setGanador(opciones[premioIndex]?.option ?? null);
+              setOpciones(nuevasOpciones);
             }}
-            backgroundColors={backgroundColors}
-            textColors={['#ffffff']}
-            outerBorderWidth={1}
-            radiusLineWidth={0}
-            outerBorderColor="transparent"
-            radiusLineColor="transparent"
+            placeholder="Escribe una opción por línea"
           />
 
-          <button
-            onClick={manejarGirar}
-            className="mt-4 bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 disabled:opacity-50"
-            disabled={opciones.length < 2}
-          >
-            Girar
-          </button>
-        </div>
-      </div>
+          <div className="flex flex-col items-center">
+            <Wheel
+              mustStartSpinning={mustSpin}
+              prizeNumber={premioIndex}
+              data={opcionesRuleta}
+              onStopSpinning={() => {
+                setMustSpin(false);
+                setGanador(opciones[premioIndex]?.option ?? null);
+              }}
+              backgroundColors={backgroundColors}
+              textColors={['#ffffff']}
+              outerBorderWidth={1}
+              radiusLineWidth={0}
+              outerBorderColor="transparent"
+              radiusLineColor="transparent"
+            />
 
-      {ganador && (
-        <div className="mt-6 text-xl font-semibold text-green-700 text-center">
-          Opción ganadora: {ganador}
+            <button
+              onClick={manejarGirar}
+              className="mt-4 bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 disabled:opacity-50"
+              disabled={opciones.length < 2}
+            >
+              Girar
+            </button>
+          </div>
         </div>
-      )}
-    </div>
+
+        {ganador && (
+          <div className="mt-6 text-xl font-semibold text-green-700 text-center">
+            Opción ganadora: {ganador}
+          </div>
+        )}
+      </div>
+    </>
   );
 }
+
+Ruleta.layout = (page) => <MainLayout>{page}</MainLayout>;

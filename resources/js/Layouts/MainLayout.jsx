@@ -38,6 +38,12 @@ export default function MainLayout({ header, children }) {
                                         Historial de Sorteos
                                     </NavLink>
                                 )}
+                                <NavLink
+                                    href={route('ruleta')}
+                                    active={route().current('ruleta')}
+                                >
+                                    Ruleta
+                                </NavLink>
                                 {user?.is_admin && (
                                     <NavLink
                                         href={route('admin.users.index')}
@@ -137,8 +143,11 @@ export default function MainLayout({ header, children }) {
                     {user ? (
                         <>
                             <div className="space-y-1 pb-3 pt-2">
-                                <ResponsiveNavLink href={route('dashboard')} active={route().current('dashboard')}>
-                                    Dashboard
+                                <ResponsiveNavLink href={route('profile.edit')} active={route().current('profile.edit')}>
+                                    <div>
+                                        <div className="text-base font-medium text-gray-800">{user.name}</div>
+                                        <div className="text-sm font-medium text-gray-500">{user.email}</div>
+                                    </div>
                                 </ResponsiveNavLink>
                                 {user?.is_admin && (
                                     <ResponsiveNavLink
@@ -151,24 +160,32 @@ export default function MainLayout({ header, children }) {
 
                             </div>
                             <div className="border-t border-gray-200 pb-1 pt-4">
-                                <div className="px-4">
-                                    <div className="text-base font-medium text-gray-800">{user.name}</div>
-                                    <div className="text-sm font-medium text-gray-500">{user.email}</div>
-                                </div>
                                 <div className="mt-3 space-y-1">
-                                    <ResponsiveNavLink href={route('home')}>
+                                    <ResponsiveNavLink href={route('home')} active={route().current('home')}>
                                         Inicio
                                     </ResponsiveNavLink>
-                                    <ResponsiveNavLink href={route('profile.edit')}>
-                                        Perfil
+
+                                    <ResponsiveNavLink href={route('sorteo.manual')} active={route().current('sorteo.manual')}>
+                                        Sorteo Manual
                                     </ResponsiveNavLink>
-                                    <ResponsiveNavLink href={route('dashboard')}>
-                                        Dashboard
+
+
+                                    {user && (
+                                        <ResponsiveNavLink href={route('sorteo.historial')} active={route().current('sorteo.historial')}>
+                                            Historial de Sorteos
+                                        </ResponsiveNavLink>
+                                    )}
+
+                                    <ResponsiveNavLink href={route('ruleta')} active={route().current('ruleta')}>
+                                        Ruleta
                                     </ResponsiveNavLink>
+
+
                                     <ResponsiveNavLink method="post" href={route('logout')} as="button">
                                         Cerrar sesión
                                     </ResponsiveNavLink>
                                 </div>
+
                             </div>
                         </>
                     ) : (
