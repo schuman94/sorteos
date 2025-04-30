@@ -53,7 +53,18 @@ Route::middleware(['auth',AdminMiddleware::class])->group(function () {
 
 Route::get('/certificado/{codigo}', [CertificadoController::class, 'show'])->name('certificado.show');
 
-Route::get('/ruleta', [RuletaController::class, 'index'])->name('ruleta');
+Route::middleware('auth')->group(function () {
+    Route::post('/ruleta/guardar', [RuletaController::class, 'guardar'])->name('ruleta.guardar');
+});
+
+Route::get('/ruleta', [RuletaController::class, 'inicio'])->name('ruleta');
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/ruletas', [RuletaController::class, 'index'])->name('ruletas.index');
+    Route::post('/ruletas', [RuletaController::class, 'store'])->name('ruletas.store');
+    Route::put('/ruletas/{ruleta}', [RuletaController::class, 'update'])->name('ruletas.update');
+    Route::delete('/ruletas/{ruleta}', [RuletaController::class, 'destroy'])->name('ruletas.destroy');
+});
 
 
 require __DIR__.'/auth.php';
