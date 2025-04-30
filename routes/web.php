@@ -52,5 +52,9 @@ Route::middleware(['auth',AdminMiddleware::class])->group(function () {
 
 Route::get('/certificado/{codigo}', [CertificadoController::class, 'show'])->name('certificado.show');
 
+Route::get('/ruleta', function () {
+    return Inertia::render('Ruleta/Ruleta');
+})->name('ruleta');
+
 
 require __DIR__.'/auth.php';
