@@ -62,4 +62,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Sorteo::class)->withTrashed();
     }
+
+    public function ruletas()
+    {
+        return $this->hasMany(Ruleta::class);
+    }
 }
