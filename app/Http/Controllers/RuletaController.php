@@ -83,6 +83,14 @@ class RuletaController extends Controller
      */
     public function destroy(Ruleta $ruleta)
     {
-        //
+        if ($ruleta->user_id !== Auth::id()) {
+            abort(403, 'No autorizado.');
+        }
+
+        $ruleta->delete();
+
+        return response()->json([
+            'message' => 'Ruleta eliminada correctamente',
+        ]);
     }
 }
