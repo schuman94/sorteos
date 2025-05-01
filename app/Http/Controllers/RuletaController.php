@@ -25,7 +25,7 @@ class RuletaController extends Controller
                 ->where('user_id', Auth::id()) // Solo el dueño puede usarlo
                 ->firstOrFail();
 
-                $nombres = collect($sorteo->ganadores)
+            $nombres = collect($sorteo->ganadores)
                 ->where('esSuplente', false)
                 ->map(function ($ganador) {
                     return $ganador->nombre_manual ?? ($ganador->comentario->autor ?? null);
@@ -38,6 +38,16 @@ class RuletaController extends Controller
             'user' => Auth::user(),
             'nombresPrecargados' => $nombres,
         ]);
+    }
+
+    public function index()
+    {
+        $ruletas = Auth::user()
+            ->ruletas()
+            ->latest()
+            ->get();
+
+        return response()->json($ruletas);
     }
 
     /**
