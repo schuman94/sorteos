@@ -4,6 +4,7 @@ import { Wheel } from 'react-custom-roulette';
 import MainLayout from '@/Layouts/MainLayout';
 import ModalGuardarRuleta from '@/Components/Ruleta/ModalGuardarRuleta';
 import ModalCargarRuleta from '@/Components/Ruleta/ModalCargarRuleta';
+import ModalGanador from '@/Components/Ruleta/ModalGanador';
 import axios from '@/lib/axios';
 
 export default function Ruleta({ user }) {
@@ -12,6 +13,7 @@ export default function Ruleta({ user }) {
     const [mustSpin, setMustSpin] = useState(false);
     const [premioIndex, setPremioIndex] = useState(0);
     const [ganador, setGanador] = useState(null);
+    const [mostrarModalGanador, setMostrarModalGanador] = useState(false);
 
     const [mostrarModalGuardar, setMostrarModalGuardar] = useState(false);
     const [mostrarModalCargar, setMostrarModalCargar] = useState(false);
@@ -127,7 +129,11 @@ export default function Ruleta({ user }) {
                             data={opcionesRuleta}
                             onStopSpinning={() => {
                                 setMustSpin(false);
-                                setGanador(opciones[premioIndex]?.option ?? null);
+                                const opcionGanadora = opciones[premioIndex]?.option ?? null;
+                                setGanador(opcionGanadora);
+                                if (opcionGanadora) {
+                                    setMostrarModalGanador(true);
+                                }
                             }}
                             backgroundColors={backgroundColors}
                             textColors={['#ffffff']}
@@ -153,11 +159,12 @@ export default function Ruleta({ user }) {
                     </div>
                 </div>
 
-                {ganador && (
-                    <div className="mt-6 text-xl font-semibold text-green-700 text-center">
-                        Opción ganadora: {ganador}
-                    </div>
-                )}
+                <ModalGanador
+                    visible={mostrarModalGanador}
+                    ganador={ganador}
+                    onClose={() => setMostrarModalGanador(false)}
+                />
+
             </div>
 
             <ModalGuardarRuleta

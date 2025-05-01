@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function ModalConfirmacion({ visible, titulo = '¿Estás seguro?', mensaje, onConfirmar, onCancelar }) {
+export default function ModalEliminacion({ visible, titulo = '¿Estás seguro?', mensaje, onConfirmar, onCancelar }) {
     if (!visible) return null;
 
     return (

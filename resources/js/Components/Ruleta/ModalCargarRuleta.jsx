@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from '@/lib/axios';
-import ModalConfirmacion from '@/Components/ModalConfirmacion';
+import ModalEliminacion from '@/Components/ModalEliminacion';
 
 export default function ModalCargarRuleta({ visible, onClose, onSeleccionar, ruletaCargadaId, onEliminarActual }) {
     const [ruletas, setRuletas] = useState([]);
@@ -144,8 +144,7 @@ export default function ModalCargarRuleta({ visible, onClose, onSeleccionar, rul
                     </>
                 )}
 
-                {/* Modal de confirmación */}
-                <ModalConfirmacion
+                <ModalEliminacion
                     visible={confirmarVisible}
                     titulo="¿Eliminar ruleta?"
                     mensaje={`¿Seguro que deseas eliminar "${ruletaPendienteEliminar?.nombre}"?`}

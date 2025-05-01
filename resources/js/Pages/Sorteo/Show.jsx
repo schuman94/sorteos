@@ -3,7 +3,7 @@ import MainLayout from '@/Layouts/MainLayout';
 import { Head, router, usePage } from '@inertiajs/react';
 import Ganadores from '@/Components/Sorteo/Ganadores';
 import Filtro from '@/Components/Sorteo/Filtro';
-import ModalConfirmacion from '@/Components/ModalConfirmacion';
+import ModalEliminacion from '@/Components/ModalEliminacion';
 
 export default function Show({ sorteo }) {
     const { auth } = usePage().props;
@@ -64,7 +64,7 @@ export default function Show({ sorteo }) {
                 <Ganadores ganadores={sorteo.ganadores} urlHost={sorteo.urlHost} />
             </div>
 
-            <ModalConfirmacion
+            <ModalEliminacion
                 visible={confirmarVisible}
                 titulo="¿Eliminar sorteo?"
                 mensaje="¿Seguro de que deseas eliminar este sorteo? Esta acción no se puede deshacer."
