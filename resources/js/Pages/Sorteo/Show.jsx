@@ -1,17 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import MainLayout from '@/Layouts/MainLayout';
 import { Head, router, usePage } from '@inertiajs/react';
 import Ganadores from '@/Components/Sorteo/Ganadores';
 import Filtro from '@/Components/Sorteo/Filtro';
-
+import ModalConfirmacion from '@/Components/ModalConfirmacion';
 
 export default function Show({ sorteo }) {
     const { auth } = usePage().props;
     const isOwner = auth.user.id === sorteo.user_id;
+
+    const [confirmarVisible, setConfirmarVisible] = useState(false);
+
     const handleDelete = () => {
-        if (confirm('¿Estás seguro de que deseas eliminar este sorteo?')) {
-            router.delete(route('sorteo.destroy', sorteo.id));
-        }
+        router.delete(route('sorteo.destroy', sorteo.id));
     };
 
     return (
@@ -53,7 +54,7 @@ export default function Show({ sorteo }) {
 
                 {isOwner && (
                     <button
-                        onClick={handleDelete}
+                        onClick={() => setConfirmarVisible(true)}
                         className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded"
                     >
                         Eliminar sorteo
@@ -62,6 +63,14 @@ export default function Show({ sorteo }) {
 
                 <Ganadores ganadores={sorteo.ganadores} urlHost={sorteo.urlHost} />
             </div>
+
+            <ModalConfirmacion
+                visible={confirmarVisible}
+                titulo="¿Eliminar sorteo?"
+                mensaje="¿Seguro de que deseas eliminar este sorteo? Esta acción no se puede deshacer."
+                onCancelar={() => setConfirmarVisible(false)}
+                onConfirmar={handleDelete}
+            />
         </>
     );
 }
