@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import axios from '@/lib/axios';
+import ModalEliminacion from '@/Components/ModalEliminacion';
 
-export default function ModalCargarRuleta({ visible, onClose, onSeleccionar }) {
+export default function ModalCargarRuleta({ visible, onClose, onSeleccionar, ruletaCargadaId, onEliminarActual }) {
     const [ruletas, setRuletas] = useState([]);
     const [filtro, setFiltro] = useState('');
-    const [paginaActual, setPaginaActual] = useState(1);
     const [cargando, setCargando] = useState(true);
     const [error, setError] = useState(null);
-    const [porPagina] = useState(6);
+    const [mostrarCantidad, setMostrarCantidad] = useState(6);
+
+    const [confirmarVisible, setConfirmarVisible] = useState(false);
+    const [ruletaPendienteEliminar, setRuletaPendienteEliminar] = useState(null);
 
     const cargarRuletas = () => {
         setCargando(true);
@@ -16,6 +19,7 @@ export default function ModalCargarRuleta({ visible, onClose, onSeleccionar }) {
                 setRuletas(response.data);
                 setCargando(false);
                 setError(null);
+                setMostrarCantidad(6);
             })
             .catch(error => {
                 console.error('Error al cargar ruletas:', error);
@@ -26,39 +30,63 @@ export default function ModalCargarRuleta({ visible, onClose, onSeleccionar }) {
 
     useEffect(() => {
         if (visible) {
+            setFiltro('');
             cargarRuletas();
         }
     }, [visible]);
 
-    const eliminarRuleta = (id) => {
-        if (!confirm('¿Seguro que quieres eliminar esta ruleta?')) return;
-        axios.delete(route('ruletas.destroy', id))
+    const confirmarEliminar = (ruleta) => {
+        setRuletaPendienteEliminar(ruleta);
+        setConfirmarVisible(true);
+    };
+
+    const eliminarRuleta = () => {
+        if (!ruletaPendienteEliminar) return;
+
+        axios.delete(route('ruletas.destroy', ruletaPendienteEliminar.id))
             .then(() => {
-                setRuletas(prev => prev.filter(r => r.id !== id));
+                setRuletas(prev => {
+                    const nuevasRuletas = prev.filter(r => r.id !== ruletaPendienteEliminar.id);
+                    if (ruletaPendienteEliminar.id === ruletaCargadaId) {
+                        onEliminarActual();
+                    }
+                    return nuevasRuletas;
+                });
             })
-            .catch(() => alert('Error al eliminar la ruleta.'));
+            .catch(() => alert('Error al eliminar la ruleta.'))
+            .finally(() => {
+                setConfirmarVisible(false);
+                setRuletaPendienteEliminar(null);
+            });
     };
 
     const ruletasFiltradas = ruletas.filter(r =>
         r.nombre.toLowerCase().includes(filtro.toLowerCase())
     );
 
-    const totalPaginas = Math.ceil(ruletasFiltradas.length / porPagina);
-    const ruletasPaginadas = ruletasFiltradas.slice((paginaActual - 1) * porPagina, paginaActual * porPagina);
+    const ruletasMostradas = ruletasFiltradas.slice(0, mostrarCantidad);
 
     if (!visible) return null;
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-4xl shadow-lg max-h-[90vh] overflow-y-auto">
-                <h2 className="text-xl font-semibold mb-4">Mis ruletas</h2>
+            <div className="bg-white rounded-lg p-6 w-full max-w-4xl shadow-lg max-h-[90vh] overflow-y-auto min-h-[500px]">
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-semibold">Mis ruletas</h2>
+                    <button
+                        onClick={onClose}
+                        className="px-4 py-1 bg-gray-400 text-white rounded hover:bg-gray-500 text-sm"
+                    >
+                        Cancelar
+                    </button>
+                </div>
 
                 <input
                     type="text"
                     value={filtro}
                     onChange={e => {
                         setFiltro(e.target.value);
-                        setPaginaActual(1);
+                        setMostrarCantidad(6);
                     }}
                     placeholder="Buscar por nombre..."
                     className="w-full border rounded px-3 py-2 mb-4"
@@ -69,11 +97,13 @@ export default function ModalCargarRuleta({ visible, onClose, onSeleccionar }) {
 
                 {!cargando && !error && (
                     <>
-                        {ruletasPaginadas.length > 0 ? (
+                        {ruletasMostradas.length > 0 ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                                {ruletasPaginadas.map(ruleta => (
+                                {ruletasMostradas.map(ruleta => (
                                     <div key={ruleta.id} className="bg-gray-100 p-4 rounded shadow-sm">
-                                        <h3 className="font-semibold">{ruleta.nombre}</h3>
+                                        <h3 className="font-semibold truncate max-w-full">
+                                            {ruleta.nombre.length > 30 ? ruleta.nombre.slice(0, 30) + '...' : ruleta.nombre}
+                                        </h3>
                                         <p className="text-xs text-gray-500">
                                             {new Date(ruleta.created_at).toLocaleString()}
                                         </p>
@@ -88,7 +118,7 @@ export default function ModalCargarRuleta({ visible, onClose, onSeleccionar }) {
                                                 Cargar
                                             </button>
                                             <button
-                                                onClick={() => eliminarRuleta(ruleta.id)}
+                                                onClick={() => confirmarEliminar(ruleta)}
                                                 className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
                                             >
                                                 Eliminar
@@ -101,36 +131,26 @@ export default function ModalCargarRuleta({ visible, onClose, onSeleccionar }) {
                             <p className="text-gray-500">No se encontraron ruletas.</p>
                         )}
 
-                        {totalPaginas > 1 && (
-                            <div className="flex justify-center gap-4 mb-4">
+                        {ruletasMostradas.length < ruletasFiltradas.length && (
+                            <div className="flex justify-center mb-4">
                                 <button
-                                    onClick={() => setPaginaActual(p => Math.max(p - 1, 1))}
-                                    disabled={paginaActual === 1}
-                                    className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 disabled:opacity-50"
+                                    onClick={() => setMostrarCantidad(c => c + 6)}
+                                    className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
                                 >
-                                    Anterior
-                                </button>
-                                <span className="self-center">Página {paginaActual} de {totalPaginas}</span>
-                                <button
-                                    onClick={() => setPaginaActual(p => Math.min(p + 1, totalPaginas))}
-                                    disabled={paginaActual === totalPaginas}
-                                    className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 disabled:opacity-50"
-                                >
-                                    Siguiente
+                                    Mostrar más
                                 </button>
                             </div>
                         )}
                     </>
                 )}
 
-                <div className="flex justify-end">
-                    <button
-                        onClick={onClose}
-                        className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
-                    >
-                        Cancelar
-                    </button>
-                </div>
+                <ModalEliminacion
+                    visible={confirmarVisible}
+                    titulo="¿Eliminar ruleta?"
+                    mensaje={`¿Seguro que deseas eliminar "${ruletaPendienteEliminar?.nombre}"?`}
+                    onCancelar={() => setConfirmarVisible(false)}
+                    onConfirmar={eliminarRuleta}
+                />
             </div>
         </div>
     );

@@ -37,7 +37,7 @@ class RuletaPolicy
      */
     public function update(User $user, Ruleta $ruleta): bool
     {
-        return false;
+        return $ruleta->user_id === $user->id;
     }
 
     /**
@@ -45,7 +45,7 @@ class RuletaPolicy
      */
     public function delete(User $user, Ruleta $ruleta): bool
     {
-        return false;
+        return $ruleta->user_id === $user->id;
     }
 
     /**

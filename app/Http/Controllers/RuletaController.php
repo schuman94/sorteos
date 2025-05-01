@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreRuletaRequest;
 use App\Http\Requests\UpdateRuletaRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 use App\Models\Ruleta;
 use Inertia\Inertia;
@@ -64,6 +65,8 @@ class RuletaController extends Controller
      */
     public function update(Request $request, Ruleta $ruleta)
     {
+        Gate::authorize('update', $ruleta);
+
         $request->validate([
             'nombre' => 'required|string|max:255|unique:ruletas,nombre,' . $ruleta->id . ',id,user_id,' . Auth::id(),
             'entradas' => 'required|array|min:1',
@@ -83,9 +86,7 @@ class RuletaController extends Controller
      */
     public function destroy(Ruleta $ruleta)
     {
-        if ($ruleta->user_id !== Auth::id()) {
-            abort(403, 'No autorizado.');
-        }
+        Gate::authorize('delete', $ruleta);
 
         $ruleta->delete();
 

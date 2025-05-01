@@ -4,6 +4,7 @@ import { Wheel } from 'react-custom-roulette';
 import MainLayout from '@/Layouts/MainLayout';
 import ModalGuardarRuleta from '@/Components/Ruleta/ModalGuardarRuleta';
 import ModalCargarRuleta from '@/Components/Ruleta/ModalCargarRuleta';
+import ModalGanador from '@/Components/Ruleta/ModalGanador';
 import axios from '@/lib/axios';
 
 export default function Ruleta({ user }) {
@@ -12,6 +13,7 @@ export default function Ruleta({ user }) {
     const [mustSpin, setMustSpin] = useState(false);
     const [premioIndex, setPremioIndex] = useState(0);
     const [ganador, setGanador] = useState(null);
+    const [mostrarModalGanador, setMostrarModalGanador] = useState(false);
 
     const [mostrarModalGuardar, setMostrarModalGuardar] = useState(false);
     const [mostrarModalCargar, setMostrarModalCargar] = useState(false);
@@ -31,7 +33,7 @@ export default function Ruleta({ user }) {
         setMustSpin(true);
     };
 
-    const guardarRuleta = async (nombre) => {
+    const guardarRuleta = async (nombre, { onError, onSuccess } = {}) => {
         try {
             const response = await axios.post(route('ruletas.store'), {
                 nombre,
@@ -43,15 +45,17 @@ export default function Ruleta({ user }) {
             setInput(JSON.parse(ruleta.entradas).join('\n'));
             setOpciones(JSON.parse(ruleta.entradas).map(op => ({ option: op })));
             setMostrarModalGuardar(false);
+            onSuccess?.();
         } catch (error) {
             console.error(error);
-            alert(error.response?.data?.message || 'Error al guardar la ruleta');
+            if (error.response?.status === 422) {
+                onError?.(error.response.data.errors);
+            }
         }
     };
 
-    const actualizarRuleta = async (nombre) => {
-        if (!ruletaCargada) return;
 
+    const actualizarRuleta = async (nombre, { onError, onSuccess } = {}) => {
         try {
             const response = await axios.put(route('ruletas.update', ruletaCargada.id), {
                 nombre,
@@ -63,11 +67,15 @@ export default function Ruleta({ user }) {
             setInput(JSON.parse(ruleta.entradas).join('\n'));
             setOpciones(JSON.parse(ruleta.entradas).map(op => ({ option: op })));
             setMostrarModalGuardar(false);
+            onSuccess?.();
         } catch (error) {
             console.error(error);
-            alert(error.response?.data?.message || 'Error al actualizar la ruleta');
+            if (error.response?.status === 422) {
+                onError?.(error.response.data.errors);
+            }
         }
     };
+
 
     const cargarRuleta = (ruleta) => {
         setRuletaCargada(ruleta);
@@ -121,7 +129,11 @@ export default function Ruleta({ user }) {
                             data={opcionesRuleta}
                             onStopSpinning={() => {
                                 setMustSpin(false);
-                                setGanador(opciones[premioIndex]?.option ?? null);
+                                const opcionGanadora = opciones[premioIndex]?.option ?? null;
+                                setGanador(opcionGanadora);
+                                if (opcionGanadora) {
+                                    setMostrarModalGanador(true);
+                                }
                             }}
                             backgroundColors={backgroundColors}
                             textColors={['#ffffff']}
@@ -134,8 +146,8 @@ export default function Ruleta({ user }) {
                         {user ? (
                             <div className="mt-4 flex gap-4">
                                 <button onClick={manejarNueva} className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Nueva</button>
-                                <button onClick={() => setMostrarModalGuardar(true)} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" disabled={opciones.length < 1}>Guardar</button>
                                 <button onClick={() => setMostrarModalCargar(true)} className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">Cargar</button>
+                                <button onClick={() => setMostrarModalGuardar(true)} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:opacity-50" disabled={opciones.length < 1}>Guardar</button>
                                 <button onClick={manejarGirar} className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 disabled:opacity-50" disabled={opciones.length < 2}>Girar</button>
                             </div>
                         ) : (
@@ -147,11 +159,12 @@ export default function Ruleta({ user }) {
                     </div>
                 </div>
 
-                {ganador && (
-                    <div className="mt-6 text-xl font-semibold text-green-700 text-center">
-                        Opción ganadora: {ganador}
-                    </div>
-                )}
+                <ModalGanador
+                    visible={mostrarModalGanador}
+                    ganador={ganador}
+                    onClose={() => setMostrarModalGanador(false)}
+                />
+
             </div>
 
             <ModalGuardarRuleta
@@ -166,7 +179,15 @@ export default function Ruleta({ user }) {
                 visible={mostrarModalCargar}
                 onClose={() => setMostrarModalCargar(false)}
                 onSeleccionar={cargarRuleta}
+                ruletaCargadaId={ruletaCargada?.id}
+                onEliminarActual={() => {
+                    setRuletaCargada(null);
+                    setInput('');
+                    setOpciones([]);
+                    setGanador(null);
+                }}
             />
+
         </>
     );
 }
