@@ -15,6 +15,12 @@ export default function Show({ sorteo }) {
         router.delete(route('sorteo.destroy', sorteo.id));
     };
 
+    const handleEnviarARuleta = () => {
+        router.visit(route('ruleta', { sorteo: sorteo.id }));
+    };
+
+    const hayGanadoresTitulares = sorteo.ganadores.some(g => !g.es_suplente);
+
     return (
         <>
             <Head title={`Sorteo`} />
@@ -52,14 +58,27 @@ export default function Show({ sorteo }) {
 
                 {sorteo.filtro && <Filtro filtro={sorteo.filtro} />}
 
-                {isOwner && (
-                    <button
-                        onClick={() => setConfirmarVisible(true)}
-                        className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded"
-                    >
-                        Eliminar sorteo
-                    </button>
-                )}
+                <div className="flex flex-col sm:flex-row gap-4">
+                    {isOwner && (
+                        <>
+                            <button
+                                onClick={() => setConfirmarVisible(true)}
+                                className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded"
+                            >
+                                Eliminar sorteo
+                            </button>
+
+                            {hayGanadoresTitulares && (
+                                <button
+                                    onClick={handleEnviarARuleta}
+                                    className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded"
+                                >
+                                    Enviar a ruleta
+                                </button>
+                            )}
+                        </>
+                    )}
+                </div>
 
                 <Ganadores ganadores={sorteo.ganadores} urlHost={sorteo.urlHost} />
             </div>

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreRuletaRequest;
 use App\Http\Requests\UpdateRuletaRequest;
+use App\Models\Sorteo;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
@@ -12,24 +14,30 @@ use Inertia\Inertia;
 
 class RuletaController extends Controller
 {
-    public function inicio()
+    public function inicio(Request $request)
     {
+        $sorteoId = $request->query('sorteo');
+        $nombres = '';
+
+        if ($sorteoId) {
+            $sorteo = Sorteo::with(['ganadores', 'ganadores.comentario'])
+                ->where('id', $sorteoId)
+                ->where('user_id', Auth::id()) // Solo el dueño puede usarlo
+                ->firstOrFail();
+
+                $nombres = collect($sorteo->ganadores)
+                ->where('esSuplente', false)
+                ->map(function ($ganador) {
+                    return $ganador->nombre_manual ?? ($ganador->comentario->autor ?? null);
+                })
+                ->filter()
+                ->implode("\n");
+        }
+
         return Inertia::render('Ruleta/Ruleta', [
             'user' => Auth::user(),
+            'nombresPrecargados' => $nombres,
         ]);
-    }
-
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        $ruletas = Auth::user()
-            ->ruletas()
-            ->latest()
-            ->get();
-
-        return response()->json($ruletas);
     }
 
     /**

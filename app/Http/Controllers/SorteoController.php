@@ -282,7 +282,7 @@ class SorteoController extends Controller
             ->orderBy('esSuplente') // primero titulares
             ->orderBy('posicion')
             ->get()
-            ->map(function ($g) {
+            ->map(function ($g) use ($sorteo) {
                 return [
                     'nombre' => $g->nombre_manual ?? $g->autor,
                     'clasificacion' => $g->esSuplente ? 'suplente' : 'titular',
@@ -290,6 +290,7 @@ class SorteoController extends Controller
                     'comentario' => $g->texto ?? null,
                     'likes' => $g->likes ?? null,
                     'fecha' => $g->fecha ?? null,
+                    'sorteo_id' => $sorteo->id,
                 ];
             })->toArray();
     }

@@ -7,9 +7,15 @@ import ModalCargarRuleta from '@/Components/Ruleta/ModalCargarRuleta';
 import ModalGanador from '@/Components/Ruleta/ModalGanador';
 import axios from '@/lib/axios';
 
-export default function Ruleta({ user }) {
-    const [input, setInput] = useState('');
-    const [opciones, setOpciones] = useState([]);
+export default function Ruleta({ user, nombresPrecargados = '' }) {
+    const [input, setInput] = useState(nombresPrecargados);
+    const [opciones, setOpciones] = useState(
+        nombresPrecargados
+            .split('\n')
+            .map(linea => linea.trim())
+            .filter(linea => linea.length > 0)
+            .map(nombre => ({ option: nombre }))
+    );
     const [mustSpin, setMustSpin] = useState(false);
     const [premioIndex, setPremioIndex] = useState(0);
     const [ganador, setGanador] = useState(null);
@@ -92,6 +98,12 @@ export default function Ruleta({ user }) {
         '#9B5DE5', '#00BBF9', '#00F5D4', '#F15BB5',
     ];
     const opcionesRuleta = opciones.length > 0 ? opciones : [{ option: '...' }, { option: '...' }];
+    const opcionesVisuales = opciones.length > 0
+    ? opciones.map(op => ({
+        option: op.option.length > 20 ? op.option.slice(0, 17) + '...' : op.option
+    }))
+    : [{ option: '...' }, { option: '...' }];
+
     const backgroundColors = opcionesRuleta.map((_, i) => coloresDisponibles[i % coloresDisponibles.length]);
 
     return (
@@ -105,7 +117,7 @@ export default function Ruleta({ user }) {
 
                 <div className="flex flex-col md:flex-row gap-32 justify-center items-start mb-8">
                     <textarea
-                        className="w-full md:w-64 border rounded p-2 h-[500px] resize-none"
+                        className="w-full md:w-64 border rounded p-2 h-[500px] resize-none font-mono overflow-x-auto whitespace-pre text-sm"
                         value={input}
                         onChange={(e) => {
                             const valor = e.target.value;
@@ -119,14 +131,14 @@ export default function Ruleta({ user }) {
                             const nuevasOpciones = lineas.map((linea) => ({ option: linea }));
                             setOpciones(nuevasOpciones);
                         }}
-                        placeholder="Escribe una opción por línea"
+                        placeholder="Una opción por línea"
                     />
 
                     <div className="flex flex-col items-center">
                         <Wheel
                             mustStartSpinning={mustSpin}
                             prizeNumber={premioIndex}
-                            data={opcionesRuleta}
+                            data={opcionesVisuales}
                             onStopSpinning={() => {
                                 setMustSpin(false);
                                 const opcionGanadora = opciones[premioIndex]?.option ?? null;
@@ -141,6 +153,7 @@ export default function Ruleta({ user }) {
                             radiusLineWidth={0}
                             outerBorderColor="transparent"
                             radiusLineColor="transparent"
+                            fontSize={14}
                         />
 
                         {user ? (
