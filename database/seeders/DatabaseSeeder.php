@@ -18,6 +18,8 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             HostSeeder::class,
             DominioSeeder::class,
+            PremioSeeder::class,
+            ColeccionSeeder::class,
         ]);
     }
 }
