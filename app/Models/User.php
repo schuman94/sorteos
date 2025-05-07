@@ -67,4 +67,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(Ruleta::class);
     }
+
+    public function colecciones()
+    {
+        return $this->hasMany(Coleccion::class);
+    }
+
+    public function rascas()
+    {
+        return $this->hasMany(Rasca::class, 'scratched_by');
+    }
 }
