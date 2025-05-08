@@ -18,14 +18,48 @@ class ColeccionSeeder extends Seeder
     {
         $sergio = User::where('name', 'sergio')->first();
 
-        $coleccion = Coleccion::create([
+        $coleccion1 = Coleccion::create([
             'nombre' => 'Rascas Nijuuni 2025',
             'descripcion' => 'Rasca y podrás obtener una camiseta o sudadera de la marca Nijuuni. Disponible durante 2025',
             'user_id' => $sergio->id,
             'abierta' => true,
         ]);
 
-        $this->crearRascas($coleccion);
+        $coleccion2 = Coleccion::create([
+            'nombre' => 'Rascas Camisetas',
+            'descripcion' => 'Rasca y podrás obtener una camiseta o sudadera.',
+            'user_id' => $sergio->id,
+            'abierta' => true,
+        ]);
+
+        $coleccion3 = Coleccion::create([
+            'nombre' => 'Rascas Camisetas y sudaderas',
+            'descripcion' => 'Rasca y podrás obtener una camiseta o sudadera.',
+            'user_id' => $sergio->id,
+            'abierta' => true,
+        ]);
+
+        $coleccion4 = Coleccion::create([
+            'nombre' => 'Rascas Coleccion 4',
+            'descripcion' => 'Descripcion de la coleccion de rascas 4.',
+            'user_id' => $sergio->id,
+            'abierta' => true,
+        ]);
+
+        $coleccion5 = Coleccion::create([
+            'nombre' => 'Rascas Coleccion 5',
+            'descripcion' => 'Descripcion de la coleccion de rascas 5.',
+            'user_id' => $sergio->id,
+            'abierta' => true,
+        ]);
+
+
+
+        $this->crearRascas($coleccion1);
+        $this->crearRascas($coleccion2);
+        $this->crearRascas($coleccion3);
+        $this->crearRascas($coleccion4);
+        $this->crearRascas($coleccion5);
     }
 
     /**

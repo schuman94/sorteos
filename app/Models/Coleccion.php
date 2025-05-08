@@ -17,7 +17,7 @@ class Coleccion extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function esta_abierta() {
+    public function estaAbierta() {
         return $this->abierta;
     }
 

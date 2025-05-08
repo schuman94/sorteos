@@ -5,10 +5,13 @@ use App\Http\Controllers\PublicacionController;
 use App\Http\Controllers\SorteoController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\CertificadoController;
+use App\Http\Controllers\ColeccionController;
+use App\Http\Controllers\PremioController;
 use App\Http\Controllers\RuletaController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Middleware\AdminMiddleware;
+use App\Models\Coleccion;
 
 Route::get('/', function () {
     return Inertia::render('Home');
@@ -64,6 +67,19 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/ruletas', [RuletaController::class, 'store'])->name('ruletas.store');
     Route::put('/ruletas/{ruleta}', [RuletaController::class, 'update'])->name('ruletas.update');
     Route::delete('/ruletas/{ruleta}', [RuletaController::class, 'destroy'])->name('ruletas.destroy');
+});
+
+Route::middleware('auth')->group(function () {
+    Route::get('/colecciones', [ColeccionController::class, 'index'])->name('colecciones.index');
+    Route::get('/colecciones/create', [ColeccionController::class, 'create'])->name('colecciones.create');
+    Route::post('/colecciones', [ColeccionController::class, 'store'])->name('colecciones.store');
+    Route::get('/colecciones/{coleccion}', [ColeccionController::class, 'show'])->name('colecciones.show');
+});
+
+
+Route::middleware('auth')->group(function () {
+    Route::get('/premios', [PremioController::class, 'index'])->name('premios.index');
+    Route::post('/premios', [PremioController::class, 'store'])->name('premios.store');
 });
 
 

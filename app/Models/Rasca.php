@@ -29,4 +29,9 @@ class Rasca extends Model
         return $this->belongsTo(User::class, 'scratched_by');
     }
 
+    public function estaPremiado()
+    {
+        return !is_null($this->premio);
+    }
+
 }

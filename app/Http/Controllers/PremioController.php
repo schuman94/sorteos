@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StorePremioRequest;
 use App\Http\Requests\UpdatePremioRequest;
 use App\Models\Premio;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 class PremioController extends Controller
 {
@@ -13,7 +15,8 @@ class PremioController extends Controller
      */
     public function index()
     {
-        //
+        $premios = Auth::user()->premios()->get();
+        return response()->json($premios);
     }
 
     /**
@@ -27,9 +30,20 @@ class PremioController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StorePremioRequest $request)
+    public function store(Request $request)
     {
-        //
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+            'descripcion' => 'required|string',
+        ]);
+
+        $premio = new Premio();
+        $premio->nombre = $request->nombre;
+        $premio->descripcion = $request->descripcion;
+        $premio->user()->associate(Auth::user());
+        $premio->save();
+
+        return response()->json($premio);
     }
 
     /**

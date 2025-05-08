@@ -17,9 +17,9 @@ class Premio extends Model
         return $this->hasMany(Rasca::class);
     }
 
-    public function esta_premiado()
+    public function user()
     {
-        //
+        return $this->belongsTo(User::class);
     }
 
 }
