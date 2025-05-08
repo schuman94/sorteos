@@ -16,6 +16,13 @@ export default function Index({ colecciones }) {
             <div className="max-w-5xl mx-auto py-12 px-4">
                 <h1 className="text-2xl font-semibold mb-6">Colecciones</h1>
 
+                <button
+                    onClick={() => router.visit(route('colecciones.create'))}
+                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                >
+                    Crear Colección
+                </button>
+
                 {colecciones.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {colecciones.map((coleccion) => (
