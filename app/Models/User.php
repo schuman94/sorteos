@@ -77,4 +77,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Rasca::class, 'scratched_by');
     }
+
+    public function premios()
+    {
+        return $this->hasMany(Premio::class);
+    }
 }

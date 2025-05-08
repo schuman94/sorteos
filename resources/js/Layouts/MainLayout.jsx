@@ -44,6 +44,12 @@ export default function MainLayout({ header, children }) {
                                 >
                                     Ruleta
                                 </NavLink>
+                                <NavLink
+                                    href={route('colecciones.index')}
+                                    active={route().current('colecciones.index')}
+                                >
+                                    Rascas
+                                </NavLink>
                                 {user?.is_admin && (
                                     <NavLink
                                         href={route('admin.users.index')}
