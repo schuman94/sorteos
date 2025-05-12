@@ -1,5 +1,3 @@
-// resources/js/Pages/Admin/Usuarios/Show.jsx
-
 import React from 'react';
 import MainLayout from '@/Layouts/MainLayout';
 import { Head, Link } from '@inertiajs/react';

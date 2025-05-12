@@ -1,7 +1,7 @@
 import MainLayout from '@/Layouts/MainLayout';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Head, Link, usePage, router } from '@inertiajs/react';
-import axios from '../lib/axios';
+import axios from '@/lib/axios';
 import Data from '@/Components/Publicacion/Data';
 
 export default function Home({ auth }) {
@@ -40,6 +40,7 @@ export default function Home({ auth }) {
     };
 
     const cargarComentarios = () => {
+        // Route::post('/sorteo', ...
         router.post(route('publicacion.comentarios'), { url: publicacionData.url });
     };
 

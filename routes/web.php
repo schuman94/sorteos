@@ -17,6 +17,7 @@ Route::get('/', function () {
     return Inertia::render('Home');
 })->name('home');
 
+
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
@@ -28,7 +29,13 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::post('/buscar-publicacion', [PublicacionController::class, 'buscar'])->name('publicacion.buscar');
+
 Route::post('/sorteo', [PublicacionController::class, 'cargarComentarios'])->middleware('auth')->name('publicacion.comentarios');
+Route::get('/sorteo', function () {
+    // Para redirigir a home si el usuario refresca la pagina (peticion get) despues de cargar comentarios
+    return redirect()->route('home');
+});
+
 Route::get('/comentarios', [PublicacionController::class, 'visualizarComentarios'])->middleware('auth')->name('comentarios.visualizar');
 Route::post('/sorteo/iniciar', [SorteoController::class, 'iniciar'])->middleware('auth')->name('sorteo.iniciar');
 
@@ -38,9 +45,6 @@ Route::get('/sorteo-manual', function () {
 
 Route::post('/sorteo-manual/iniciar', [SorteoController::class, 'iniciar_manual'])->middleware('auth')->name('sorteo.manual.iniciar');
 
-Route::get('/sorteo', function () {
-    return redirect()->route('home');
-});
 
 Route::get('/historial', [SorteoController::class, 'historial'])->middleware('auth')->name('sorteo.historial');
 

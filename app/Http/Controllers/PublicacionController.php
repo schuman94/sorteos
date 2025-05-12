@@ -90,8 +90,8 @@ class PublicacionController extends Controller
             return Inertia::render('Sorteo/Sorteo', $publicacion->toArray());
 
         } catch (\Exception $e) {
-            return redirect()->route('home')->withErrors([
-                'url' => 'Error al cargar los comentarios: ' . $e->getMessage()
+            return back()->withErrors([
+                'url' => 'Error al cargar los comentarios: ' . $e->getMessage(),
             ]);
         }
     }
