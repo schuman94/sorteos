@@ -1,8 +1,8 @@
 import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import Dropdown from '@/Components/Dropdown';
-import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
+import { Link, usePage } from '@inertiajs/react';
 
 export default function MainLayout({ header, children }) {
     const { auth } = usePage().props;

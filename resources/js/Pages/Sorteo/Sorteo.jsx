@@ -1,11 +1,11 @@
 import MainLayout from '@/Layouts/MainLayout';
-import { useState, useEffect } from 'react';
 import Data from '@/Components/Publicacion/Data';
 import Comentarios from '@/Components/Publicacion/Comentarios';
 import Ganadores from '@/Components/Sorteo/Ganadores';
 import CuentaRegresiva from '@/Components/Sorteo/CuentaRegresiva';
-import { Head } from '@inertiajs/react';
 import axios from '@/lib/axios';
+import { useState, useEffect } from 'react';
+import { Head } from '@inertiajs/react';
 
 export default function Sorteo(props) {
     const [formData, setFormData] = useState({

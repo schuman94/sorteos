@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
-import axios from '@/lib/axios';
 import ModalEliminacion from '@/Components/ModalEliminacion';
+import axios from '@/lib/axios';
+import { useEffect, useState } from 'react';
 
 export default function ModalCargarRuleta({ visible, onClose, onSeleccionar, ruletaCargadaId, onEliminarActual }) {
     const [ruletas, setRuletas] = useState([]);

@@ -1,11 +1,11 @@
-import { useState } from 'react';
-import { Head } from '@inertiajs/react';
-import { Wheel } from 'react-custom-roulette';
 import MainLayout from '@/Layouts/MainLayout';
 import ModalGuardarRuleta from '@/Components/Ruleta/ModalGuardarRuleta';
 import ModalCargarRuleta from '@/Components/Ruleta/ModalCargarRuleta';
 import ModalGanador from '@/Components/Ruleta/ModalGanador';
 import axios from '@/lib/axios';
+import { useState } from 'react';
+import { Head } from '@inertiajs/react';
+import { Wheel } from 'react-custom-roulette';
 
 export default function Ruleta({ user, nombresPrecargados = '' }) {
     const [input, setInput] = useState(nombresPrecargados);

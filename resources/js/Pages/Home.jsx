@@ -1,10 +1,10 @@
 import MainLayout from '@/Layouts/MainLayout';
+import Data from '@/Components/Publicacion/Data';
+import axios from '@/lib/axios';
 import { useState } from 'react';
 import { Head, Link, usePage, router } from '@inertiajs/react';
-import axios from '@/lib/axios';
-import Data from '@/Components/Publicacion/Data';
 
-export default function Home({ auth }) {
+export default function Home() {
     const [url, setUrl] = useState('');
     const [publicacionData, setPublicacionData] = useState('');
     const [loading, setLoading] = useState(false);

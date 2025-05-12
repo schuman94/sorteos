@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { Head, router } from '@inertiajs/react';
+import MainLayout from '@/Layouts/MainLayout';
 import ModalCrearPremio from '@/Components/Premio/ModalCrearPremio';
 import ModalCargarPremio from '@/Components/Premio/ModalCargarPremio';
-import MainLayout from '@/Layouts/MainLayout';
+import { useState } from 'react';
+import { Head, router } from '@inertiajs/react';
 
 export default function Index() {
     const [nombre, setNombre] = useState('');
