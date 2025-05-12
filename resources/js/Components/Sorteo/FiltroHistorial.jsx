@@ -1,5 +1,3 @@
-import React from 'react';
-
 export default function FiltroHistorial({ anyoSeleccionado, tipoSeleccionado, anyos, hosts, onChange }) {
     return (
         <div className="flex justify-between items-center mb-6 flex-wrap gap-4">

@@ -1,4 +1,3 @@
-import React from 'react';
 import GanadorCard from '@/Components/Sorteo/GanadorCard';
 import { router } from '@inertiajs/react';
 

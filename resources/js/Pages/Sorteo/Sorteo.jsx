@@ -40,10 +40,14 @@ export default function Sorteo(props) {
     }, [cuentaRegresiva]);
 
     const handleChange = (e) => {
+        // Desestructuracion de objeto: declaramos las variables name, type, value y checked y les damos su valor correspondiente del input.
         const { name, type, value, checked } = e.target;
-        setFormData({
-            ...formData,
-            [name]: type === 'checkbox' ? checked : value,
+        // La funcion set creada con useState recibe como parametro un objeto, ya que ese es el tipo de dato de la variable formData.
+        setFormData({ // Forma abreviada de React para indicar el objeto con el valor actualizado.
+            ...formData, // Se crea una copia del objeto
+            [name]: type === 'checkbox' ? checked : value, // y se modifica solo la propiedad que nos interesa mediante una asignación automatica de [clave]: valor.
+            // La variable name contiene el nombre de la propiedad y la variable value contiene el nuevo valor del input.
+            // El operador terciario es por si se trata de un campo de tipo checkbox, en este caso no se asigna value, sino checked.
         });
     };
 

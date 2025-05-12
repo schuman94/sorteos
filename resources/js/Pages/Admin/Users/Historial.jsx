@@ -1,7 +1,7 @@
 import MainLayout from '@/Layouts/MainLayout';
-import { Head, router } from '@inertiajs/react';
 import SorteoCard from '@/Components/Sorteo/SorteoCard';
 import FiltroHistorial from '@/Components/Sorteo/FiltroHistorial';
+import { Head, router } from '@inertiajs/react';
 
 export default function Historial({ user, sorteos, hosts, anyos, anyoSeleccionado, tipoSeleccionado }) {
     const handleFilterChange = (e) => {
