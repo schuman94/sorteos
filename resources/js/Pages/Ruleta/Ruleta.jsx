@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Head } from '@inertiajs/react';
 import { Wheel } from 'react-custom-roulette';
 import MainLayout from '@/Layouts/MainLayout';

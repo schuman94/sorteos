@@ -1,5 +1,5 @@
 import MainLayout from '@/Layouts/MainLayout';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Data from '@/Components/Publicacion/Data';
 import Comentarios from '@/Components/Publicacion/Comentarios';
 import Ganadores from '@/Components/Sorteo/Ganadores';

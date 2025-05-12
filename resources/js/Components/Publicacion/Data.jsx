@@ -1,5 +1,3 @@
-import React from 'react';
-
 export default function Show({ autor, num_comentarios, likes, fecha_publicacion, titulo, visualizaciones, url }) {
     return (
         <div className="max-w-md mx-auto mt-8 p-4 border rounded bg-white shadow dark:bg-gray-800 dark:text-white">

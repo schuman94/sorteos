@@ -1,5 +1,3 @@
-import React from 'react';
-
 export default function ModalGanador({ visible, ganador, onClose }) {
     if (!visible || !ganador) return null;
 

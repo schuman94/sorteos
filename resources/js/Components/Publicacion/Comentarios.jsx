@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from '@/lib/axios';
 import Comentario from '@/Components/Publicacion/Comentario';
 

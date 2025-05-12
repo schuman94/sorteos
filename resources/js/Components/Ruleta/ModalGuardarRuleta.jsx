@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function ModalGuardarRuleta({ visible, onClose, onGuardarNueva, onActualizar, ruletaCargada }) {
     const [nombre, setNombre] = useState('');

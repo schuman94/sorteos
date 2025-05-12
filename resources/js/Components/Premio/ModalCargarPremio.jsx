@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from '@/lib/axios';
 
 export default function ModalCargarPremio({ visible, onClose, onSeleccionarPremio }) {
