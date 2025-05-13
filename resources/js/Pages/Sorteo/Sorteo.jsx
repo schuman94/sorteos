@@ -1,5 +1,5 @@
 import MainLayout from '@/Layouts/MainLayout';
-import Data from '@/Components/Publicacion/Data';
+import Publicacion from '@/Components/Publicacion/Publicacion';
 import Comentarios from '@/Components/Publicacion/Comentarios';
 import Ganadores from '@/Components/Sorteo/Ganadores';
 import CuentaRegresiva from '@/Components/Sorteo/CuentaRegresiva';
@@ -82,7 +82,7 @@ export default function Sorteo(props) {
                 {!ganadores ? (
                     <>
                         <div className="flex justify-center mb-12">
-                            <Data {...props} />
+                            <Publicacion {...props} />
                         </div>
 
                         <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 p-6 rounded shadow mb-8">

@@ -1,12 +1,12 @@
 import MainLayout from '@/Layouts/MainLayout';
-import Data from '@/Components/Publicacion/Data';
+import Publicacion from '@/Components/Publicacion/Publicacion';
 import axios from '@/lib/axios';
 import { useState } from 'react';
 import { Head, Link, usePage, router } from '@inertiajs/react';
 
 export default function Home() {
     const [url, setUrl] = useState('');
-    const [publicacionData, setPublicacionData] = useState('');
+    const [publicacion, setPublicacion] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const { errors } = usePage().props;
@@ -15,11 +15,11 @@ export default function Home() {
         e.preventDefault();
         setLoading(true);
         setError(null);
-        setPublicacionData(null);
+        setPublicacion(null);
 
         try {
-            const response = await axios.post('/buscar-publicacion', { url });
-            setPublicacionData(response.data);
+            const response = await axios.post(route('publicacion.buscar'), { url });
+            setPublicacion(response.data);
         } catch (err) {
             if (err.response && err.response.data) {
                 // Errores del validate del controlador
@@ -41,7 +41,7 @@ export default function Home() {
 
     const cargarComentarios = () => {
         // Route::post('/sorteo', ...
-        router.post(route('publicacion.comentarios'), { url: publicacionData.url });
+        router.post(route('publicacion.comentarios'), { url: publicacion.url });
     };
 
     return (
@@ -79,14 +79,14 @@ export default function Home() {
                     {error && <div className="mt-4 text-red-600">{error}</div>}
 
                     {/* Mostrar los datos de la publicación si existen */}
-                    {publicacionData && (
+                    {publicacion && (
                         <>
                             <div className="mt-8">
-                                <Data {...publicacionData} />
+                                <Publicacion {...publicacion} />
                             </div>
 
                             <button
-                                onClick={() => cargarComentarios(publicacionData.url)}
+                                onClick={() => cargarComentarios(publicacion.url)}
                                 className="mt-4 px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
                             >
                                 Cargar comentarios
