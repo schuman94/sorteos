@@ -48,7 +48,6 @@ class PublicacionController extends Controller
 
             // Retornar la respuesta con los datos
             return response()->json($publicacion);
-
         } catch (\InvalidArgumentException $e) {
             return response()->json(['error' => 'La URL no corresponde a una publicación válida.'], 422);
         } catch (\RuntimeException $e) {
@@ -80,18 +79,20 @@ class PublicacionController extends Controller
             $publicacion->cargarComentariosDesdeApi();
 
             // Almacenar los datos de la publicacion en la sesión
-            Session::put('publicacionData', $publicacion->toArray());
-
-            // Almacenar los comentarios en la sesión
-            Session::put('comentarios', $publicacion->comentarios);
-
+            // Es necesario incluir los los comentarios explícitamente, ya que...
+            // el método toArray solo convierte atributos persistidos del modelo eloquent.
+            Session::put('publicacion', array_merge(
+                $publicacion->toArray(),
+                ['comentarios' => $publicacion->comentarios]
+            ));
 
             // Retornar la vista con los datos
-            return Inertia::render('Sorteo/Sorteo', $publicacion->toArray());
-
+            return Inertia::render('Sorteo/Sorteo', [
+                'publicacion' => $publicacion->toArray() // No se pasan los comentarios
+            ]);
         } catch (\Exception $e) {
-            return redirect()->route('home')->withErrors([
-                'url' => 'Error al cargar los comentarios: ' . $e->getMessage()
+            return back()->withErrors([
+                'url' => 'Error al cargar los comentarios: ' . $e->getMessage(),
             ]);
         }
     }
@@ -101,7 +102,8 @@ class PublicacionController extends Controller
      */
     public function visualizarComentarios()
     {
-        $comentarios = Session::get('comentarios', []);
+        $publicacion = Session::get('publicacion', []);
+        $comentarios = $publicacion['comentarios'] ?? [];
 
         // Obtenemos la página actual
         $paginaActual = LengthAwarePaginator::resolveCurrentPage();
@@ -123,5 +125,4 @@ class PublicacionController extends Controller
 
         return response()->json($comentariosPaginados);
     }
-
 }

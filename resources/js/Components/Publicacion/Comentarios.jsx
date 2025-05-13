@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import axios from '../../lib/axios';
 import Comentario from '@/Components/Publicacion/Comentario';
+import axios from '@/lib/axios';
+import { useEffect, useState } from 'react';
 
 export default function Comentarios() {
     const [comentarios, setComentarios] = useState([]);

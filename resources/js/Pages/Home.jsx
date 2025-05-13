@@ -1,12 +1,12 @@
 import MainLayout from '@/Layouts/MainLayout';
-import React, { useState } from 'react';
+import Publicacion from '@/Components/Publicacion/Publicacion';
+import axios from '@/lib/axios';
+import { useState } from 'react';
 import { Head, Link, usePage, router } from '@inertiajs/react';
-import axios from '../lib/axios';
-import Data from '@/Components/Publicacion/Data';
 
-export default function Home({ auth }) {
+export default function Home() {
     const [url, setUrl] = useState('');
-    const [publicacionData, setPublicacionData] = useState('');
+    const [publicacion, setPublicacion] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const { errors } = usePage().props;
@@ -15,11 +15,11 @@ export default function Home({ auth }) {
         e.preventDefault();
         setLoading(true);
         setError(null);
-        setPublicacionData(null);
+        setPublicacion(null);
 
-        try {
-            const response = await axios.post('/buscar-publicacion', { url });
-            setPublicacionData(response.data);
+        try {                                                            // forma simplificada de {url: url}
+            const response = await axios.post(route('publicacion.buscar'), { url });
+            setPublicacion(response.data);
         } catch (err) {
             if (err.response && err.response.data) {
                 // Errores del validate del controlador
@@ -40,7 +40,9 @@ export default function Home({ auth }) {
     };
 
     const cargarComentarios = () => {
-        router.post(route('publicacion.comentarios'), { url: publicacionData.url });
+        // Route::post('/sorteo', ...                 // aqui no se usa la forma simplificada porque debe llamarse url
+        router.post(route('publicacion.comentarios'), { url: publicacion.url });
+        // Pasamos la publicacion.url y no la variable url (de useState) por si el usuario escribe otra cosa en el input antes de darle a cargar comentarios
     };
 
     return (
@@ -78,14 +80,14 @@ export default function Home({ auth }) {
                     {error && <div className="mt-4 text-red-600">{error}</div>}
 
                     {/* Mostrar los datos de la publicación si existen */}
-                    {publicacionData && (
+                    {publicacion && (
                         <>
                             <div className="mt-8">
-                                <Data {...publicacionData} />
+                                <Publicacion {...publicacion} />
                             </div>
 
                             <button
-                                onClick={() => cargarComentarios(publicacionData.url)}
+                                onClick={cargarComentarios}
                                 className="mt-4 px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
                             >
                                 Cargar comentarios
@@ -102,10 +104,6 @@ export default function Home({ auth }) {
                         </Link>
                     </div>
                 </main>
-
-                <footer className="text-center py-4 text-sm">
-                    {/* Nada por ahora */}
-                </footer>
             </div>
         </>
     );

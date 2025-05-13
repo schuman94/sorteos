@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
 import MainLayout from '@/Layouts/MainLayout';
-import { Head, router, usePage } from '@inertiajs/react';
 import Ganadores from '@/Components/Sorteo/Ganadores';
 import Filtro from '@/Components/Sorteo/Filtro';
 import ModalEliminacion from '@/Components/ModalEliminacion';
+import { useState } from 'react';
+import { Head, router, usePage } from '@inertiajs/react';
 
 export default function Show({ sorteo }) {
     const { auth } = usePage().props;

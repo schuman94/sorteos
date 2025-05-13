@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
 import axios from '@/lib/axios';
+import { useState, useEffect } from 'react';
 
 export default function ModalCargarPremio({ visible, onClose, onSeleccionarPremio }) {
     const [premios, setPremios] = useState([]);

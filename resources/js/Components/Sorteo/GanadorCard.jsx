@@ -1,5 +1,3 @@
-import React from 'react';
-
 export default function GanadorCard({ nombre, posicion, comentario, likes, fecha, urlHost }) {
     const construirPerfil = () => {
         if (!comentario || !urlHost) return null;

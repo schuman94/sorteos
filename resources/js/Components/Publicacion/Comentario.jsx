@@ -1,5 +1,3 @@
-import React from 'react';
-
 export default function Comentario({ autor, fecha, texto, likes }) {
     return (
         <li className="border-b pb-4">

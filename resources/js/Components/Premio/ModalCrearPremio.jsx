@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
 import axios from '@/lib/axios';
+import { useState } from 'react';
 
 export default function ModalNuevoPremio({ visible, onClose, onCrearPremio }) {
     const [nombre, setNombre] = useState('');

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\PublicacionController;
 use App\Http\Controllers\SorteoController;
 use App\Http\Controllers\Admin\UserController;
@@ -17,6 +18,7 @@ Route::get('/', function () {
     return Inertia::render('Home');
 })->name('home');
 
+
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
@@ -28,7 +30,18 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::post('/buscar-publicacion', [PublicacionController::class, 'buscar'])->name('publicacion.buscar');
+
 Route::post('/sorteo', [PublicacionController::class, 'cargarComentarios'])->middleware('auth')->name('publicacion.comentarios');
+Route::get('/sorteo', function () {
+    $publicacion = Session::get('publicacion');
+    if ($publicacion) {
+        return Inertia::render('Sorteo/Sorteo', [
+            'publicacion' => $publicacion,
+        ]);
+    }
+    return redirect()->route('home');
+});
+
 Route::get('/comentarios', [PublicacionController::class, 'visualizarComentarios'])->middleware('auth')->name('comentarios.visualizar');
 Route::post('/sorteo/iniciar', [SorteoController::class, 'iniciar'])->middleware('auth')->name('sorteo.iniciar');
 
@@ -38,20 +51,16 @@ Route::get('/sorteo-manual', function () {
 
 Route::post('/sorteo-manual/iniciar', [SorteoController::class, 'iniciar_manual'])->middleware('auth')->name('sorteo.manual.iniciar');
 
-Route::get('/sorteo', function () {
-    return redirect()->route('home');
-});
 
 Route::get('/historial', [SorteoController::class, 'historial'])->middleware('auth')->name('sorteo.historial');
 
 Route::get('/sorteo/{sorteo}', [SorteoController::class, 'show'])->middleware('auth')->name('sorteo.show');
 Route::delete('/sorteos/{sorteo}', [SorteoController::class, 'destroy'])->name('sorteo.destroy');
 
-Route::middleware(['auth',AdminMiddleware::class])->group(function () {
+Route::middleware(['auth', AdminMiddleware::class])->group(function () {
     Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users.index');
     Route::get('/admin/users/{user}', [UserController::class, 'show'])->name('admin.users.show');
     Route::get('/admin/users/{user}/historial', [UserController::class, 'historial'])->name('admin.users.historial');
-
 });
 
 Route::get('/certificado/{codigo}', [CertificadoController::class, 'show'])->name('certificado.show');
@@ -83,4 +92,4 @@ Route::middleware('auth')->group(function () {
 });
 
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

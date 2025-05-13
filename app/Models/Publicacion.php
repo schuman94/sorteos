@@ -27,6 +27,8 @@ class Publicacion extends Model
         'host_id',
     ];
 
+    public array $comentarios = [];
+
     public function sorteo()
     {
         return $this->hasOne(Sorteo::class);
@@ -37,7 +39,6 @@ class Publicacion extends Model
         return $this->belongsTo(Host::class);
     }
 
-    public array $comentarios = [];
 
     public function getHost(): Host
     {

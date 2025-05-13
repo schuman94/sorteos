@@ -1,6 +1,5 @@
-import React from 'react';
 import MainLayout from '@/Layouts/MainLayout';
-import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 
 export default function Index({ users, filters }) {
     const handleChange = (e) => {
