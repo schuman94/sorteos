@@ -103,10 +103,6 @@ export default function Home() {
                         </Link>
                     </div>
                 </main>
-
-                <footer className="text-center py-4 text-sm">
-                    {/* Nada por ahora */}
-                </footer>
             </div>
         </>
     );
