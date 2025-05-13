@@ -12,7 +12,12 @@ class Comentario extends Model
 
     protected $fillable = ['autor', 'texto', 'fecha', 'likes'];
 
-    public function ganador() {
+    protected $casts = [
+        'fecha' => 'datetime',
+    ];
+
+    public function ganador()
+    {
         return $this->belongsTo(Ganador::class);
     }
 }

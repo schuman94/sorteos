@@ -12,7 +12,9 @@ class Rasca extends Model
 
     protected $fillable = ['codigo'];
 
-    protected $casts = ['scratched_at'];
+    protected $casts = [
+        'scratched_at' => 'datetime',
+    ];
 
     public function coleccion()
     {

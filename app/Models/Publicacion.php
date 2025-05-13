@@ -27,6 +27,10 @@ class Publicacion extends Model
         'host_id',
     ];
 
+    protected $casts = [
+        'fecha_publicacion' => 'datetime',
+    ];
+
     public array $comentarios = [];
 
     public function sorteo()

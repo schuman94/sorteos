@@ -58,7 +58,7 @@ class YouTubeDriver implements PublicacionDriver
 
         // Asignar atributos
         $publicacion->autor = $snippet['channelTitle'] ?? null;
-        $publicacion->fecha_publicacion = new Carbon($snippet['publishedAt']);
+        $publicacion->fecha_publicacion = Carbon::parse($snippet['publishedAt']);
         $publicacion->titulo = $snippet['title'] ?? null;
 
         $publicacion->likes = isset($statistics['likeCount'])

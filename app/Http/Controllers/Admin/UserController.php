@@ -67,7 +67,7 @@ class UserController extends Controller
                         'titulo' => $sorteo->publicacion?->titulo,
                         'tipo' => $sorteo->publicacion?->host?->nombre ?? 'Manual',
                         'num_participantes' => $sorteo->num_participantes,
-                        'created_at' => $sorteo->created_at->toDateTimeString(),
+                        'created_at' => $sorteo->created_at,
                     ];
                 }),
             ]
@@ -109,7 +109,7 @@ class UserController extends Controller
             'titulo' => $sorteo->publicacion?->titulo,
             'tipo' => $sorteo->publicacion?->host?->nombre ?? 'Manual',
             'num_participantes' => $sorteo->num_participantes,
-            'created_at' => $sorteo->created_at->toDateTimeString(),
+            'created_at' => $sorteo->created_at,
         ];
     });
 

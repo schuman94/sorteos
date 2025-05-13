@@ -79,17 +79,14 @@ class PublicacionController extends Controller
             $publicacion->cargarComentariosDesdeApi();
 
             // Almacenar los datos de la publicacion en la sesión
-            // Es necesario incluir los los comentarios explícitamente, ya que...
-            // el método toArray solo convierte atributos persistidos del modelo eloquent.
-            Session::put('publicacion', array_merge(
-                $publicacion->toArray(),
-                ['comentarios' => $publicacion->comentarios]
-            ));
+            // el metodo toArray excluye los comentarios por no ser un atributo persistido del modelo
+            Session::put('publicacion', $publicacion->toArray());
+            // Almacenar los comentarios de la publicacion en la sesión.
+            Session::put('comentarios', $publicacion->comentarios);
 
-            // Retornar la vista con los datos
-            return Inertia::render('Sorteo/Sorteo', [
-                'publicacion' => $publicacion->toArray() // No se pasan los comentarios
-            ]);
+            // Peticion get a /sorteo (los datos y comentarios se cargan desde la sesión)
+            return Inertia::location(route('sorteo'));
+
         } catch (\Exception $e) {
             return back()->withErrors([
                 'url' => 'Error al cargar los comentarios: ' . $e->getMessage(),
@@ -102,8 +99,7 @@ class PublicacionController extends Controller
      */
     public function visualizarComentarios()
     {
-        $publicacion = Session::get('publicacion', []);
-        $comentarios = $publicacion['comentarios'] ?? [];
+        $comentarios = Session::get('comentarios', []);
 
         // Obtenemos la página actual
         $paginaActual = LengthAwarePaginator::resolveCurrentPage();

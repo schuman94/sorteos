@@ -43,7 +43,7 @@ class BlueskyDriver implements PublicacionDriver
         $post = $service->getPost($this->uri);
 
         $publicacion->autor = $post['author']['handle'] ?? null;
-        $publicacion->fecha_publicacion = Carbon::parse($post['record']['createdAt'] ?? now());
+        $publicacion->fecha_publicacion = Carbon::parse($post['record']['createdAt']);
         $publicacion->titulo = $post['record']['text'] ?? '[Publicación de Bluesky]';
         $publicacion->num_comentarios = $post['replyCount'] ?? null;
         $publicacion->likes = $post['likeCount'] ?? null;

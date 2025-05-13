@@ -74,10 +74,10 @@ class SorteoController extends Controller
 
 
         // Obtener los datos y comentarios de la sesión
-        $publicacionData = Session::get('publicacionData');
-        $comentarios = Session::get('comentarios', []);
+        $publicacion = Session::get('publicacion');
+        $comentarios = Session::get('comentarios');
 
-        if (!$comentarios || !$publicacionData) {
+        if (!$comentarios || !$publicacion) {
             return response()->json(['error' => 'No hay datos de la publicación disponibles.'], 422);
         }
 
@@ -96,7 +96,7 @@ class SorteoController extends Controller
 
         try {
             // Crear y guardar el modelo Publicacion
-            $publicacion = new Publicacion($publicacionData);
+            $publicacion = new Publicacion($publicacion);
             $publicacion->host()->associate($publicacion->getHost());
             $publicacion->save();
 
@@ -333,7 +333,7 @@ class SorteoController extends Controller
                 'titulo' => $sorteo->publicacion?->titulo,
                 'tipo' => $sorteo->publicacion?->host?->nombre ?? 'Manual',
                 'num_participantes' => $sorteo->num_participantes,
-                'created_at' => $sorteo->created_at->toDateTimeString(),
+                'created_at' => $sorteo->created_at,
                 'certificado' => $sorteo->codigo_certificado,
             ];
         });
@@ -378,7 +378,7 @@ class SorteoController extends Controller
                 'titulo' => $publicacion?->titulo,
                 'tipo' => $publicacion?->host?->nombre ?? 'Manual',
                 'num_participantes' => $sorteo->num_participantes,
-                'created_at' => $sorteo->created_at->toDateTimeString(),
+                'created_at' => $sorteo->created_at,
                 'user_id' => $sorteo->user_id,
                 'certificado' => $sorteo->codigo_certificado,
                 'filtro' => $sorteo->filtro ? [

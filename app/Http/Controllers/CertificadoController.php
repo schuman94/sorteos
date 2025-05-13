@@ -18,7 +18,7 @@ class CertificadoController extends Controller
         return Inertia::render('Certificado/Show', [
             'sorteo' => [
                 'codigo_certificado' => $sorteo->codigo_certificado,
-                'created_at' => $sorteo->created_at->toDateTimeString(),
+                'created_at' => $sorteo->created_at,
                 'num_participantes' => $sorteo->num_participantes,
                 'titulo' => $sorteo->publicacion?->titulo,
                 'url' => $sorteo->publicacion?->url,

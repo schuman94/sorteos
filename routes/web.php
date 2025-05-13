@@ -31,7 +31,8 @@ Route::middleware('auth')->group(function () {
 
 Route::post('/buscar-publicacion', [PublicacionController::class, 'buscar'])->name('publicacion.buscar');
 
-Route::post('/sorteo', [PublicacionController::class, 'cargarComentarios'])->middleware('auth')->name('publicacion.comentarios');
+Route::post('/cargar-comentarios', [PublicacionController::class, 'cargarComentarios'])->middleware('auth')->name('publicacion.comentarios');
+
 Route::get('/sorteo', function () {
     $publicacion = Session::get('publicacion');
     if ($publicacion) {
@@ -40,9 +41,10 @@ Route::get('/sorteo', function () {
         ]);
     }
     return redirect()->route('home');
-});
+})->name('sorteo');
 
 Route::get('/comentarios', [PublicacionController::class, 'visualizarComentarios'])->middleware('auth')->name('comentarios.visualizar');
+
 Route::post('/sorteo/iniciar', [SorteoController::class, 'iniciar'])->middleware('auth')->name('sorteo.iniciar');
 
 Route::get('/sorteo-manual', function () {
