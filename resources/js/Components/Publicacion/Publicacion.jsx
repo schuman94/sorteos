@@ -1,4 +1,4 @@
-export default function Show({ autor, num_comentarios, likes, fecha_publicacion, titulo, visualizaciones}) {
+export default function Publicacion({ autor, num_comentarios, likes, fecha_publicacion, titulo, visualizaciones}) {
     return (
         <div className="max-w-md mx-auto mt-8 p-4 border rounded bg-white shadow dark:bg-gray-800 dark:text-white">
             <h2 className="text-xl font-semibold mb-4">Publicación</h2>

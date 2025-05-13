@@ -17,7 +17,7 @@ export default function Home() {
         setError(null);
         setPublicacion(null);
 
-        try {
+        try {                                                            // forma simplificada de {url: url}
             const response = await axios.post(route('publicacion.buscar'), { url });
             setPublicacion(response.data);
         } catch (err) {
@@ -40,8 +40,9 @@ export default function Home() {
     };
 
     const cargarComentarios = () => {
-        // Route::post('/sorteo', ...
+        // Route::post('/sorteo', ...                 // aqui no se usa la forma simplificada porque debe llamarse url
         router.post(route('publicacion.comentarios'), { url: publicacion.url });
+        // Pasamos la publicacion.url y no la variable url (de useState) por si el usuario escribe otra cosa en el input antes de darle a cargar comentarios
     };
 
     return (
@@ -86,7 +87,7 @@ export default function Home() {
                             </div>
 
                             <button
-                                onClick={() => cargarComentarios(publicacion.url)}
+                                onClick={cargarComentarios}
                                 className="mt-4 px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
                             >
                                 Cargar comentarios

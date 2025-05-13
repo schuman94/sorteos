@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\PublicacionController;
 use App\Http\Controllers\SorteoController;
 use App\Http\Controllers\Admin\UserController;
@@ -32,7 +33,12 @@ Route::post('/buscar-publicacion', [PublicacionController::class, 'buscar'])->na
 
 Route::post('/sorteo', [PublicacionController::class, 'cargarComentarios'])->middleware('auth')->name('publicacion.comentarios');
 Route::get('/sorteo', function () {
-    // Para redirigir a home si el usuario refresca la pagina (peticion get) despues de cargar comentarios
+    $publicacion = Session::get('publicacion');
+    if ($publicacion) {
+        return Inertia::render('Sorteo/Sorteo', [
+            'publicacion' => $publicacion,
+        ]);
+    }
     return redirect()->route('home');
 });
 
@@ -51,11 +57,10 @@ Route::get('/historial', [SorteoController::class, 'historial'])->middleware('au
 Route::get('/sorteo/{sorteo}', [SorteoController::class, 'show'])->middleware('auth')->name('sorteo.show');
 Route::delete('/sorteos/{sorteo}', [SorteoController::class, 'destroy'])->name('sorteo.destroy');
 
-Route::middleware(['auth',AdminMiddleware::class])->group(function () {
+Route::middleware(['auth', AdminMiddleware::class])->group(function () {
     Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users.index');
     Route::get('/admin/users/{user}', [UserController::class, 'show'])->name('admin.users.show');
     Route::get('/admin/users/{user}/historial', [UserController::class, 'historial'])->name('admin.users.historial');
-
 });
 
 Route::get('/certificado/{codigo}', [CertificadoController::class, 'show'])->name('certificado.show');
@@ -87,4 +92,4 @@ Route::middleware('auth')->group(function () {
 });
 
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

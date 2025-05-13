@@ -7,7 +7,7 @@ import axios from '@/lib/axios';
 import { useState, useEffect } from 'react';
 import { Head } from '@inertiajs/react';
 
-export default function Sorteo(props) {
+export default function Sorteo({publicacion}) {
     const [formData, setFormData] = useState({
         num_ganadores: 1,
         num_suplentes: 0,
@@ -82,7 +82,7 @@ export default function Sorteo(props) {
                 {!ganadores ? (
                     <>
                         <div className="flex justify-center mb-12">
-                            <Publicacion {...props} />
+                            <Publicacion {...publicacion} />
                         </div>
 
                         <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 p-6 rounded shadow mb-8">
