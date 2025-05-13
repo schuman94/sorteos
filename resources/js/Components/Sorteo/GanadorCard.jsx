@@ -1,3 +1,5 @@
+import { formatearFecha as ff } from '@/utils/fecha';
+
 export default function GanadorCard({ nombre, posicion, comentario, likes, fecha, urlHost }) {
     const construirPerfil = () => {
         if (!comentario || !urlHost) return null;
@@ -40,7 +42,7 @@ export default function GanadorCard({ nombre, posicion, comentario, likes, fecha
                     <p className="mb-1 italic">{comentario}</p>
                     <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
                         {likes != null && (<span>👍 {likes ?? 0}</span>)}
-                        <span>{new Date(fecha).toLocaleString()}</span>
+                        <span>{ff(fecha)}</span>
                     </div>
                 </div>
             )}

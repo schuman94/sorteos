@@ -8,47 +8,34 @@ export default function Ganadores({ ganadores, urlHost }) {
 
     const sorteoId = ganadores[0]?.sorteo_id;
 
+    const ListaGanadores = ({ titulo, ganadores, urlHost }) => {
+        if (ganadores.length === 0) return null;
+
+        return (
+            <div className="mb-10">
+                <h2 className="text-2xl font-bold text-center mb-4">{titulo}</h2>
+                <div className="grid gap-4">
+                    {ganadores.map((g, i) => (
+                        <GanadorCard
+                            key={i}
+                            nombre={g.nombre}
+                            posicion={g.posicion}
+                            comentario={g.comentario}
+                            likes={g.likes}
+                            fecha={g.fecha}
+                            urlHost={urlHost}
+                        />
+                    ))}
+                </div>
+            </div>
+        );
+    };
+
+
     return (
         <div className="max-w-2xl mx-auto">
-            {/* Ganadores titulares */}
-            {titulares.length > 0 && (
-                <div className="mb-10">
-                    <h2 className="text-2xl font-bold text-center mb-4">Ganadores</h2>
-                    <div className="grid gap-4">
-                        {titulares.map((g, i) => (
-                            <GanadorCard
-                                key={i}
-                                nombre={g.nombre}
-                                posicion={g.posicion}
-                                comentario={g.comentario}
-                                likes={g.likes}
-                                fecha={g.fecha}
-                                urlHost={urlHost}
-                            />
-                        ))}
-                    </div>
-                </div>
-            )}
-
-            {/* Suplentes */}
-            {suplentes.length > 0 && (
-                <div className="mb-10">
-                    <h2 className="text-2xl font-bold text-center mb-4">Suplentes</h2>
-                    <div className="grid gap-4">
-                        {suplentes.map((g, i) => (
-                            <GanadorCard
-                                key={i}
-                                nombre={g.nombre}
-                                posicion={g.posicion}
-                                comentario={g.comentario}
-                                likes={g.likes}
-                                fecha={g.fecha}
-                                urlHost={urlHost}
-                            />
-                        ))}
-                    </div>
-                </div>
-            )}
+            <ListaGanadores titulo="Ganadores" ganadores={titulares} urlHost={urlHost} />
+            <ListaGanadores titulo="Suplentes" ganadores={suplentes} urlHost={urlHost} />
 
             {/* Botón para ir al sorteo */}
             {sorteoId && (

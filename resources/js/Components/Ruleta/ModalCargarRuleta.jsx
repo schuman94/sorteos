@@ -105,7 +105,7 @@ export default function ModalCargarRuleta({ visible, onClose, onSeleccionar, rul
                                             {ruleta.nombre.length > 30 ? ruleta.nombre.slice(0, 30) + '...' : ruleta.nombre}
                                         </h3>
                                         <p className="text-xs text-gray-500">
-                                            {new Date(ruleta.created_at).toLocaleString()}
+                                            {ruleta.created_at}
                                         </p>
                                         <div className="mt-2 flex justify-end gap-2">
                                             <button

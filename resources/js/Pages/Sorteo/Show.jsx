@@ -4,6 +4,7 @@ import Filtro from '@/Components/Sorteo/Filtro';
 import ModalEliminacion from '@/Components/ModalEliminacion';
 import { useState } from 'react';
 import { Head, router, usePage } from '@inertiajs/react';
+import { formatearFecha as ff } from '@/utils/fecha';
 
 export default function Show({ sorteo }) {
     const { auth } = usePage().props;
@@ -39,7 +40,7 @@ export default function Show({ sorteo }) {
                     </h2>
 
                     <div className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
-                        <p><strong>Fecha:</strong> {new Date(sorteo.created_at).toLocaleString()}</p>
+                        <p><strong>Fecha:</strong> {ff(sorteo.created_at)}</p>
                         <p><strong>Participantes:</strong> {sorteo.num_participantes}</p>
                         <p><strong>Tipo:</strong> {sorteo.tipo.split('\\').pop()}</p>
                         <p>

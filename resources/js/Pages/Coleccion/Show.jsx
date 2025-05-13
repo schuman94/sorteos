@@ -1,4 +1,5 @@
 import MainLayout from '@/Layouts/MainLayout';
+import { formatearFecha as ff } from '@/utils/fecha';
 
 export default function Show({ coleccion }) {
     return (
@@ -14,7 +15,7 @@ export default function Show({ coleccion }) {
 
                 <div>
                     <strong>Fecha de creación:</strong>
-                    <p>{new Date(coleccion.created_at).toLocaleDateString()}</p>
+                    <p>{ff(coleccion.created_at)}</p>
                 </div>
             </div>
         </div>

@@ -1,4 +1,5 @@
 import { router } from '@inertiajs/react';
+import { formatearFecha as ff } from '@/utils/fecha';
 
 export default function SorteoCard({ sorteo }) {
     const handleClick = (e) => {
@@ -26,7 +27,7 @@ export default function SorteoCard({ sorteo }) {
             </h2>
             <div className="mt-2 text-sm text-gray-700 dark:text-gray-300">
                 <p><strong>Participantes:</strong> {sorteo.num_participantes}</p>
-                <p><strong>Fecha:</strong> {new Date(sorteo.created_at).toLocaleString()}</p>
+                <p><strong>Fecha:</strong> {ff(sorteo.created_at)}</p>
                 <p><strong>Tipo:</strong> {sorteo.tipo}</p>
             </div>
         </div>

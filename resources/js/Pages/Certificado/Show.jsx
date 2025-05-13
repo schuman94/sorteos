@@ -1,5 +1,6 @@
 import MainLayout from '@/Layouts/MainLayout';
 import { Head } from '@inertiajs/react';
+import { formatearFecha as ff } from '@/utils/fecha';
 
 export default function CertificadoShow({ sorteo }) {
     const ganadoresTitulares = sorteo.ganadores.filter(g => g.clasificacion === 'titular');
@@ -32,7 +33,7 @@ export default function CertificadoShow({ sorteo }) {
                     </div>
 
                     <div className="text-center text-sm text-gray-600 dark:text-gray-300 space-y-1">
-                        <p><strong>Fecha:</strong> {new Date(sorteo.created_at).toLocaleString()}</p>
+                        <p><strong>Fecha:</strong> {ff(sorteo.created_at)}</p>
                         <p><strong>Participantes:</strong> {sorteo.num_participantes}</p>
                     </div>
 
