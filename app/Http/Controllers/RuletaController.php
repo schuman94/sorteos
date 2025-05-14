@@ -58,7 +58,11 @@ class RuletaController extends Controller
             'nombre' => 'required|string|max:255|unique:ruletas,nombre,NULL,id,user_id,' . Auth::id(),
             'opciones' => 'required|array|min:1',
             'opciones.*' => 'string|max:255',
-        ]);
+        ], [
+            'nombre.unique' => 'Ya existe una ruleta con ese nombre.',
+            'nombre.required' => 'Debes introducir un nombre',
+        ]
+    );
 
         $ruleta = new Ruleta();
         $ruleta->nombre = $request->nombre;
@@ -88,6 +92,9 @@ class RuletaController extends Controller
             'nombre' => 'required|string|max:255|unique:ruletas,nombre,' . $ruleta->id . ',id,user_id,' . Auth::id(),
             'opciones' => 'required|array|min:1',
             'opciones.*' => 'string|max:255',
+        ], [
+            'nombre.unique' => 'Ya existe otra ruleta con ese nombre',
+            'nombre.required' => 'Debes introducir un nombre.',
         ]);
 
         $ruleta->nombre = $request->nombre;

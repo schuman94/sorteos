@@ -3,7 +3,7 @@ import ModalGuardarRuleta from '@/Components/Ruleta/ModalGuardarRuleta';
 import ModalCargarRuleta from '@/Components/Ruleta/ModalCargarRuleta';
 import ModalGanador from '@/Components/Ruleta/ModalGanador';
 import axios from '@/lib/axios';
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { Head, usePage } from '@inertiajs/react';
 import { Wheel } from 'react-custom-roulette';
 import { jsonToWheel, jsonToText } from '@/utils/ruleta';
@@ -37,7 +37,6 @@ export default function Ruleta({ opcionesPrecargadas }) {
     ];
     const backgroundColors = opcionesVisuales.map((_, i) => coloresDisponibles[i % coloresDisponibles.length]);
 
-
     const [ruletaCargada, setRuletaCargada] = useState(null);
 
     const nuevaRuleta = () => {
@@ -47,6 +46,7 @@ export default function Ruleta({ opcionesPrecargadas }) {
         setGanador(null);
     };
 
+    // Cargar la ruleta seleccionada desde el modal
     const cargarRuleta = (ruleta) => {
         setRuletaCargada(ruleta);
         setInput(jsonToText(ruleta.opciones));
@@ -63,7 +63,6 @@ export default function Ruleta({ opcionesPrecargadas }) {
     const [mostrarModalGuardar, setMostrarModalGuardar] = useState(false);
     const [mostrarModalCargar, setMostrarModalCargar] = useState(false);
 
-
     const girarRuleta = () => {
         if (opciones.length === 0) return;
         const numeroAleatorio = Math.floor(Math.random() * opciones.length);
@@ -71,48 +70,7 @@ export default function Ruleta({ opcionesPrecargadas }) {
         setGirando(true);
     };
 
-    const guardarRuleta = async (nombre, { onError, onSuccess } = {}) => {
-        try {
-            const response = await axios.post(route('ruletas.store'), {
-                nombre,
-                opciones: opciones.map(op => op.option),
-            });
 
-            const ruleta = response.data.ruleta;
-            setRuletaCargada(ruleta);
-            setInput(jsonToText(ruleta.opciones));
-            setOpciones(jsonToWheel(ruleta.opciones));
-            setMostrarModalGuardar(false);
-            onSuccess?.();
-        } catch (error) {
-            console.error(error);
-            if (error.response?.status === 422) {
-                onError?.(error.response.data.errors);
-            }
-        }
-    };
-
-
-    const actualizarRuleta = async (nombre, { onError, onSuccess } = {}) => {
-        try {
-            const response = await axios.put(route('ruletas.update', ruletaCargada.id), {
-                nombre,
-                opciones: opciones.map(op => op.option),
-            });
-
-            const ruleta = response.data.ruleta;
-            setRuletaCargada(ruleta);
-            setInput(jsonToText(ruleta.opciones));
-            setOpciones(jsonToWheel(ruleta.opciones));
-            setMostrarModalGuardar(false);
-            onSuccess?.();
-        } catch (error) {
-            console.error(error);
-            if (error.response?.status === 422) {
-                onError?.(error.response.data.errors);
-            }
-        }
-    };
 
     return (
         <>
@@ -224,8 +182,12 @@ export default function Ruleta({ opcionesPrecargadas }) {
                 visible={mostrarModalGuardar}
                 onClose={() => setMostrarModalGuardar(false)}
                 ruletaCargada={ruletaCargada}
-                onGuardarNueva={guardarRuleta}
-                onActualizar={actualizarRuleta}
+                opciones={opciones}
+                onGuardado={(ruleta) => {
+                    setRuletaCargada(ruleta);
+                    setInput(jsonToText(ruleta.opciones));
+                    setOpciones(jsonToWheel(ruleta.opciones));
+                }}
             />
 
             <ModalCargarRuleta
