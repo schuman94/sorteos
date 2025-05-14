@@ -15,7 +15,7 @@ export default function ModalCargarPremio({ visible, onClose, onSeleccionarPremi
 
     const cargarPremios = async () => {
         try {
-            const response = await axios.get(route('premios.index'));
+            const response = await axios.get(route('premios.cargarTodos'));
             setPremios(response.data);
         } catch (error) {
             console.error(error);

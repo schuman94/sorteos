@@ -7,13 +7,42 @@ use App\Http\Requests\UpdatePremioRequest;
 use App\Models\Premio;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class PremioController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
+    {
+        $query = Premio::query()
+            ->where('user_id', Auth::id());
+
+        // Búsqueda
+        if ($search = $request->input('search')) {
+            $query->where('nombre', 'like', '%' . $search . '%');
+        }
+
+        // Orden
+        $sort = $request->input('sort', 'created_at');
+        $direction = $request->input('direction', 'desc');
+
+        $query->orderBy($sort, $direction);
+
+        $premios = $query->paginate(10)->withQueryString();
+
+        return Inertia::render('Premios/Index', [
+            'premios' => $premios,
+            'filters' => [
+                'search' => $search,
+                'sort' => $sort,
+                'direction' => $direction,
+            ],
+        ]);
+    }
+
+    public function cargarTodos()
     {
         $premios = Auth::user()->premios()->get();
         return response()->json($premios);

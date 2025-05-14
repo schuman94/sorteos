@@ -53,8 +53,6 @@ class ColeccionSeeder extends Seeder
             'abierta' => true,
         ]);
 
-
-
         $this->crearRascas($coleccion1);
         $this->crearRascas($coleccion2);
         $this->crearRascas($coleccion3);

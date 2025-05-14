@@ -81,6 +81,7 @@ Route::middleware('auth')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('/premios', [PremioController::class, 'index'])->name('premios.index');
     Route::post('/premios', [PremioController::class, 'store'])->name('premios.store');
+    Route::get('/cargar-premios', [PremioController::class, 'cargarTodos'])->name('premios.cargarTodos');
 });
 
 require __DIR__ . '/auth.php';
