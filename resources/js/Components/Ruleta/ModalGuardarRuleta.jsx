@@ -1,44 +1,51 @@
+import axios from '@/lib/axios';
 import { useState, useEffect } from 'react';
 
-export default function ModalGuardarRuleta({ visible, onClose, onGuardarNueva, onActualizar, ruletaCargada }) {
+export default function ModalGuardarRuleta({ visible, onClose, ruletaCargada, onGuardado, opciones }) {
     const [nombre, setNombre] = useState('');
     const [errorNombre, setErrorNombre] = useState(null);
+    const [guardando, setGuardando] = useState(false);
 
     useEffect(() => {
         setNombre(ruletaCargada ? ruletaCargada.nombre : '');
-        setErrorNombre(null); // Limpiar errores al abrir
+        setErrorNombre(null);
     }, [ruletaCargada, visible]);
 
-    const handleGuardarNueva = () => {
+    const guardar = async (modo) => {
         if (nombre.trim() === '') {
-            setErrorNombre('Debes introducir un nombre.');
+            setErrorNombre('Debes introducir un nombre.'); // Esta validación eclipsa a la del validate. Evitamos hacer petición.
             return;
         }
 
-        onGuardarNueva(nombre, {
-            onError: (errors) => {
-                if (errors?.nombre) setErrorNombre(errors.nombre);
-            },
-            onSuccess: () => {
-                setErrorNombre(null);
-            },
-        });
-    };
+        setGuardando(true);
+        setErrorNombre(null);
 
-    const handleActualizar = () => {
-        if (nombre.trim() === '') {
-            setErrorNombre('Debes introducir un nombre.');
-            return;
+        try {
+            let response;
+
+            if (modo === 'nueva') {
+                response = await axios.post(route('ruletas.store'), {
+                    nombre,
+                    opciones: opciones.map(op => op.option),
+                });
+            } else if (modo === 'actualizar' && ruletaCargada) {
+                response = await axios.put(route('ruletas.update', ruletaCargada.id), {
+                    nombre,
+                    opciones: opciones.map(op => op.option), // Genera un array de strings que el controlador convierte con json_encode
+                });
+            }
+
+            onGuardado(response.data.ruleta); // Ejecuta la funcion definida en ruleta.jsx
+            onClose(); // Ejecuta setMostrarModalGuardar(false) definido en ruleta.jsx
+        } catch (error) {
+            if (error.response?.status === 422 && error.response.data.errors?.nombre) {
+                setErrorNombre(error.response.data.errors.nombre[0]);
+            } else {
+                setErrorNombre('Error al guardar la ruleta.');
+            }
+        } finally {
+            setGuardando(false);
         }
-
-        onActualizar(nombre, {
-            onError: (errors) => {
-                if (errors?.nombre) setErrorNombre(errors.nombre);
-            },
-            onSuccess: () => {
-                setErrorNombre(null);
-            },
-        });
     };
 
     if (!visible) return null;
@@ -55,11 +62,12 @@ export default function ModalGuardarRuleta({ visible, onClose, onGuardarNueva, o
                     value={nombre}
                     onChange={(e) => {
                         setNombre(e.target.value);
-                        setErrorNombre(null); // limpiar error al escribir
+                        setErrorNombre(null);
                     }}
                     className={`w-full border rounded px-3 py-2 mb-1 ${errorNombre ? 'border-red-500' : ''}`}
                     placeholder="Nombre de la ruleta"
                     autoFocus
+                    disabled={guardando}
                 />
                 {errorNombre && <p className="text-red-600 text-sm mb-2">{errorNombre}</p>}
 
@@ -67,22 +75,25 @@ export default function ModalGuardarRuleta({ visible, onClose, onGuardarNueva, o
                     <button
                         onClick={onClose}
                         className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
+                        disabled={guardando}
                     >
                         Cancelar
                     </button>
 
                     {ruletaCargada && (
                         <button
-                            onClick={handleActualizar}
+                            onClick={() => guardar('actualizar')}
                             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                            disabled={guardando}
                         >
                             Actualizar
                         </button>
                     )}
 
                     <button
-                        onClick={handleGuardarNueva}
+                        onClick={() => guardar('nueva')}
                         className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                        disabled={guardando}
                     >
                         {ruletaCargada ? 'Guardar como nueva' : 'Guardar'}
                     </button>

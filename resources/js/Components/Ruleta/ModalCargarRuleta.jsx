@@ -4,31 +4,13 @@ import { useEffect, useState } from 'react';
 import { formatearFecha as ff } from '@/utils/fecha';
 
 export default function ModalCargarRuleta({ visible, onClose, onSeleccionar, ruletaCargadaId, onEliminarActual }) {
-    const [ruletas, setRuletas] = useState([]);
-    const [filtro, setFiltro] = useState('');
+    const [ruletas, setRuletas] = useState([]); // Todas las ruletas del usuario
+    const [filtro, setFiltro] = useState(''); // Filtro de nombre para las ruletas
     const [cargando, setCargando] = useState(true);
-    const [error, setError] = useState(null);
-    const [mostrarCantidad, setMostrarCantidad] = useState(6);
+    const [error, setError] = useState(null); // Error en la carga de las ruletas
+    const [mostrarCantidad, setMostrarCantidad] = useState(6); // Numero de ruletas mostradas en el modal
 
-    const [confirmarVisible, setConfirmarVisible] = useState(false);
-    const [ruletaPendienteEliminar, setRuletaPendienteEliminar] = useState(null);
-
-    const cargarRuletas = () => {
-        setCargando(true);
-        axios.get(route('ruletas.index'))
-            .then(response => {
-                setRuletas(response.data);
-                setCargando(false);
-                setError(null);
-                setMostrarCantidad(6);
-            })
-            .catch(error => {
-                console.error('Error al cargar ruletas:', error);
-                setError('No se pudieron cargar tus ruletas.');
-                setCargando(false);
-            });
-    };
-
+    // Cuando la propiedad visible cambia, se elimina el filtro y se reinicia la carga de ruletas
     useEffect(() => {
         if (visible) {
             setFiltro('');
@@ -36,36 +18,58 @@ export default function ModalCargarRuleta({ visible, onClose, onSeleccionar, rul
         }
     }, [visible]);
 
+    const cargarRuletas = async () => {
+        setCargando(true);
+        try {
+            const response = await axios.get(route('ruletas.index'));
+            setRuletas(response.data); // response.data contiene el json con todas las ruletas devuelto por el metodo index
+            setError(null);
+            setMostrarCantidad(6); // Reinicia el numero de ruletas mostradas a 6
+        } catch (error) {
+            console.error('Error al cargar ruletas:', error);
+            setError('No se pudieron cargar tus ruletas.');
+        } finally {
+            setCargando(false);
+        }
+    };
+
+    // Ruletas filtradas por nombre
+    const ruletasFiltradas = ruletas.filter(r =>
+        r.nombre.toLowerCase().includes(filtro.toLowerCase())
+    );
+
+    // Ruleta mostradas en el modal
+    const ruletasMostradas = ruletasFiltradas.slice(0, mostrarCantidad);
+
+    const [confirmarVisible, setConfirmarVisible] = useState(false);
+    const [ruletaPendienteEliminar, setRuletaPendienteEliminar] = useState(null);
+
+    // Mostrar modal para confirmar la eliminación de la ruleta seleccionada
     const confirmarEliminar = (ruleta) => {
         setRuletaPendienteEliminar(ruleta);
         setConfirmarVisible(true);
     };
 
-    const eliminarRuleta = () => {
-        if (!ruletaPendienteEliminar) return;
-
-        axios.delete(route('ruletas.destroy', ruletaPendienteEliminar.id))
-            .then(() => {
-                setRuletas(prev => {
-                    const nuevasRuletas = prev.filter(r => r.id !== ruletaPendienteEliminar.id);
-                    if (ruletaPendienteEliminar.id === ruletaCargadaId) {
-                        onEliminarActual();
-                    }
-                    return nuevasRuletas;
-                });
-            })
-            .catch(() => alert('Error al eliminar la ruleta.'))
-            .finally(() => {
-                setConfirmarVisible(false);
-                setRuletaPendienteEliminar(null);
+    const eliminarRuleta = async () => {
+        if (!ruletaPendienteEliminar) return; // Por seguridad: Si no hay ruleta pendiente de eliminar, no se hace nada
+        try {
+            const response = await axios.delete(route('ruletas.destroy', ruletaPendienteEliminar.id));
+            // Eliminamos desde el cliente la ruleta de la lista para evitar hacer una nueva carga desde el backend
+            // Esto lo hacemos cargando con set una copia de la variable ruletas a la que le hemos eliminado la ruletaPendienteEliminar
+            setRuletas(prev => {
+                const nuevasRuletas = prev.filter(r => r.id !== ruletaPendienteEliminar.id);
+                if (ruletaPendienteEliminar.id === ruletaCargadaId) { // Si la ruleta que hemos eliminado era la que estaba cargada...
+                    onEliminarActual(); // Se ejecuta onEliminarActual (definida en ruleta.jsx) para borrar la carga.
+                }
+                return nuevasRuletas;
             });
-    };
-
-    const ruletasFiltradas = ruletas.filter(r =>
-        r.nombre.toLowerCase().includes(filtro.toLowerCase())
-    );
-
-    const ruletasMostradas = ruletasFiltradas.slice(0, mostrarCantidad);
+        } catch (error) {
+            console.error('Error al eliminar la ruleta:', error);
+        } finally {
+            setConfirmarVisible(false); // Cerramos modal de confirmar eliminar
+            setRuletaPendienteEliminar(null); // Ya no hay ruleta pendiente de eliminar
+        }
+    }
 
     if (!visible) return null;
 
@@ -111,8 +115,8 @@ export default function ModalCargarRuleta({ visible, onClose, onSeleccionar, rul
                                         <div className="mt-2 flex justify-end gap-2">
                                             <button
                                                 onClick={() => {
-                                                    onSeleccionar(ruleta);
-                                                    onClose();
+                                                    onSeleccionar(ruleta); // cargarRuleta en ruleta.jsx
+                                                    onClose(); // setMostrarModalCargar(false) en ruleta.jsx
                                                 }}
                                                 className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
                                             >

@@ -17,10 +17,10 @@ export default function ModalCargarPremio({ visible, onClose, onSeleccionarPremi
         try {
             const response = await axios.get(route('premios.index'));
             setPremios(response.data);
-            setCargando(false);
         } catch (error) {
             console.error(error);
             setError('Error al cargar los premios.');
+        } finally {
             setCargando(false);
         }
     };

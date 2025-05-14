@@ -13,25 +13,30 @@ export default function Comentarios() {
         cargarComentarios(1);
     }, []);
 
-    const cargarComentarios = (paginaActual) => {
+    const cargarComentarios = async (paginaActual) => {
         setLoading(true);
-        axios.get(route('comentarios.visualizar'), {
-            params: { page: paginaActual }
-        })
-            .then(response => {
-                const nuevosComentarios = response.data.data;
-                setComentarios(prev => [...prev, ...nuevosComentarios]);
+        setError(null);
 
-                // Si estamos en la última página, no hay más comentarios
-                if (paginaActual >= response.data.last_page) {
-                    setHasMore(false);
-                }
-            })
-            .catch(() => {
-                setError('No se pudieron cargar los comentarios');
-            })
-            .finally(() => setLoading(false));
+        try {
+            const response = await axios.get(route('comentarios.visualizar'), {
+                params: { page: paginaActual }
+            });
+
+            const nuevosComentarios = response.data.data;
+
+            setComentarios(prev => [...prev, ...nuevosComentarios]);
+
+            if (paginaActual >= response.data.last_page) {
+                setHasMore(false);
+            }
+
+        } catch (error) {
+            setError('No se pudieron cargar los comentarios');
+        } finally {
+            setLoading(false);
+        }
     };
+
 
     const mostrarMas = () => {
         const siguientePagina = pagina + 1;

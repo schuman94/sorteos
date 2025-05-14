@@ -11,15 +11,17 @@ export default function Home() {
     const [error, setError] = useState(null);
     const { errors } = usePage().props;
 
+
+    // e es el evento que desencadena la funcion.
     const handleSearch = async (e) => {
-        e.preventDefault();
+        e.preventDefault(); // Evita que el formulario recargue la pagina al hacer submit
         setLoading(true);
         setError(null);
         setPublicacion(null);
 
         try {                                                            // forma simplificada de {url: url}
             const response = await axios.post(route('publicacion.buscar'), { url });
-            setPublicacion(response.data);
+            setPublicacion(response.data); // response.data contiene el json que devuelve el metodo publicacion.buscar del controlador
         } catch (err) {
             if (err.response && err.response.data) {
                 // Errores del validate del controlador
@@ -33,8 +35,7 @@ export default function Home() {
             } else {
                 setError('Error desconocido al buscar la publicación');
             }
-        }
-        finally {
+        } finally {
             setLoading(false);
         }
     };
