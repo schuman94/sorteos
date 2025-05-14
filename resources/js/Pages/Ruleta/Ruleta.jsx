@@ -125,7 +125,7 @@ export default function Ruleta({ opcionesPrecargadas }) {
 
                 <div className="flex flex-col md:flex-row gap-32 justify-center items-start mb-8">
                     <textarea
-                        className="w-full md:w-64 border rounded p-2 h-[500px] resize-none font-mono overflow-x-auto whitespace-pre text-sm"
+                        className="w-full md:w-64 border rounded p-2 h-[500px] resize-none font-mono overflow-x-auto whitespace-pre text-sm disabled:opacity-50"
                         value={input}
                         onChange={(e) => {
                             const valor = e.target.value;
@@ -140,6 +140,7 @@ export default function Ruleta({ opcionesPrecargadas }) {
                             setOpciones(nuevasOpciones);
                         }}
                         placeholder="Una opción por línea"
+                        disabled={girando}
                     />
 
                     <div className="flex flex-col items-center">
@@ -165,14 +166,46 @@ export default function Ruleta({ opcionesPrecargadas }) {
 
                         {user ? (
                             <div className="mt-4 flex gap-4">
-                                <button onClick={() => { nuevaRuleta(); }} className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Nueva</button>
-                                <button onClick={() => { setMostrarModalCargar(true); }} className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">Cargar</button>
-                                <button onClick={() => { setMostrarModalGuardar(true); }} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:opacity-50" disabled={opciones.length < 1}>Guardar</button>
-                                <button onClick={girarRuleta} className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 disabled:opacity-50" disabled={opciones.length < 2}>Girar</button>
+                                <button
+                                    className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 disabled:opacity-50"
+                                    onClick={nuevaRuleta}
+                                    disabled={girando}
+                                >
+                                    Nueva
+                                </button>
+                                <button
+                                    className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 disabled:opacity-50"
+                                    onClick={() => setMostrarModalCargar(true)}
+                                    disabled={girando}
+                                >
+                                    Cargar
+                                </button>
+                                <button
+                                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:opacity-50"
+                                    onClick={() => setMostrarModalGuardar(true)}
+                                    disabled={girando || opciones.length < 1}
+                                >
+                                    Guardar
+                                </button>
+                                <button
+                                    className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 disabled:opacity-50"
+                                    onClick={girarRuleta}
+                                    disabled={girando || opciones.length < 2}
+                                >
+                                    Girar
+                                </button>
                             </div>
+
+
                         ) : (
                             <div className="mt-4">
-                                <button onClick={girarRuleta} className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 disabled:opacity-50" disabled={opciones.length < 2}>Girar</button>
+                                <button
+                                    className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 disabled:opacity-50"
+                                    onClick={girarRuleta}
+                                    disabled={girando || opciones.length < 2}
+                                >
+                                    Girar
+                                </button>
                             </div>
                         )}
 
