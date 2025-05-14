@@ -3,53 +3,85 @@ import ModalGuardarRuleta from '@/Components/Ruleta/ModalGuardarRuleta';
 import ModalCargarRuleta from '@/Components/Ruleta/ModalCargarRuleta';
 import ModalGanador from '@/Components/Ruleta/ModalGanador';
 import axios from '@/lib/axios';
-import { useState } from 'react';
-import { Head } from '@inertiajs/react';
+import { useState, useRef } from 'react';
+import { Head, usePage } from '@inertiajs/react';
 import { Wheel } from 'react-custom-roulette';
+import { jsonToWheel, jsonToText } from '@/utils/ruleta';
 
-export default function Ruleta({ user, nombresPrecargados = '' }) {
-    const [input, setInput] = useState(nombresPrecargados);
-    const [opciones, setOpciones] = useState(
-        nombresPrecargados
-            .split('\n')
-            .map(linea => linea.trim())
-            .filter(linea => linea.length > 0)
-            .map(nombre => ({ option: nombre }))
+export default function Ruleta({ opcionesPrecargadas }) {
+    const user = usePage().props.auth?.user;
+
+    const [input, setInput] = useState(
+        jsonToText(opcionesPrecargadas) // En el textarea aparece una por linea
     );
-    const [mustSpin, setMustSpin] = useState(false);
-    const [premioIndex, setPremioIndex] = useState(0);
-    const [ganador, setGanador] = useState(null);
-    const [mostrarModalGanador, setMostrarModalGanador] = useState(false);
 
-    const [mostrarModalGuardar, setMostrarModalGuardar] = useState(false);
-    const [mostrarModalCargar, setMostrarModalCargar] = useState(false);
+    const [opciones, setOpciones] = useState(
+        jsonToWheel(opcionesPrecargadas) // Formato para Wheel
+    );
+
+    // OpcionesVisuales es la variable que le pasamos a Wheel como data. Se recalcula a partir de opciones.
+    // Adaptamos las opciones para que no se vean tan largas en la ruleta, acortando e incluyendo '...'
+    // y para que si opciones está vacia aparezcan como "placeholder" tres opciones '...'
+    const opcionesVisuales = opciones.length > 0
+        ? opciones.map(op => ({
+            option: op.option.length > 20 ? op.option.slice(0, 17) + '...' : op.option
+        }))
+        : [{ option: '...' }, { option: '...' }, { option: '...' }];
+
+    const coloresDisponibles = [
+        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+        '#9966FF', '#FF9F40', '#00A878', '#FF5E5B',
+        '#3D348B', '#E4B363', '#2EC4B6', '#E71D36',
+        '#F4D35E', '#0081A7', '#F07167', '#70C1B3',
+        '#9B5DE5', '#00BBF9', '#00F5D4', '#F15BB5',
+    ];
+    const backgroundColors = opcionesVisuales.map((_, i) => coloresDisponibles[i % coloresDisponibles.length]);
+
+
     const [ruletaCargada, setRuletaCargada] = useState(null);
 
-    const manejarNueva = () => {
+    const nuevaRuleta = () => {
         setInput('');
         setOpciones([]);
         setRuletaCargada(null);
         setGanador(null);
     };
 
-    const manejarGirar = () => {
+    const cargarRuleta = (ruleta) => {
+        setRuletaCargada(ruleta);
+        setInput(jsonToText(ruleta.opciones));
+        setOpciones(jsonToWheel(ruleta.opciones));
+        setGanador(null);
+    };
+
+    const [girando, setGirando] = useState(false);
+    const [indiceGanador, setIndiceGanador] = useState(null);
+
+    const [ganador, setGanador] = useState(null);
+    const [mostrarModalGanador, setMostrarModalGanador] = useState(false);
+
+    const [mostrarModalGuardar, setMostrarModalGuardar] = useState(false);
+    const [mostrarModalCargar, setMostrarModalCargar] = useState(false);
+
+
+    const girarRuleta = () => {
         if (opciones.length === 0) return;
-        const indexAleatorio = Math.floor(Math.random() * opciones.length);
-        setPremioIndex(indexAleatorio);
-        setMustSpin(true);
+        const numeroAleatorio = Math.floor(Math.random() * opciones.length);
+        setIndiceGanador(numeroAleatorio);
+        setGirando(true);
     };
 
     const guardarRuleta = async (nombre, { onError, onSuccess } = {}) => {
         try {
             const response = await axios.post(route('ruletas.store'), {
                 nombre,
-                entradas: opciones.map(op => op.option),
+                opciones: opciones.map(op => op.option),
             });
 
             const ruleta = response.data.ruleta;
             setRuletaCargada(ruleta);
-            setInput(JSON.parse(ruleta.entradas).join('\n'));
-            setOpciones(JSON.parse(ruleta.entradas).map(op => ({ option: op })));
+            setInput(jsonToText(ruleta.opciones));
+            setOpciones(jsonToWheel(ruleta.opciones));
             setMostrarModalGuardar(false);
             onSuccess?.();
         } catch (error) {
@@ -65,13 +97,13 @@ export default function Ruleta({ user, nombresPrecargados = '' }) {
         try {
             const response = await axios.put(route('ruletas.update', ruletaCargada.id), {
                 nombre,
-                entradas: opciones.map(op => op.option),
+                opciones: opciones.map(op => op.option),
             });
 
             const ruleta = response.data.ruleta;
             setRuletaCargada(ruleta);
-            setInput(JSON.parse(ruleta.entradas).join('\n'));
-            setOpciones(JSON.parse(ruleta.entradas).map(op => ({ option: op })));
+            setInput(jsonToText(ruleta.opciones));
+            setOpciones(jsonToWheel(ruleta.opciones));
             setMostrarModalGuardar(false);
             onSuccess?.();
         } catch (error) {
@@ -81,30 +113,6 @@ export default function Ruleta({ user, nombresPrecargados = '' }) {
             }
         }
     };
-
-
-    const cargarRuleta = (ruleta) => {
-        setRuletaCargada(ruleta);
-        setInput(JSON.parse(ruleta.entradas).join('\n'));
-        setOpciones(JSON.parse(ruleta.entradas).map(op => ({ option: op })));
-        setGanador(null);
-    };
-
-    const coloresDisponibles = [
-        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
-        '#9966FF', '#FF9F40', '#00A878', '#FF5E5B',
-        '#3D348B', '#E4B363', '#2EC4B6', '#E71D36',
-        '#F4D35E', '#0081A7', '#F07167', '#70C1B3',
-        '#9B5DE5', '#00BBF9', '#00F5D4', '#F15BB5',
-    ];
-    const opcionesRuleta = opciones.length > 0 ? opciones : [{ option: '...' }, { option: '...' }];
-    const opcionesVisuales = opciones.length > 0
-    ? opciones.map(op => ({
-        option: op.option.length > 20 ? op.option.slice(0, 17) + '...' : op.option
-    }))
-    : [{ option: '...' }, { option: '...' }];
-
-    const backgroundColors = opcionesRuleta.map((_, i) => coloresDisponibles[i % coloresDisponibles.length]);
 
     return (
         <>
@@ -117,35 +125,35 @@ export default function Ruleta({ user, nombresPrecargados = '' }) {
 
                 <div className="flex flex-col md:flex-row gap-32 justify-center items-start mb-8">
                     <textarea
-                        className="w-full md:w-64 border rounded p-2 h-[500px] resize-none font-mono overflow-x-auto whitespace-pre text-sm"
+                        className="w-full md:w-64 border rounded p-2 h-[500px] resize-none font-mono overflow-x-auto whitespace-pre text-sm disabled:opacity-50"
                         value={input}
                         onChange={(e) => {
                             const valor = e.target.value;
                             setInput(valor);
 
-                            const lineas = valor
-                                .split('\n')
-                                .map((linea) => linea.trim())
-                                .filter((linea) => linea.length > 0);
+                            const nuevasOpciones = valor
+                                .split('\n') // separamos por salto de linea
+                                .map((linea) => linea.trim()) // trimeamos espacios
+                                .filter((linea) => linea.length > 0) // eliminamos lineas en blanco
+                                .map((linea) => ({ option: linea })); // formato para Wheel
 
-                            const nuevasOpciones = lineas.map((linea) => ({ option: linea }));
                             setOpciones(nuevasOpciones);
                         }}
                         placeholder="Una opción por línea"
+                        disabled={girando}
                     />
 
                     <div className="flex flex-col items-center">
                         <Wheel
-                            mustStartSpinning={mustSpin}
-                            prizeNumber={premioIndex}
+                            mustStartSpinning={girando}
+                            prizeNumber={indiceGanador}
                             data={opcionesVisuales}
                             onStopSpinning={() => {
-                                setMustSpin(false);
-                                const opcionGanadora = opciones[premioIndex]?.option ?? null;
+                                setGirando(false);
+                                const opcionGanadora = opciones[indiceGanador]?.option ?? null;
                                 setGanador(opcionGanadora);
-                                if (opcionGanadora) {
-                                    setMostrarModalGanador(true);
-                                }
+                                setMostrarModalGanador(true);
+                                setIndiceGanador(null);
                             }}
                             backgroundColors={backgroundColors}
                             textColors={['#ffffff']}
@@ -158,14 +166,46 @@ export default function Ruleta({ user, nombresPrecargados = '' }) {
 
                         {user ? (
                             <div className="mt-4 flex gap-4">
-                                <button onClick={manejarNueva} className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Nueva</button>
-                                <button onClick={() => setMostrarModalCargar(true)} className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">Cargar</button>
-                                <button onClick={() => setMostrarModalGuardar(true)} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:opacity-50" disabled={opciones.length < 1}>Guardar</button>
-                                <button onClick={manejarGirar} className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 disabled:opacity-50" disabled={opciones.length < 2}>Girar</button>
+                                <button
+                                    className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 disabled:opacity-50"
+                                    onClick={nuevaRuleta}
+                                    disabled={girando}
+                                >
+                                    Nueva
+                                </button>
+                                <button
+                                    className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 disabled:opacity-50"
+                                    onClick={() => setMostrarModalCargar(true)}
+                                    disabled={girando}
+                                >
+                                    Cargar
+                                </button>
+                                <button
+                                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:opacity-50"
+                                    onClick={() => setMostrarModalGuardar(true)}
+                                    disabled={girando || opciones.length < 1}
+                                >
+                                    Guardar
+                                </button>
+                                <button
+                                    className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 disabled:opacity-50"
+                                    onClick={girarRuleta}
+                                    disabled={girando || opciones.length < 2}
+                                >
+                                    Girar
+                                </button>
                             </div>
+
+
                         ) : (
                             <div className="mt-4">
-                                <button onClick={manejarGirar} className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 disabled:opacity-50" disabled={opciones.length < 2}>Girar</button>
+                                <button
+                                    className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 disabled:opacity-50"
+                                    onClick={girarRuleta}
+                                    disabled={girando || opciones.length < 2}
+                                >
+                                    Girar
+                                </button>
                             </div>
                         )}
 
