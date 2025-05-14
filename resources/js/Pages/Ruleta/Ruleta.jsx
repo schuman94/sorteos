@@ -70,8 +70,6 @@ export default function Ruleta({ opcionesPrecargadas }) {
         setGirando(true);
     };
 
-
-
     return (
         <>
             <Head title="Ruleta" />

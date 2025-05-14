@@ -31,7 +31,7 @@ export default function ModalGuardarRuleta({ visible, onClose, ruletaCargada, on
             } else if (modo === 'actualizar' && ruletaCargada) {
                 response = await axios.put(route('ruletas.update', ruletaCargada.id), {
                     nombre,
-                    opciones: opciones.map(op => op.option),
+                    opciones: opciones.map(op => op.option), // Genera un array de strings que el controlador convierte con json_encode
                 });
             }
 

@@ -66,7 +66,7 @@ class RuletaController extends Controller
 
         $ruleta = new Ruleta();
         $ruleta->nombre = $request->nombre;
-        $ruleta->opciones = json_encode($request->opciones);
+        $ruleta->opciones = json_encode($request->opciones); // Se convierte en un json string
         $ruleta->user()->associate(Auth::user());
         $ruleta->save();
 
