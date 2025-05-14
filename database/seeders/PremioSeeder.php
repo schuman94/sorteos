@@ -17,15 +17,21 @@ class PremioSeeder extends Seeder
         $sergio = User::where('name', 'sergio')->first();
 
         Premio::create([
-            'nombre' => 'camiseta',
-            'user_id' => $sergio->id,
+            'nombre' => 'Camiseta Fire in the Blood',
+            'valor' => 24.95,
+            'link' => 'https://nijuuni.es/products/fire-in-the-blood-camiseta-regular',
+            'proveedor' => 'Nijuuni',
             'descripcion' => 'Sudadera de la marca Nijuuni, el organizador del sorteo se pondrá en contacto contigo por email y podrás indicarle modelo y talla',
+            'user_id' => $sergio->id,
         ]);
 
         Premio::create([
-            'nombre' => 'sudadera',
-            'user_id' => $sergio->id,
+            'nombre' => 'Sudadera NIKA01',
+            'valor' => 49.95,
+            'link' => 'https://nijuuni.es/products/nika03-hoodie',
+            'proveedor' => 'Nijuuni',
             'descripcion' => 'Sudadera de la marca Nijuuni, el organizador del sorteo se pondrá en contacto contigo por email y podrás indicarle modelo y talla',
+            'user_id' => $sergio->id,
         ]);
     }
 }

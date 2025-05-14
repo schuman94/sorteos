@@ -13,10 +13,14 @@ return new class extends Migration
     {
         Schema::create('premios', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre');
-            $table->text('descripcion');
+            $table->string('nombre')->unique();
+            $table->string('proveedor');
+            $table->decimal('valor', 8, 2);
+            $table->text('descripcion')->nullable();
+            $table->string('link')->nullable();
             $table->foreignId('user_id')->constrained();
             $table->timestamps();
+            // imagen
         });
     }
 

@@ -67,8 +67,8 @@ class ColeccionSeeder extends Seeder
      */
     private function crearRascas(Coleccion $coleccion)
     {
-        $camiseta = Premio::where('nombre', 'camiseta')->first();
-        $sudadera = Premio::where('nombre', 'sudadera')->first();
+        $camiseta = Premio::find(1);
+        $sudadera = Premio::find(2);
 
         Rasca::factory()->count(2)->create();
 
