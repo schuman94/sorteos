@@ -2,10 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreRuletaRequest;
-use App\Http\Requests\UpdateRuletaRequest;
 use App\Models\Sorteo;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
@@ -17,7 +14,7 @@ class RuletaController extends Controller
     public function inicio(Request $request)
     {
         $sorteoId = $request->query('sorteo');
-        $nombres = '';
+        $opciones = collect(); // Inicializamos como colección vacía
 
         if ($sorteoId) {
             $sorteo = Sorteo::with(['ganadores', 'ganadores.comentario'])
@@ -25,18 +22,20 @@ class RuletaController extends Controller
                 ->where('user_id', Auth::id()) // Solo el dueño puede usarlo
                 ->firstOrFail();
 
-            $nombres = collect($sorteo->ganadores)
+            $opciones = $sorteo->ganadores
                 ->where('esSuplente', false)
                 ->map(function ($ganador) {
-                    return $ganador->nombre_manual ?? ($ganador->comentario->autor ?? null);
+                    return $ganador->comentario?->autor ?? $ganador->nombre_manual; // Si el ganador no tiene comentario, se devuelve nombre_manual
                 })
-                ->filter()
-                ->implode("\n");
+                ->filter() // Elimina valores null (por si acaso)
+                ->values(); // Resetea los índices
+
         }
 
         return Inertia::render('Ruleta/Ruleta', [
-            'user' => Auth::user(),
-            'nombresPrecargados' => $nombres,
+            'opcionesPrecargadas' => $opciones->toJson(),
+            // Se envia como una string JSON para que tenga el mismo formato que la columna "opciones" de la tabla ruletas
+            // Si está vacia devuelve "[]"
         ]);
     }
 
@@ -57,13 +56,13 @@ class RuletaController extends Controller
     {
         $request->validate([
             'nombre' => 'required|string|max:255|unique:ruletas,nombre,NULL,id,user_id,' . Auth::id(),
-            'entradas' => 'required|array|min:1',
-            'entradas.*' => 'string|max:255',
+            'opciones' => 'required|array|min:1',
+            'opciones.*' => 'string|max:255',
         ]);
 
         $ruleta = new Ruleta();
         $ruleta->nombre = $request->nombre;
-        $ruleta->entradas = json_encode($request->entradas);
+        $ruleta->opciones = json_encode($request->opciones);
         $ruleta->user()->associate(Auth::user());
         $ruleta->save();
 
@@ -87,12 +86,12 @@ class RuletaController extends Controller
 
         $request->validate([
             'nombre' => 'required|string|max:255|unique:ruletas,nombre,' . $ruleta->id . ',id,user_id,' . Auth::id(),
-            'entradas' => 'required|array|min:1',
-            'entradas.*' => 'string|max:255',
+            'opciones' => 'required|array|min:1',
+            'opciones.*' => 'string|max:255',
         ]);
 
         $ruleta->nombre = $request->nombre;
-        $ruleta->entradas = json_encode($request->entradas);
+        $ruleta->opciones = json_encode($request->opciones);
         $ruleta->save();
 
         return response()->json(['message' => 'Ruleta actualizada correctamente', 'ruleta' => $ruleta]);

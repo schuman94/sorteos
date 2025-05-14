@@ -1,6 +1,7 @@
 import ModalEliminacion from '@/Components/ModalEliminacion';
 import axios from '@/lib/axios';
 import { useEffect, useState } from 'react';
+import { formatearFecha as ff } from '@/utils/fecha';
 
 export default function ModalCargarRuleta({ visible, onClose, onSeleccionar, ruletaCargadaId, onEliminarActual }) {
     const [ruletas, setRuletas] = useState([]);
@@ -105,7 +106,7 @@ export default function ModalCargarRuleta({ visible, onClose, onSeleccionar, rul
                                             {ruleta.nombre.length > 30 ? ruleta.nombre.slice(0, 30) + '...' : ruleta.nombre}
                                         </h3>
                                         <p className="text-xs text-gray-500">
-                                            {ruleta.created_at}
+                                            {ff(ruleta.created_at)}
                                         </p>
                                         <div className="mt-2 flex justify-end gap-2">
                                             <button

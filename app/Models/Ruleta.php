@@ -10,7 +10,7 @@ class Ruleta extends Model
     /** @use HasFactory<\Database\Factories\RuletaFactory> */
     use HasFactory;
 
-    protected $fillable = ['nombre', 'entradas'];
+    protected $fillable = ['nombre', 'opciones'];
 
     public function user() {
         return $this->belongsTo(User::class);
