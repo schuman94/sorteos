@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('nombre')->unique();
             $table->string('proveedor');
-            $table->decimal('valor', 8, 2);
+            $table->decimal('valor', 8, 2)->default(0);
             $table->text('descripcion')->nullable();
             $table->string('link')->nullable();
             $table->foreignId('user_id')->constrained();

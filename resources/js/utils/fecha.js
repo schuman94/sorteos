@@ -11,3 +11,18 @@ export function formatearFecha(fechaUtc) {
         return 'Fecha inválida';
     }
 }
+
+export function formatearFechaCorta(fechaUtc) {
+    if (!fechaUtc) return 'Fecha no disponible';
+
+    try {
+        return new Date(fechaUtc).toLocaleDateString('es-ES', {
+            timeZone: 'Europe/Madrid',
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+        });
+    } catch {
+        return 'Fecha inválida';
+    }
+}

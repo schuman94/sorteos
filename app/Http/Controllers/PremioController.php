@@ -19,18 +19,19 @@ class PremioController extends Controller
         $query = Premio::query()
             ->where('user_id', Auth::id());
 
-        // Búsqueda
         if ($search = $request->input('search')) {
-            $query->where('nombre', 'like', '%' . $search . '%');
+            $query->where(function ($q) use ($search) {
+                $q->where('nombre', 'ilike', '%' . $search . '%')
+                    ->orWhere('proveedor', 'ilike', '%' . $search . '%');
+            });
         }
 
-        // Orden
         $sort = $request->input('sort', 'created_at');
         $direction = $request->input('direction', 'desc');
 
         $query->orderBy($sort, $direction);
 
-        $premios = $query->paginate(10)->withQueryString();
+        $premios = $query->paginate(20)->withQueryString();
 
         return Inertia::render('Premios/Index', [
             'premios' => $premios,
@@ -41,6 +42,7 @@ class PremioController extends Controller
             ],
         ]);
     }
+
 
     public function cargarTodos()
     {
@@ -80,7 +82,9 @@ class PremioController extends Controller
      */
     public function show(Premio $premio)
     {
-        //
+        return Inertia::render('Premios/Show', [
+            'premio' => $premio,
+        ]);
     }
 
     /**

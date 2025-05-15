@@ -21,7 +21,7 @@ class PremioSeeder extends Seeder
             'valor' => 24.95,
             'link' => 'https://nijuuni.es/products/fire-in-the-blood-camiseta-regular',
             'proveedor' => 'Nijuuni',
-            'descripcion' => 'Sudadera de la marca Nijuuni, el organizador del sorteo se pondrá en contacto contigo por email y podrás indicarle modelo y talla',
+            'descripcion' => 'Camiseta de la marca Nijuuni, el organizador del sorteo se pondrá en contacto contigo por email y podrás indicarle modelo y talla',
             'user_id' => $sergio->id,
         ]);
 
@@ -33,5 +33,11 @@ class PremioSeeder extends Seeder
             'descripcion' => 'Sudadera de la marca Nijuuni, el organizador del sorteo se pondrá en contacto contigo por email y podrás indicarle modelo y talla',
             'user_id' => $sergio->id,
         ]);
+
+        Premio::factory()
+            ->count(50)
+            ->create([
+                'user_id' => $sergio->id,
+            ]);
     }
 }

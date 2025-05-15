@@ -1,4 +1,5 @@
 import { formatearFecha as ff } from '@/utils/fecha';
+import { ThumbsUp } from 'lucide-react';
 
 export default function Comentario({ autor, fecha, texto, likes }) {
     return (
@@ -9,9 +10,10 @@ export default function Comentario({ autor, fecha, texto, likes }) {
             </p>
             <p className="mt-1">{texto}</p>
             {likes != null && (
-                <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                    👍 {likes}
-                </p>
+                <div className="mt-1 text-sm text-gray-600 dark:text-gray-400 inline-flex items-center gap-1">
+                    <ThumbsUp className="w-4 h-4 text-blue-500" />
+                    {likes}
+                </div>
             )}
         </li>
     );

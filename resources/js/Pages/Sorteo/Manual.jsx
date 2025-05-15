@@ -68,67 +68,78 @@ export default function Manual() {
                     <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 p-6 rounded shadow mb-8">
                         <h2 className="text-2xl font-semibold mb-4">Sorteo Manual</h2>
 
-                        <div className="grid grid-cols-1 gap-6">
-                            <div>
-                                <label htmlFor="num_ganadores" className="block mb-1 font-medium">Nº de ganadores</label>
-                                <input
-                                    type="number"
-                                    name="num_ganadores"
-                                    id="num_ganadores"
-                                    value={formData.num_ganadores}
-                                    onChange={handleChange}
-                                    className="input w-full"
-                                />
+                        <div className="max-w-3xl mx-auto grid gap-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                                <div>
+                                    <label htmlFor="num_ganadores" className="block mb-1 font-medium whitespace-nowrap">
+                                        Nº de ganadores
+                                    </label>
+                                    <input
+                                        type="number"
+                                        name="num_ganadores"
+                                        id="num_ganadores"
+                                        value={formData.num_ganadores}
+                                        onChange={handleChange}
+                                        className="input w-full"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label htmlFor="num_suplentes" className="block mb-1 font-medium whitespace-nowrap">
+                                        Nº de suplentes
+                                    </label>
+                                    <input
+                                        type="number"
+                                        name="num_suplentes"
+                                        id="num_suplentes"
+                                        value={formData.num_suplentes}
+                                        onChange={handleChange}
+                                        className="input w-full"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label htmlFor="cuenta_regresiva" className="block mb-1 font-medium whitespace-nowrap">
+                                        Cuenta atrás
+                                    </label>
+                                    <input
+                                        type="number"
+                                        name="cuenta_regresiva"
+                                        id="cuenta_regresiva"
+                                        min={3}
+                                        max={15}
+                                        value={formData.cuenta_regresiva || 5}
+                                        onChange={handleChange}
+                                        className="input w-full"
+                                    />
+                                </div>
                             </div>
 
                             <div>
-                                <label htmlFor="num_suplentes" className="block mb-1 font-medium">Nº de suplentes</label>
-                                <input
-                                    type="number"
-                                    name="num_suplentes"
-                                    id="num_suplentes"
-                                    value={formData.num_suplentes}
-                                    onChange={handleChange}
-                                    className="input w-full"
-                                />
-                            </div>
-
-                            <div>
-                                <label htmlFor="participantes" className="block mb-1 font-medium">Participantes</label>
+                                <label htmlFor="participantes" className="block mb-1 font-medium">
+                                    Participantes
+                                </label>
                                 <textarea
                                     name="participantes"
                                     id="participantes"
                                     placeholder="Un nombre por línea"
                                     value={formData.participantes}
                                     onChange={handleChange}
-                                    className="input w-full"
-                                    rows={6}
+                                    className="input w-full min-h-[140px] resize-y"
                                 />
                             </div>
 
-                            <div className="flex items-center gap-2">
-                                <input
-                                    type="checkbox"
-                                    name="eliminar_duplicados"
-                                    id="eliminar_duplicados"
-                                    checked={formData.eliminar_duplicados}
-                                    onChange={handleChange}
-                                />
-                                <label htmlFor="eliminar_duplicados">Eliminar nombres duplicados</label>
-                            </div>
-
-                            <div>
-                                <label htmlFor="cuenta_regresiva" className="block mb-1 font-medium">Cuenta regresiva (segundos)</label>
-                                <input
-                                    type="number"
-                                    name="cuenta_regresiva"
-                                    id="cuenta_regresiva"
-                                    min={3}
-                                    max={15}
-                                    value={formData.cuenta_regresiva || 5}
-                                    onChange={handleChange}
-                                    className="input w-full"
-                                />
+                            <div className="text-sm text-gray-700 dark:text-gray-300">
+                                <label className="flex items-center gap-2">
+                                    <input
+                                        type="checkbox"
+                                        name="eliminar_duplicados"
+                                        id="eliminar_duplicados"
+                                        checked={formData.eliminar_duplicados}
+                                        onChange={handleChange}
+                                    />
+                                    Eliminar nombres duplicados
+                                </label>
                             </div>
                         </div>
 
