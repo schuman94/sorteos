@@ -59,10 +59,12 @@ export default function ModalCargarPremio({ onSeleccionar, onClose }) {
         },
         {
             header: 'Valor',
-            accessorKey: 'valor',
-            cell: info => parseFloat(info.getValue()).toFixed(2),
-        }
-        ,
+            accessorFn: row => parseFloat(row.valor), // asegura tipo numérico
+            id: 'valor', // obligatorio al usar accessorFn
+            cell: info => info.getValue().toFixed(2),
+            sortingFn: 'basic', // sorting numérico básico
+        },
+
         {
             header: 'Fecha',
             accessorKey: 'created_at',

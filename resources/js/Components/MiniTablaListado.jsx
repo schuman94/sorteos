@@ -36,10 +36,14 @@ export default function MiniTablaListado({
         fetchData();
     }, [filters]);
 
-    const sorting = useMemo(() => [{
+const sorting = useMemo(() => {
+    if (!filters.sort) return [];
+    return [{
         id: filters.sort,
         desc: filters.direction === 'desc',
-    }], [filters.sort, filters.direction]);
+    }];
+}, [filters.sort, filters.direction]);
+
 
     const table = useReactTable({
         data: data.data || [],
