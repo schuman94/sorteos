@@ -1,71 +1,86 @@
-import axios from '@/lib/axios';
-import { useState, useEffect } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import axios from 'axios';
+import MiniTablaListado from '@/Components/MiniTablaListado';
+import { formatearFechaCorta as ffc } from '@/utils/fecha';
 
-export default function ModalCargarPremio({ visible, onClose, onSeleccionarPremio }) {
-    const [premios, setPremios] = useState([]);
-    const [error, setError] = useState('');
-    const [cargando, setCargando] = useState(true);
-    const [filtro, setFiltro] = useState('');
+export default function ModalCargarPremio({ onSeleccionar, onClose }) {
+    const [data, setData] = useState({ data: [], current_page: 1, last_page: 1 });
+    const [anyos, setAnyos] = useState([]);
+    const [filters, setFilters] = useState({
+        search: '',
+        sort: 'created_at',
+        direction: 'desc',
+        anyo: '',
+        page: 1,
+    });
 
-    useEffect(() => {
-        if (visible) {
-            cargarPremios();
-        }
-    }, [visible]);
-
-    const cargarPremios = async () => {
+    const fetchData = async () => {
         try {
-            const response = await axios.get(route('premios.index'));
-            setPremios(response.data);
+            const response = await axios.get(route('premios.index'), { params: filters });
+            setData(response.data.premios);
+            setAnyos(response.data.anyos);
         } catch (error) {
-            console.error(error);
-            setError('Error al cargar los premios.');
-        } finally {
-            setCargando(false);
+            console.error('Error al cargar los premios:', error);
         }
     };
 
-    const premiosFiltrados = premios.filter(p => p.nombre.toLowerCase().includes(filtro.toLowerCase()));
+    const prevFilters = useRef();
 
-    if (!visible) return null;
+    useEffect(() => {
+        // Evita llamada duplicada si los filtros no han cambiado realmente
+        if (JSON.stringify(prevFilters.current) !== JSON.stringify(filters)) {
+            prevFilters.current = filters;
+            fetchData();
+        }
+    }, [filters]);
+
+    const columns = [
+        {
+            header: 'Nombre',
+            accessorKey: 'nombre',
+        }
+        ,
+        {
+            header: 'Proveedor',
+            accessorKey: 'proveedor',
+        },
+        {
+            header: 'Valor',
+            accessorFn: row => parseFloat(row.valor), // asegura tipo numérico
+            id: 'valor', // obligatorio al usar accessorFn
+            cell: info => info.getValue().toFixed(2),
+            sortingFn: 'basic', // sorting numérico básico
+        },
+
+        {
+            header: 'Fecha',
+            accessorKey: 'created_at',
+            cell: info => ffc(info.getValue()),
+        },
+    ];
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-4xl shadow-lg">
-                <h2 className="text-xl font-semibold mb-4">Seleccionar Premio</h2>
-                <input
-                    type="text"
-                    value={filtro}
-                    onChange={(e) => setFiltro(e.target.value)}
-                    placeholder="Buscar por nombre..."
-                    className="w-full border rounded px-3 py-2 mb-4"
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg shadow-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6 space-y-4">
+                <div className="flex items-center justify-between">
+                    <h2 className="text-xl font-bold">Seleccionar premio</h2>
+                    <button
+                        onClick={onClose}
+                        className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold px-4 py-2 rounded"
+                    >
+                        Cancelar
+                    </button>
+                </div>
+
+                <MiniTablaListado
+                    rutaIndex="premios.index"
+                    columns={columns}
+                    anyos={anyos}
+                    placeholder="Buscar por nombre o proveedor..."
+                    onSeleccionar={onSeleccionar}
+                    onClose={onClose}
                 />
 
-                {cargando && <p className="text-gray-600">Cargando premios...</p>}
-                {error && <p className="text-red-600">{error}</p>}
-
-                {!cargando && !error && (
-                    <div className="space-y-4">
-                        {premiosFiltrados.length > 0 ? (
-                            premiosFiltrados.map((premio) => (
-                                <div key={premio.id} className="flex justify-between items-center bg-gray-100 p-4 rounded shadow-sm">
-                                    <span>{premio.nombre}</span>
-                                    <button
-                                        onClick={() => {
-                                            onSeleccionarPremio(premio);
-                                            onClose();
-                                        }}
-                                        className="bg-blue-500 text-white rounded px-4 py-1"
-                                    >
-                                        Seleccionar
-                                    </button>
-                                </div>
-                            ))
-                        ) : (
-                            <p>No se encontraron premios.</p>
-                        )}
-                    </div>
-                )}
             </div>
         </div>
     );

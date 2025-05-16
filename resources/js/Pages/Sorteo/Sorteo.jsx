@@ -7,7 +7,7 @@ import axios from '@/lib/axios';
 import { useState, useEffect } from 'react';
 import { Head } from '@inertiajs/react';
 
-export default function Sorteo({publicacion}) {
+export default function Sorteo({ publicacion }) {
     const [formData, setFormData] = useState({
         num_ganadores: 1,
         num_suplentes: 0,
@@ -88,46 +88,67 @@ export default function Sorteo({publicacion}) {
                         <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 p-6 rounded shadow mb-8">
                             <h2 className="text-2xl font-semibold mb-4">Opciones del sorteo</h2>
 
-                            <div className="grid grid-cols-1 gap-6">
-                                {/* Nº de ganadores */}
-                                <div>
-                                    <label htmlFor="num_ganadores" className="block mb-1 font-medium">Nº de ganadores</label>
-                                    <input
-                                        type="number"
-                                        name="num_ganadores"
-                                        id="num_ganadores"
-                                        value={formData.num_ganadores}
-                                        onChange={handleChange}
-                                        className="input w-full"
-                                    />
+                            <div className="max-w-3xl mx-auto grid gap-6">
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                    <div>
+                                        <label htmlFor="num_ganadores" className="block mb-1 font-medium whitespace-nowrap">Ganadores</label>
+                                        <input
+                                            type="number"
+                                            name="num_ganadores"
+                                            id="num_ganadores"
+                                            value={formData.num_ganadores}
+                                            onChange={handleChange}
+                                            className="input w-full"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="num_suplentes" className="block mb-1 font-medium whitespace-nowrap">Suplentes</label>
+                                        <input
+                                            type="number"
+                                            name="num_suplentes"
+                                            id="num_suplentes"
+                                            value={formData.num_suplentes}
+                                            onChange={handleChange}
+                                            className="input w-full"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="cuenta_regresiva" className="block mb-1 font-medium whitespace-nowrap">Cuenta atrás (s)</label>
+                                        <input
+                                            type="number"
+                                            name="cuenta_regresiva"
+                                            id="cuenta_regresiva"
+                                            min={3}
+                                            max={15}
+                                            value={formData.cuenta_regresiva || 5}
+                                            onChange={handleChange}
+                                            className="input w-full"
+                                        />
+                                    </div>
                                 </div>
 
-                                {/* Nº de suplentes */}
-                                <div>
-                                    <label htmlFor="num_suplentes" className="block mb-1 font-medium">Nº de suplentes</label>
-                                    <input
-                                        type="number"
-                                        name="num_suplentes"
-                                        id="num_suplentes"
-                                        value={formData.num_suplentes}
-                                        onChange={handleChange}
-                                        className="input w-full"
-                                    />
+                                <div className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+                                    <label className="flex items-center gap-2">
+                                        <input
+                                            type="checkbox"
+                                            name="permitir_autores_duplicados"
+                                            checked={formData.permitir_autores_duplicados}
+                                            onChange={handleChange}
+                                        />
+                                        Permitir usuarios duplicados (mismo usuario con comentarios distintos)
+                                    </label>
+
+                                    <label className="flex items-center gap-2">
+                                        <input
+                                            type="checkbox"
+                                            name="mencion"
+                                            checked={formData.mencion}
+                                            onChange={handleChange}
+                                        />
+                                        Solo comentarios que mencionen a un amigo
+                                    </label>
                                 </div>
 
-                                {/* Permitir autores duplicados */}
-                                <div className="flex items-center gap-2">
-                                    <input
-                                        type="checkbox"
-                                        name="permitir_autores_duplicados"
-                                        id="permitir_autores_duplicados"
-                                        checked={formData.permitir_autores_duplicados}
-                                        onChange={handleChange}
-                                    />
-                                    <label htmlFor="permitir_autores_duplicados">Permitir usuarios duplicados (mismo usuario con comentarios distintos)</label>
-                                </div>
-
-                                {/* Hashtag */}
                                 <div>
                                     <label htmlFor="hashtag" className="block mb-1 font-medium">Filtrar por palabra o #hashtag</label>
                                     <input
@@ -141,57 +162,34 @@ export default function Sorteo({publicacion}) {
                                     />
                                 </div>
 
-                                {/* Mención */}
-                                <div className="flex items-center gap-2">
-                                    <input
-                                        type="checkbox"
-                                        name="mencion"
-                                        id="mencion"
-                                        checked={formData.mencion}
-                                        onChange={handleChange}
-                                    />
-                                    <label htmlFor="mencion">Solo comentarios que mencionen a un amigo</label>
-                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                    <div>
+                                        <label htmlFor="participantes_manuales" className="block mb-1 font-medium whitespace-nowrap">
+                                            Añadir participantes
+                                        </label>
+                                        <textarea
+                                            name="participantes_manuales"
+                                            id="participantes_manuales"
+                                            placeholder="Lista de participantes que quieres añadir además de los comentarios"
+                                            value={formData.participantes_manuales}
+                                            onChange={handleChange}
+                                            className="input w-full min-h-[140px] resize-y"
+                                        />
+                                    </div>
 
-                                {/* Participantes extra */}
-                                <div>
-                                    <label htmlFor="participantes_manuales" className="block mb-1 font-medium">Añadir participantes</label>
-                                    <textarea
-                                        name="participantes_manuales"
-                                        id="participantes_manuales"
-                                        placeholder="Lista de participantes que quieres añadir además de los comentarios"
-                                        value={formData.participantes_manuales}
-                                        onChange={handleChange}
-                                        className="input w-full"
-                                    />
-                                </div>
-
-                                {/* Usuarios excluidos */}
-                                <div>
-                                    <label htmlFor="usuarios_excluidos" className="block mb-1 font-medium">Excluir usuarios</label>
-                                    <textarea
-                                        name="usuarios_excluidos"
-                                        id="usuarios_excluidos"
-                                        placeholder="Lista de usuarios que quieres excluir de los comentarios"
-                                        value={formData.usuarios_excluidos}
-                                        onChange={handleChange}
-                                        className="input w-full"
-                                    />
-                                </div>
-
-                                {/* Cuenta regresiva */}
-                                <div>
-                                    <label htmlFor="cuenta_regresiva" className="block mb-1 font-medium">Cuenta regresiva (segundos)</label>
-                                    <input
-                                        type="number"
-                                        name="cuenta_regresiva"
-                                        id="cuenta_regresiva"
-                                        min={3}
-                                        max={15}
-                                        value={formData.cuenta_regresiva || 5}
-                                        onChange={handleChange}
-                                        className="input w-full"
-                                    />
+                                    <div>
+                                        <label htmlFor="usuarios_excluidos" className="block mb-1 font-medium whitespace-nowrap">
+                                            Excluir usuarios
+                                        </label>
+                                        <textarea
+                                            name="usuarios_excluidos"
+                                            id="usuarios_excluidos"
+                                            placeholder="Lista de usuarios que quieres excluir de los comentarios"
+                                            value={formData.usuarios_excluidos}
+                                            onChange={handleChange}
+                                            className="input w-full min-h-[140px] resize-y"
+                                        />
+                                    </div>
                                 </div>
                             </div>
 

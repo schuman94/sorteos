@@ -81,6 +81,13 @@ Route::middleware('auth')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('/premios', [PremioController::class, 'index'])->name('premios.index');
     Route::post('/premios', [PremioController::class, 'store'])->name('premios.store');
+    Route::get('/premios/create', [PremioController::class, 'create'])->name('premios.create');
+    Route::get('/premios/{premio}', [PremioController::class, 'show'])->name('premios.show');
+    Route::get('/premios/{premio}/edit', [PremioController::class, 'edit'])->name('premios.edit');
+    Route::put('/premios/{premio}', [PremioController::class, 'update'])->name('premios.update');
+    Route::delete('/premios/{premio}', [PremioController::class, 'destroy'])->name('premios.destroy');
+    Route::post('/premios/store-and-load', [PremioController::class, 'storeAndLoad'])->name('premios.storeAndLoad');
 });
+
 
 require __DIR__ . '/auth.php';

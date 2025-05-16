@@ -24,7 +24,7 @@ export default function Show({ sorteo }) {
 
     return (
         <>
-            <Head title={`Sorteo`} />
+            <Head title="Sorteo" />
 
             <div className="max-w-4xl mx-auto py-12 px-4 space-y-8">
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">

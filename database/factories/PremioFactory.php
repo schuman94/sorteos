@@ -17,7 +17,11 @@ class PremioFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'nombre' => fake()->words(2, true),
+            'valor' => fake()->randomFloat(2, 5, 500),
+            'proveedor' => fake()->company(),
+            'descripcion' => fake()->sentence(),
+            'link' => fake()->url(),
         ];
     }
 }

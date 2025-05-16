@@ -12,11 +12,21 @@ export default function Index() {
     const [showPremiosModal, setShowPremiosModal] = useState(false);
     const [showNuevoPremioModal, setShowNuevoPremioModal] = useState(false);
 
-    const handleAddPremio = (premio) => {
-        setPremios([...premios, { premio, cantidad: 1 }]);
+    const handleAddPremio = (nuevoPremio) => {
+        const index = premios.findIndex(p => p.premio.id === nuevoPremio.id);
+
+        if (index !== -1) {
+            // Ya existe: incrementa cantidad
+            const nuevos = [...premios];
+            nuevos[index].cantidad += 1;
+            setPremios(nuevos);
+        } else {
+            // No existe: lo añade como nuevo
+            setPremios([...premios, { premio: nuevoPremio, cantidad: 1 }]);
+        }
+
         setShowPremiosModal(false);
     };
-
     const handleCreatePremio = (nuevoPremio) => {
         setPremios([...premios, { premio: nuevoPremio, cantidad: 1 }]);
         setShowNuevoPremioModal(false);
@@ -143,11 +153,13 @@ export default function Index() {
                     </button>
                 </form>
 
-                <ModalCargarPremio
-                    visible={showPremiosModal}
-                    onClose={() => setShowPremiosModal(false)}
-                    onSeleccionarPremio={handleAddPremio}
-                />
+                {showPremiosModal && (
+                    <ModalCargarPremio
+                        onClose={() => setShowPremiosModal(false)}
+                        onSeleccionar={handleAddPremio}
+                    />
+                )}
+
 
                 <ModalCrearPremio
                     visible={showNuevoPremioModal}

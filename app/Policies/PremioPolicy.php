@@ -21,7 +21,7 @@ class PremioPolicy
      */
     public function view(User $user, Premio $premio): bool
     {
-        return false;
+        return $user->id === $premio->user_id;
     }
 
     /**
@@ -37,7 +37,7 @@ class PremioPolicy
      */
     public function update(User $user, Premio $premio): bool
     {
-        return false;
+        return $user->id === $premio->user_id;
     }
 
     /**
@@ -45,7 +45,7 @@ class PremioPolicy
      */
     public function delete(User $user, Premio $premio): bool
     {
-        return false;
+        return $user->id === $premio->user_id;
     }
 
     /**
