@@ -2,9 +2,10 @@ import MainLayout from '@/Layouts/MainLayout';
 import ModalCrearPremio from '@/Components/Premio/ModalCrearPremio';
 import ModalCargarPremio from '@/Components/Premio/ModalCargarPremio';
 import { useState } from 'react';
-import { Head, router } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 
 export default function Index() {
+    const { errors } = usePage().props;
     const [nombre, setNombre] = useState('');
     const [descripcion, setDescripcion] = useState('');
     const [numeroRascas, setNumeroRascas] = useState(1);
@@ -144,6 +145,11 @@ export default function Index() {
                             </div>
                         )}
                     </div>
+                    {errors.premios && (
+                        <div className="bg-red-100 border border-red-300 text-red-700 px-4 py-2 rounded text-sm">
+                            {errors.premios}
+                        </div>
+                    )}
 
                     <button
                         type="submit"
