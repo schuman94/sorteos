@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StorePremioRequest;
-use App\Http\Requests\UpdatePremioRequest;
 use App\Models\Premio;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Gate;
 
 class PremioController extends Controller
 {
@@ -16,11 +15,11 @@ class PremioController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Premio::query()->where('user_id', Auth::id());
+        $premios = Auth::user()->premios();
 
         // Filtro por búsqueda de texto
         if ($search = $request->input('search')) {
-            $query->where(function ($q) use ($search) {
+            $premios->where(function ($q) use ($search) {
                 $q->where('nombre', 'ilike', '%' . $search . '%')
                     ->orWhere('proveedor', 'ilike', '%' . $search . '%');
             });
@@ -28,21 +27,21 @@ class PremioController extends Controller
 
         // Filtro por año
         if ($anyo = $request->input('anyo')) {
-            $query->whereYear('created_at', $anyo);
+            $premios->whereYear('created_at', $anyo);
         }
 
         // Ordenamiento
         $sort = $request->input('sort', 'created_at');
         $direction = $request->input('direction', 'desc');
 
-        $query->orderBy($sort, $direction);
+        $premios->orderBy($sort, $direction);
 
-        // Paginación
+        // Paginación (20 en index, 10 en modal)
         $perPage = $request->wantsJson() ? 10 : 20;
-        $premios = $query->paginate($perPage)->withQueryString();
+        $premios = $premios->paginate($perPage)->withQueryString();
 
         // Años disponibles para el select
-        $anyos = Premio::where('user_id', Auth::id())
+        $anyos = Auth::user()->premios()
             ->selectRaw('DISTINCT EXTRACT(YEAR FROM created_at) AS anyo')
             ->orderByDesc('anyo')
             ->pluck('anyo');
@@ -125,6 +124,8 @@ class PremioController extends Controller
      */
     public function show(Premio $premio)
     {
+        Gate::authorize('view', $premio);
+
         return Inertia::render('Premios/Show', [
             'premio' => $premio,
         ]);
@@ -146,7 +147,7 @@ class PremioController extends Controller
      */
     public function update(Request $request, Premio $premio)
     {
-        // pendiente gate/policy
+        Gate::authorize('update', $premio);
 
         $validated = $request->validate([
             'nombre' => 'required|string|max:255|unique:premios,nombre,' . $premio->id,
@@ -166,8 +167,7 @@ class PremioController extends Controller
      */
     public function destroy(Premio $premio)
     {
-        // pendiente gate/policy
-
+        Gate::authorize('delete', $premio);
 
         // Un premio no se puede eliminar si está en algún rasca
         if ($premio->rascas()->exists()) {

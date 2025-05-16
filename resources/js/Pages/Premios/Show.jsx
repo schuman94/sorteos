@@ -76,7 +76,7 @@ export default function Show({ premio }) {
                     </div>
 
                     {/* Botones de acción dentro del recuadro */}
-                    <div className="flex gap-2 pt-4 border-t pt-4">
+                    <div className="flex gap-2 pt-4 border-t">
                         <Link
                             href={route('premios.edit', premio.id)}
                             className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
