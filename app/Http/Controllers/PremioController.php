@@ -46,6 +46,7 @@ class PremioController extends Controller
             ->orderByDesc('anyo')
             ->pluck('anyo');
 
+
         // Para el modal en el create de colecciones
         if ($request->wantsJson()) {
             return response()->json([
