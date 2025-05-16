@@ -83,7 +83,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/premios', [PremioController::class, 'store'])->name('premios.store');
     Route::get('/premios/create', [PremioController::class, 'create'])->name('premios.create');
     Route::get('/premios/{premio}', [PremioController::class, 'show'])->name('premios.show');
-    Route::get('/cargar-premios', [PremioController::class, 'cargarTodos'])->name('premios.cargarTodos');
     Route::get('/premios/{premio}/edit', [PremioController::class, 'edit'])->name('premios.edit');
     Route::put('/premios/{premio}', [PremioController::class, 'update'])->name('premios.update');
     Route::delete('/premios/{premio}', [PremioController::class, 'destroy'])->name('premios.destroy');

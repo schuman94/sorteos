@@ -74,14 +74,6 @@ class PremioController extends Controller
         ]);
     }
 
-
-
-    public function cargarTodos()
-    {
-        $premios = Auth::user()->premios()->get();
-        return response()->json($premios);
-    }
-
     /**
      * Show the form for creating a new resource.
      */

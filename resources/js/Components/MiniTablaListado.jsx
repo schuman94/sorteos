@@ -1,18 +1,9 @@
 import { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
-import {
-    useReactTable,
-    getCoreRowModel,
-    flexRender,
-} from '@tanstack/react-table';
+import { useReactTable, getCoreRowModel, flexRender } from '@tanstack/react-table';
 import { ArrowDown, ArrowUp, MoveVertical } from 'lucide-react';
 
-export default function MiniTablaListado({
-    columns,
-    rutaIndex,
-    anyos = [],
-    placeholder = 'Buscar...'
-}) {
+export default function MiniTablaListado({ columns, rutaIndex, anyos = [], placeholder = 'Buscar...', onSeleccionar = null, onClose = null, }) {
     const [data, setData] = useState({ data: [], current_page: 1, last_page: 1 });
     const [filters, setFilters] = useState({
         search: '',
@@ -35,13 +26,13 @@ export default function MiniTablaListado({
         fetchData();
     }, [filters]);
 
-const sorting = useMemo(() => {
-    if (!filters.sort) return [];
-    return [{
-        id: filters.sort,
-        desc: filters.direction === 'desc',
-    }];
-}, [filters.sort, filters.direction]);
+    const sorting = useMemo(() => {
+        if (!filters.sort) return [];
+        return [{
+            id: filters.sort,
+            desc: filters.direction === 'desc',
+        }];
+    }, [filters.sort, filters.direction]);
 
 
     const table = useReactTable({
@@ -132,7 +123,18 @@ const sorting = useMemo(() => {
 
                 <tbody>
                     {table.getRowModel().rows.map(row => (
-                        <tr key={row.id} className="hover:bg-gray-50">
+                        <tr
+                            key={row.id}
+                            className="hover:bg-gray-100 cursor-pointer"
+                            onClick={() => {
+                                if (typeof onSeleccionar === 'function') {
+                                    onSeleccionar(row.original);
+                                }
+                                if (typeof onClose === 'function') {
+                                    onClose();
+                                }
+                            }}
+                        >
                             {row.getVisibleCells().map(cell => (
                                 <td key={cell.id} className="px-4 py-2 border-t">
                                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
