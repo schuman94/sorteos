@@ -17,7 +17,6 @@ export default function ModalCargarPremio({ onSeleccionar, onClose }) {
     const fetchData = async () => {
         try {
             const response = await axios.get(route('premios.index'), { params: filters });
-            console.log('response.data.premios:', response.data.premios);
             setData(response.data.premios);
             setAnyos(response.data.anyos);
         } catch (error) {
@@ -77,13 +76,12 @@ export default function ModalCargarPremio({ onSeleccionar, onClose }) {
                 <h2 className="text-xl font-bold">Seleccionar premio</h2>
 
                 <MiniTablaListado
-                    data={data}
+                    rutaIndex="premios.index"
                     columns={columns}
-                    filters={filters}
-                    setFilters={setFilters}
                     anyos={anyos}
                     placeholder="Buscar por nombre o proveedor..."
                 />
+
 
                 <div className="flex justify-end pt-4">
                     <button

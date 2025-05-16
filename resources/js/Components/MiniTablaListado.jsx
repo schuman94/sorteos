@@ -1,36 +1,65 @@
-import { useState } from 'react';
-import { useReactTable, getCoreRowModel, getSortedRowModel, flexRender } from '@tanstack/react-table';
+import { useState, useEffect, useMemo } from 'react';
+import axios from 'axios';
+import {
+    useReactTable,
+    getCoreRowModel,
+    getSortedRowModel,
+    flexRender,
+} from '@tanstack/react-table';
 import { ArrowDown, ArrowUp, MoveVertical } from 'lucide-react';
 
 export default function MiniTablaListado({
-    data,
     columns,
-    filters,
-    setFilters,
+    rutaIndex,
     anyos = [],
     placeholder = 'Buscar...'
 }) {
-    const [sorting, setSorting] = useState([{
+    const [data, setData] = useState({ data: [], current_page: 1, last_page: 1 });
+    const [filters, setFilters] = useState({
+        search: '',
+        sort: 'created_at',
+        direction: 'desc',
+        anyo: '',
+        page: 1,
+    });
+
+    const fetchData = async () => {
+        try {
+            const response = await axios.get(route(rutaIndex), { params: filters });
+            setData(response.data.premios);
+        } catch (error) {
+            console.error('Error al cargar los datos:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, [filters]);
+
+    const sorting = useMemo(() => [{
         id: filters.sort,
         desc: filters.direction === 'desc',
-    }]);
+    }], [filters.sort, filters.direction]);
 
     const table = useReactTable({
-        data: data.data,
+        data: data.data || [],
         columns,
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
-        state: {
-            sorting,
-        },
-        onSortingChange: (newSorting) => {
-            setSorting(newSorting);
-            const sort = newSorting[0]?.id;
-            const direction = newSorting[0]?.desc ? 'desc' : 'asc';
+        state: { sorting },
+        onSortingChange: (updater) => {
+            const sortState = typeof updater === 'function' ? updater(sorting) : updater;
+            const newSort = sortState[0]?.id;
+            const newDirection = sortState[0]?.desc ? 'desc' : 'asc';
 
             setFilters(prev => {
-                if (prev.sort === sort && prev.direction === direction) return prev;
-                return { ...prev, sort, direction, page: 1 };
+                if (prev.sort === newSort && prev.direction === newDirection) return prev;
+                return {
+                    ...prev,
+                    sort: newSort,
+                    direction: newDirection,
+                    page: 1,
+                };
             });
         },
     });
@@ -40,12 +69,13 @@ export default function MiniTablaListado({
             <div className="mb-4 flex flex-wrap items-center gap-4">
                 <input
                     type="text"
-                    value={filters.search || ''}
+                    value={filters.search}
                     onChange={(e) =>
-                        setFilters(prev => {
-                            if (prev.search === e.target.value) return prev;
-                            return { ...prev, search: e.target.value, page: 1 };
-                        })
+                        setFilters(prev => ({
+                            ...prev,
+                            search: e.target.value,
+                            page: 1,
+                        }))
                     }
                     className="border rounded px-3 py-2 w-full sm:w-[300px]"
                     placeholder={placeholder}
@@ -53,14 +83,14 @@ export default function MiniTablaListado({
 
                 {anyos.length > 0 && (
                     <select
-                        value={filters.anyo || ''}
-                        onChange={(e) => {
-                            const nuevoAnyo = e.target.value || '';
-                            setFilters(prev => {
-                                if (prev.anyo === nuevoAnyo) return prev;
-                                return { ...prev, anyo: nuevoAnyo, page: 1 };
-                            });
-                        }}
+                        value={filters.anyo}
+                        onChange={(e) =>
+                            setFilters(prev => ({
+                                ...prev,
+                                anyo: e.target.value,
+                                page: 1,
+                            }))
+                        }
                         className="border rounded px-3 py-2 w-full sm:w-[90px]"
                     >
                         <option value="">Año</option>
@@ -119,11 +149,10 @@ export default function MiniTablaListado({
                     <button
                         disabled={data.current_page <= 1}
                         onClick={() =>
-                            setFilters(prev => {
-                                const nueva = data.current_page - 1;
-                                if (nueva === prev.page) return prev;
-                                return { ...prev, page: nueva };
-                            })
+                            setFilters(prev => ({
+                                ...prev,
+                                page: data.current_page - 1,
+                            }))
                         }
                         className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
                     >
@@ -133,11 +162,10 @@ export default function MiniTablaListado({
                     <button
                         disabled={data.current_page >= data.last_page}
                         onClick={() =>
-                            setFilters(prev => {
-                                const nueva = data.current_page + 1;
-                                if (nueva === prev.page) return prev;
-                                return { ...prev, page: nueva };
-                            })
+                            setFilters(prev => ({
+                                ...prev,
+                                page: data.current_page + 1,
+                            }))
                         }
                         className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
                     >
