@@ -10,6 +10,7 @@ use Inertia\Inertia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 
 class ColeccionController extends Controller
@@ -51,17 +52,35 @@ class ColeccionController extends Controller
             'premios.*.cantidad' => 'required|integer|min:1',
         ]);
 
+        $totalPremios = collect($validatedData['premios'])->sum('cantidad');
 
-        $coleccion = new Coleccion();
-        $coleccion->nombre = $validatedData['nombre'];
-        $coleccion->descripcion = $validatedData['descripcion'];
-        $coleccion->user()->associate(Auth::user());
-        $coleccion->save();
+        if ($totalPremios > $validatedData['numeroRascas']) {
+            return back()->withErrors([
+                'premios' => 'La cantidad total de premios no puede superar el número de rascas (' . $validatedData['numeroRascas'] . ').',
+            ])->withInput();
+        }
 
-        $this->CrearRascas($coleccion, $validatedData['numeroRascas'], $validatedData['premios']);
+        try {
+            $coleccion = null;
 
-        return Inertia::location(route('colecciones.show', $coleccion));
+            DB::transaction(function () use ($validatedData, &$coleccion) {
+                $coleccion = new \App\Models\Coleccion();
+                $coleccion->nombre = $validatedData['nombre'];
+                $coleccion->descripcion = $validatedData['descripcion'];
+                $coleccion->user()->associate(Auth::user());
+                $coleccion->save();
+
+                $this->CrearRascas($coleccion, $validatedData['numeroRascas'], $validatedData['premios']);
+            });
+            return Inertia::location(route('colecciones.show', $coleccion));
+        } catch (\Throwable $e) {
+            // Loguear si es necesario: Log::error($e);
+            return back()->withErrors([
+                'general' => 'Ocurrió un error al crear la colección. Intenta de nuevo.',
+            ])->withInput();
+        }
     }
+
 
 
     public function crearRascas(Coleccion $coleccion, $numRascas, $premios)
