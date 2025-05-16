@@ -1,59 +1,66 @@
-import { router } from '@inertiajs/react';
+import { useState } from 'react';
 import { useReactTable, getCoreRowModel, getSortedRowModel, flexRender } from '@tanstack/react-table';
 import { ArrowDown, ArrowUp, MoveVertical } from 'lucide-react';
 
-export default function TablaListado({ data, columns, filters, rutaIndex, placeholder = 'Buscar...', anyos = [] }) {
+export default function MiniTablaListado({
+    data,
+    columns,
+    filters,
+    setFilters,
+    anyos = [],
+    placeholder = 'Buscar...'
+}) {
+    const [sorting, setSorting] = useState([{
+        id: filters.sort,
+        desc: filters.direction === 'desc',
+    }]);
+
     const table = useReactTable({
         data: data.data,
         columns,
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
         state: {
-            sorting: [{
-                id: filters.sort,
-                desc: filters.direction === 'desc',
-            }]
+            sorting,
         },
-        onSortingChange: (updater) => {
-            const sortState = updater instanceof Function ? updater(table.getState().sorting) : updater;
-            const sort = sortState[0]?.id;
-            const direction = sortState[0]?.desc ? 'desc' : 'asc';
+        onSortingChange: (newSorting) => {
+            setSorting(newSorting);
+            const sort = newSorting[0]?.id;
+            const direction = newSorting[0]?.desc ? 'desc' : 'asc';
 
-            router.get(route(rutaIndex), {
-                ...filters,
-                sort,
-                direction,
-            }, { preserveState: true });
+            setFilters(prev => {
+                if (prev.sort === sort && prev.direction === direction) return prev;
+                return { ...prev, sort, direction, page: 1 };
+            });
         },
     });
 
     return (
         <>
             <div className="mb-4 flex flex-wrap items-center gap-4">
-
                 <input
                     type="text"
-                    defaultValue={filters.search || ''}
+                    value={filters.search || ''}
                     onChange={(e) =>
-                        router.get(route(rutaIndex), {
-                            ...filters,
-                            search: e.target.value,
-                        }, { preserveState: true })
+                        setFilters(prev => {
+                            if (prev.search === e.target.value) return prev;
+                            return { ...prev, search: e.target.value, page: 1 };
+                        })
                     }
                     className="border rounded px-3 py-2 w-full sm:w-[300px]"
                     placeholder={placeholder}
                 />
 
-
                 {anyos.length > 0 && (
                     <select
                         value={filters.anyo || ''}
-                        onChange={(e) =>
-                            router.get(route(rutaIndex), {
-                                ...filters,
-                                anyo: e.target.value || undefined,
-                            }, { preserveState: true })
-                        }
+                        onChange={(e) => {
+                            const nuevoAnyo = e.target.value || '';
+                            setFilters(prev => {
+                                if (prev.anyo === nuevoAnyo) return prev;
+                                return { ...prev, anyo: nuevoAnyo, page: 1 };
+                            });
+                        }}
                         className="border rounded px-3 py-2 w-full sm:w-[90px]"
                     >
                         <option value="">Año</option>
@@ -63,7 +70,6 @@ export default function TablaListado({ data, columns, filters, rutaIndex, placeh
                     </select>
                 )}
             </div>
-
 
             <table className="min-w-full text-sm bg-white shadow rounded overflow-hidden">
                 <thead className="bg-gray-100 text-left">
@@ -106,26 +112,37 @@ export default function TablaListado({ data, columns, filters, rutaIndex, placeh
 
             <div className="flex justify-between items-center mt-4">
                 <span className="text-sm text-gray-600">
-                    {data.current_page} de {data.last_page}
+                    Página {data.current_page} de {data.last_page}
                 </span>
 
                 <div className="space-x-2">
-                    {data.prev_page_url && (
-                        <button
-                            className="px-4 py-2 bg-gray-200 rounded"
-                            onClick={() => router.get(data.prev_page_url, {}, { preserveState: true })}
-                        >
-                            Anterior
-                        </button>
-                    )}
-                    {data.next_page_url && (
-                        <button
-                            className="px-4 py-2 bg-gray-200 rounded"
-                            onClick={() => router.get(data.next_page_url, {}, { preserveState: true })}
-                        >
-                            Siguiente
-                        </button>
-                    )}
+                    <button
+                        disabled={data.current_page <= 1}
+                        onClick={() =>
+                            setFilters(prev => {
+                                const nueva = data.current_page - 1;
+                                if (nueva === prev.page) return prev;
+                                return { ...prev, page: nueva };
+                            })
+                        }
+                        className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+                    >
+                        Anterior
+                    </button>
+
+                    <button
+                        disabled={data.current_page >= data.last_page}
+                        onClick={() =>
+                            setFilters(prev => {
+                                const nueva = data.current_page + 1;
+                                if (nueva === prev.page) return prev;
+                                return { ...prev, page: nueva };
+                            })
+                        }
+                        className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+                    >
+                        Siguiente
+                    </button>
                 </div>
             </div>
         </>

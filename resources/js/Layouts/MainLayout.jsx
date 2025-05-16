@@ -50,6 +50,7 @@ export default function MainLayout({ header, children }) {
                                 >
                                     Rascas
                                 </NavLink>
+
                                 {user?.is_admin && (
                                     <NavLink
                                         href={route('admin.users.index')}
@@ -186,6 +187,9 @@ export default function MainLayout({ header, children }) {
                                         Ruleta
                                     </ResponsiveNavLink>
 
+                                    <ResponsiveNavLink href={route('colecciones.index')} active={route().current('colecciones.index')}>
+                                        Rascas
+                                    </ResponsiveNavLink>
 
                                     <ResponsiveNavLink method="post" href={route('logout')} as="button">
                                         Cerrar sesión

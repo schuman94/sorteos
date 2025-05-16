@@ -1,8 +1,9 @@
+import MainLayout from '@/Layouts/MainLayout';
 import TablaListado from '@/Components/TablaListado';
-import { Link } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { formatearFechaCorta as ffc } from '@/utils/fecha';
 
-export default function Index({ premios, filters }) {
+export default function Index({ premios, filters, anyos }) {
     const columns = [
         {
             header: 'Nombre',
@@ -36,15 +37,30 @@ export default function Index({ premios, filters }) {
     ];
 
     return (
-        <div className="max-w-6xl mx-auto py-12 px-4 space-y-6">
-            <h1 className="text-2xl font-bold mb-4">Premios</h1>
-            <TablaListado
-                data={premios}
-                columns={columns}
-                filters={filters}
-                rutaIndex="premios.index"
-                placeholder="Buscar por nombre o proveedor..."
-            />
-        </div>
+        <>
+            <Head title="Premios" />
+
+            <div className="max-w-6xl mx-auto py-12 px-4 space-y-6">
+                <div className="flex items-center justify-between mb-4">
+                    <h1 className="text-2xl font-bold">Premios</h1>
+                    <Link
+                        href={route('premios.create')}
+                        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+                    >
+                        Nuevo premio
+                    </Link>
+                </div>
+                <TablaListado
+                    data={premios}
+                    columns={columns}
+                    filters={filters}
+                    rutaIndex="premios.index"
+                    placeholder="Buscar por nombre o proveedor..."
+                    anyos={anyos}
+                />
+            </div>
+        </>
     );
 }
+
+Index.layout = (page) => <MainLayout>{page}</MainLayout>;

@@ -16,9 +16,9 @@ class PremioController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Premio::query()
-            ->where('user_id', Auth::id());
+        $query = Premio::query()->where('user_id', Auth::id());
 
+        // Filtro por búsqueda de texto
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('nombre', 'ilike', '%' . $search . '%')
@@ -26,22 +26,54 @@ class PremioController extends Controller
             });
         }
 
+        // Filtro por año
+        if ($anyo = $request->input('anyo')) {
+            $query->whereYear('created_at', $anyo);
+        }
+
+        // Ordenamiento
         $sort = $request->input('sort', 'created_at');
         $direction = $request->input('direction', 'desc');
 
         $query->orderBy($sort, $direction);
 
-        $premios = $query->paginate(20)->withQueryString();
+        // Paginación
+        $perPage = $request->wantsJson() ? 10 : 20;
+        $premios = $query->paginate($perPage)->withQueryString();
 
+        // Años disponibles para el select
+        $anyos = Premio::where('user_id', Auth::id())
+            ->selectRaw('DISTINCT EXTRACT(YEAR FROM created_at) AS anyo')
+            ->orderByDesc('anyo')
+            ->pluck('anyo');
+
+        // Para el modal en el create de colecciones
+        if ($request->wantsJson()) {
+            return response()->json([
+                'premios' => $premios,
+                'filters' => [
+                    'search' => $search,
+                    'anyo' => $anyo,
+                    'sort' => $sort,
+                    'direction' => $direction,
+                ],
+                'anyos' => $anyos,
+            ]);
+        }
+
+        // Para el index de premios
         return Inertia::render('Premios/Index', [
             'premios' => $premios,
             'filters' => [
                 'search' => $search,
+                'anyo' => $anyo,
                 'sort' => $sort,
                 'direction' => $direction,
             ],
+            'anyos' => $anyos,
         ]);
     }
+
 
 
     public function cargarTodos()
@@ -55,7 +87,7 @@ class PremioController extends Controller
      */
     public function create()
     {
-        //
+        return Inertia::render('Premios/Create');
     }
 
     /**
@@ -63,19 +95,38 @@ class PremioController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'nombre' => 'required|string|max:255',
-            'descripcion' => 'required|string',
+        $validated = $request->validate([
+            'nombre' => 'required|string|max:255|unique:premios,nombre',
+            'proveedor' => 'required|string|max:255',
+            'valor' => 'required|numeric|min:0',
+            'descripcion' => 'nullable|string',
+            'link' => 'nullable|url',
         ]);
 
-        $premio = new Premio();
-        $premio->nombre = $request->nombre;
-        $premio->descripcion = $request->descripcion;
+        $premio = new Premio($validated);
+        $premio->user()->associate(Auth::user());
+        $premio->save();
+
+        return redirect()->route('premios.show', $premio)->with('success', 'Premio creado correctamente.');
+    }
+
+    public function storeAndLoad(Request $request)
+    {
+        $validated = $request->validate([
+            'nombre' => 'required|string|max:255|unique:premios,nombre',
+            'proveedor' => 'required|string|max:255',
+            'valor' => 'required|numeric|min:0',
+            'descripcion' => 'nullable|string',
+            'link' => 'nullable|url',
+        ]);
+
+        $premio = new Premio($validated);
         $premio->user()->associate(Auth::user());
         $premio->save();
 
         return response()->json($premio);
     }
+
 
     /**
      * Display the specified resource.
@@ -92,15 +143,30 @@ class PremioController extends Controller
      */
     public function edit(Premio $premio)
     {
-        //
+        // pendiente gate/policy
+        return Inertia::render('Premios/Edit', [
+            'premio' => $premio,
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdatePremioRequest $request, Premio $premio)
+    public function update(Request $request, Premio $premio)
     {
-        //
+        // pendiente gate/policy
+
+        $validated = $request->validate([
+            'nombre' => 'required|string|max:255|unique:premios,nombre,' . $premio->id,
+            'proveedor' => 'required|string|max:255',
+            'valor' => 'required|numeric|min:0',
+            'descripcion' => 'nullable|string',
+            'link' => 'nullable|url',
+        ]);
+
+        $premio->update($validated);
+
+        return redirect()->route('premios.show', $premio)->with('success', 'Premio actualizado correctamente.');
     }
 
     /**
@@ -108,6 +174,18 @@ class PremioController extends Controller
      */
     public function destroy(Premio $premio)
     {
-        //
+        // pendiente gate/policy
+
+
+        // Un premio no se puede eliminar si está en algún rasca
+        if ($premio->rascas()->exists()) {
+            return back()->withErrors([
+                'premio' => 'No se puede eliminar el premio porque está asociado a uno o más rascas.',
+            ]);
+        }
+
+        $premio->delete();
+
+        return redirect()->route('premios.index')->with('success', 'Premio eliminado.');
     }
 }

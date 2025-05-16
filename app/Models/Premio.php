@@ -10,7 +10,7 @@ class Premio extends Model
     /** @use HasFactory<\Database\Factories\PremioFactory> */
     use HasFactory;
 
-    protected $fillable = ['nombre', ' descripcion'];
+    protected $fillable = ['nombre', ' descripcion', 'proveedor', 'valor', 'link'];
 
     public function rascas()
     {
