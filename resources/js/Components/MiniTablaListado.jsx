@@ -3,7 +3,6 @@ import axios from 'axios';
 import {
     useReactTable,
     getCoreRowModel,
-    getSortedRowModel,
     flexRender,
 } from '@tanstack/react-table';
 import { ArrowDown, ArrowUp, MoveVertical } from 'lucide-react';
@@ -49,7 +48,7 @@ const sorting = useMemo(() => {
         data: data.data || [],
         columns,
         getCoreRowModel: getCoreRowModel(),
-        getSortedRowModel: getSortedRowModel(),
+
         state: { sorting },
         onSortingChange: (updater) => {
             const sortState = typeof updater === 'function' ? updater(sorting) : updater;

@@ -1,5 +1,5 @@
 import { router } from '@inertiajs/react';
-import { useReactTable, getCoreRowModel, getSortedRowModel, flexRender } from '@tanstack/react-table';
+import { useReactTable, getCoreRowModel,  flexRender } from '@tanstack/react-table';
 import { ArrowDown, ArrowUp, MoveVertical } from 'lucide-react';
 
 export default function TablaListado({ data, columns, filters, rutaIndex, placeholder = 'Buscar...', anyos = [] }) {
@@ -7,7 +7,7 @@ export default function TablaListado({ data, columns, filters, rutaIndex, placeh
         data: data.data,
         columns,
         getCoreRowModel: getCoreRowModel(),
-        getSortedRowModel: getSortedRowModel(),
+
         state: {
             sorting: [{
                 id: filters.sort,
