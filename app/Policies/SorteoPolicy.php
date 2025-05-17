@@ -21,7 +21,7 @@ class SorteoPolicy
      */
     public function view(User $user, Sorteo $sorteo): bool
     {
-        return $user->id === $sorteo->user_id || $user->isAdmin;
+        return $user->id === $sorteo->user_id || $user->is_admin;
     }
 
     /**

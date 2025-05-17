@@ -16,7 +16,7 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!Auth::user() || !Auth::user()->isAdmin) {
+        if (!Auth::user() || !Auth::user()->is_admin) {
             abort(403, 'No tienes permisos para acceder a esta sección.');
         }
         return $next($request);
