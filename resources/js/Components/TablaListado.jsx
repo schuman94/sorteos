@@ -1,8 +1,12 @@
 import { router } from '@inertiajs/react';
-import { useReactTable, getCoreRowModel,  flexRender } from '@tanstack/react-table';
+import { useReactTable, getCoreRowModel, flexRender } from '@tanstack/react-table';
 import { ArrowDown, ArrowUp, MoveVertical } from 'lucide-react';
 
 export default function TablaListado({ data, columns, filters, rutaIndex, placeholder = 'Buscar...', anyos = [] }) {
+    const getRuta = () => {
+        return Array.isArray(rutaIndex) ? route(...rutaIndex) : route(rutaIndex);
+    };
+
     const table = useReactTable({
         data: data.data,
         columns,
@@ -19,7 +23,7 @@ export default function TablaListado({ data, columns, filters, rutaIndex, placeh
             const sort = sortState[0]?.id;
             const direction = sortState[0]?.desc ? 'desc' : 'asc';
 
-            router.get(route(rutaIndex), {
+            router.get(getRuta(), {
                 ...filters,
                 sort,
                 direction,
@@ -30,12 +34,11 @@ export default function TablaListado({ data, columns, filters, rutaIndex, placeh
     return (
         <>
             <div className="mb-4 flex flex-wrap items-center gap-4">
-
                 <input
                     type="text"
                     defaultValue={filters.search || ''}
                     onChange={(e) =>
-                        router.get(route(rutaIndex), {
+                        router.get(getRuta(), {
                             ...filters,
                             search: e.target.value,
                         }, { preserveState: true })
@@ -44,12 +47,11 @@ export default function TablaListado({ data, columns, filters, rutaIndex, placeh
                     placeholder={placeholder}
                 />
 
-
                 {anyos.length > 0 && (
                     <select
                         value={filters.anyo || ''}
                         onChange={(e) =>
-                            router.get(route(rutaIndex), {
+                            router.get(getRuta(), {
                                 ...filters,
                                 anyo: e.target.value || undefined,
                             }, { preserveState: true })
@@ -63,7 +65,6 @@ export default function TablaListado({ data, columns, filters, rutaIndex, placeh
                     </select>
                 )}
             </div>
-
 
             <table className="min-w-full text-sm bg-white shadow rounded overflow-hidden">
                 <thead className="bg-gray-100 text-left">

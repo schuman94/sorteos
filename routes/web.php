@@ -78,7 +78,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('colecciones', ColeccionController::class)->parameters([
         'colecciones' => 'coleccion',
     ]);
-    Route::post('/colecciones/{coleccion}/proporcionar-rascas', [\App\Http\Controllers\ColeccionController::class, 'proporcionarRascas'])->name('colecciones.proporcionarRascas');
+    Route::post('/colecciones/{coleccion}/proporcionar-rascas', [ColeccionController::class, 'proporcionarRascas'])->name('colecciones.proporcionarRascas');
+    Route::get('colecciones/{coleccion}/rascas', [ColeccionController::class, 'rascasProporcionados'])->name('colecciones.rascasProporcionados');
 });
 
 Route::middleware('auth')->group(function () {

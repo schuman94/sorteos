@@ -114,7 +114,7 @@ class ColeccionController extends Controller
     public function show(Coleccion $coleccion)
     {
         $coleccion->loadCount(['rascas as rascas_restantes' => function ($query) {
-            $query->where('proporcionado', false);
+            $query->whereNull('provided_at');
         }]);
 
         return Inertia::render('Coleccion/Show', [
@@ -158,7 +158,7 @@ class ColeccionController extends Controller
         $cantidadSolicitada = $validated['cantidad'];
 
         $rascasDisponibles = $coleccion->rascas()
-            ->where('proporcionado', false)
+            ->whereNull('provided_at')
             ->get()
             ->shuffle();
 
@@ -172,7 +172,7 @@ class ColeccionController extends Controller
 
         DB::transaction(function () use ($rascasSeleccionados) {
             foreach ($rascasSeleccionados as $rasca) {
-                $rasca->proporcionado = true;
+                $rasca->provided_at = now();
                 $rasca->save();
             }
         });
@@ -182,5 +182,48 @@ class ColeccionController extends Controller
         return redirect()
             ->route('colecciones.show', $coleccion)
             ->with('urls', $urls);
+    }
+
+    public function rascasProporcionados(Request $request, Coleccion $coleccion)
+    {
+        $query = $coleccion->rascas()
+            ->whereNotNull('provided_at')
+            ->leftJoin('users', 'rascas.scratched_by', '=', 'users.id')
+            ->select(
+                'rascas.id',
+                'rascas.codigo',
+                'rascas.provided_at',
+                'rascas.scratched_at',
+                DB::raw("users.name as scratched_by")
+            );
+
+
+        // Filtro de búsqueda
+        if ($search = $request->input('search')) {
+            $query->where('rascas.codigo', 'ilike', "%{$search}%");
+        }
+
+        // Ordenación
+        $sort = $request->input('sort', 'provided_at');
+        $direction = $request->input('direction', 'desc');
+
+        if (in_array($sort, ['codigo', 'scratched_at', 'scratched_by', 'provided_at'])) {
+            $query->orderBy($sort, $direction);
+        }
+
+        $rascas = $query->paginate(20)->withQueryString();
+
+        return Inertia::render('Coleccion/Rascas', [
+            'rascas' => $rascas,
+            'filters' => [
+                'search' => $search,
+                'sort' => $sort,
+                'direction' => $direction,
+            ],
+            'coleccion' => [
+                'id' => $coleccion->id,
+                'nombre' => $coleccion->nombre,
+            ],
+        ]);
     }
 }

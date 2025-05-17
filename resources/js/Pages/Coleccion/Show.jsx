@@ -1,4 +1,4 @@
-import { useForm, usePage, Head } from '@inertiajs/react';
+import { useForm, Head, Link } from '@inertiajs/react';
 import MainLayout from '@/Layouts/MainLayout';
 import { formatearFecha as ff } from '@/utils/fecha';
 
@@ -28,6 +28,13 @@ export default function Show({ coleccion, urls }) {
                     <div><strong>Fecha de creación:</strong> <p>{ff(coleccion.created_at)}</p></div>
                     <div><strong>Rascas restantes:</strong> {coleccion.rascas_restantes}</div>
                 </div>
+
+                <Link
+                    href={route('colecciones.rascasProporcionados', coleccion.id)}
+                    className="inline-block bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded"
+                >
+                    Ver rascas proporcionados
+                </Link>
 
                 {coleccion.rascas_restantes > 0 && (
                     <form onSubmit={handleSubmit} className="space-y-4">
