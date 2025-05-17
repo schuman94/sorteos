@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('rascas', function (Blueprint $table) {
             $table->id();
             $table->uuid('codigo')->unique();
-            $table->boolean('proporcionado')->default(false);
+            $table->timestamp('provided_at')->nullable();
             $table->foreignId('coleccion_id')->constrained('colecciones');
             $table->foreignId('premio_id')->nullable()->constrained();
             $table->foreignId('scratched_by')->nullable()->constrained('users');
