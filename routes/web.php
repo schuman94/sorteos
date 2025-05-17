@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\CertificadoController;
 use App\Http\Controllers\ColeccionController;
 use App\Http\Controllers\PremioController;
+use App\Http\Controllers\RascaController;
 use App\Http\Controllers\RuletaController;
 use App\Http\Middleware\AdminMiddleware;
 use Illuminate\Support\Facades\Session;
@@ -59,7 +60,6 @@ Route::middleware(['auth', AdminMiddleware::class])->group(function () {
     Route::get('/admin/users/{user}/historial', [UserController::class, 'historial'])->name('admin.users.historial');
     Route::put('/admin/users/{user}/hacer-admin', [UserController::class, 'hacerAdmin'])->name('admin.users.hacer');
     Route::put('/admin/users/{user}/deshacer-admin', [UserController::class, 'deshacerAdmin'])->name('admin.users.deshacer');
-
 });
 
 Route::get('/certificado/{codigo}', [CertificadoController::class, 'show'])->name('certificado.show');
@@ -75,22 +75,18 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
-    Route::get('/colecciones', [ColeccionController::class, 'index'])->name('colecciones.index');
-    Route::get('/colecciones/create', [ColeccionController::class, 'create'])->name('colecciones.create');
-    Route::post('/colecciones', [ColeccionController::class, 'store'])->name('colecciones.store');
-    Route::get('/colecciones/{coleccion}', [ColeccionController::class, 'show'])->name('colecciones.show');
+    Route::resource('colecciones', ColeccionController::class)->parameters([
+        'colecciones' => 'coleccion',
+    ]);
+    Route::post('/colecciones/{coleccion}/proporcionar-rascas', [\App\Http\Controllers\ColeccionController::class, 'proporcionarRascas'])->name('colecciones.proporcionarRascas');
 });
 
 Route::middleware('auth')->group(function () {
-    Route::get('/premios', [PremioController::class, 'index'])->name('premios.index');
-    Route::post('/premios', [PremioController::class, 'store'])->name('premios.store');
-    Route::get('/premios/create', [PremioController::class, 'create'])->name('premios.create');
-    Route::get('/premios/{premio}', [PremioController::class, 'show'])->name('premios.show');
-    Route::get('/premios/{premio}/edit', [PremioController::class, 'edit'])->name('premios.edit');
-    Route::put('/premios/{premio}', [PremioController::class, 'update'])->name('premios.update');
-    Route::delete('/premios/{premio}', [PremioController::class, 'destroy'])->name('premios.destroy');
+    Route::resource('premios', PremioController::class);
     Route::post('/premios/store-and-load', [PremioController::class, 'storeAndLoad'])->name('premios.storeAndLoad');
 });
+
+Route::get('/rascas/{codigo}', [RascaController::class, 'show'])->name('rascas.show');
 
 
 require __DIR__ . '/auth.php';
