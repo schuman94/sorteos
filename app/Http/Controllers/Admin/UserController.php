@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
-use App\Models\Sorteo;
 use App\Models\Host;
 use Illuminate\Support\Facades\Auth;
 
@@ -31,7 +30,7 @@ class UserController extends Controller
         if (in_array($sort, ['id', 'name', 'email', 'created_at', 'sorteos_count', 'is_admin'])) {
             $query->orderBy($sort, $direction);
         }
-        $users = $query->paginate(10)->withQueryString();
+        $users = $query->paginate(20)->withQueryString();
 
         return Inertia::render('Admin/Users/Index', [
             'users' => $users,
