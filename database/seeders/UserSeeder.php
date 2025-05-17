@@ -18,14 +18,14 @@ class UserSeeder extends Seeder
             'name' => 'admin',
             'email' => 'admin@admin.com',
             'password' => Hash::make('adminadmin'),
-            'isAdmin' => true,
+            'is_admin' => true,
         ]);
 
         User::create([
             'name' => 'admin2',
             'email' => 'admin2@admin2.com',
             'password' => Hash::make('admin2admin2'),
-            'isAdmin' => true,
+            'is_admin' => true,
         ]);
 
 
@@ -33,13 +33,13 @@ class UserSeeder extends Seeder
             'name' => 'sergio',
             'email' => 'sergio@sergio.com',
             'password' => Hash::make('sergiosergio'),
-            'isAdmin' => false,
+            'is_admin' => false,
         ]);
 
         // Usuarios aleatorios con contraseña 'password'
         User::factory()->count(20)->create([
             'password' => Hash::make('password'),
-            'isAdmin' => false,
+            'is_admin' => false,
         ]);
     }
 }

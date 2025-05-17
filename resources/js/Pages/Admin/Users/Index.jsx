@@ -31,7 +31,7 @@ export default function Index({ users, filters }) {
         },
         {
             header: 'Rol',
-            accessorKey: 'isAdmin',
+            accessorKey: 'is_admin',
             cell: info => info.getValue() ? 'Admin' : 'Usuario',
         },
         {

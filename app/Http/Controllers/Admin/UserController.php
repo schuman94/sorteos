@@ -8,6 +8,7 @@ use Inertia\Inertia;
 use Illuminate\Http\Request;
 use App\Models\Sorteo;
 use App\Models\Host;
+use Illuminate\Support\Facades\Auth;
 
 
 class UserController extends Controller
@@ -27,7 +28,7 @@ class UserController extends Controller
         $direction = $request->input('direction', 'asc');
 
         // Ordenaciones posibles (protección contra columnas no válidas)
-        if (in_array($sort, ['id', 'name', 'email', 'created_at', 'sorteos_count', 'isAdmin'])) {
+        if (in_array($sort, ['id', 'name', 'email', 'created_at', 'sorteos_count', 'is_admin'])) {
             $query->orderBy($sort, $direction);
         }
         $users = $query->paginate(10)->withQueryString();
@@ -38,28 +39,10 @@ class UserController extends Controller
         ]);
     }
 
-
-
     public function show(User $user)
     {
-        $user->load('sorteos.publicacion.host');
-
         return Inertia::render('Admin/Users/Show', [
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'sorteos' => $user->sorteos->map(function ($sorteo) {
-                    return [
-                        'id' => $sorteo->id,
-                        'url' => $sorteo->publicacion?->url,
-                        'titulo' => $sorteo->publicacion?->titulo,
-                        'tipo' => $sorteo->publicacion?->host?->nombre ?? 'Manual',
-                        'num_participantes' => $sorteo->num_participantes,
-                        'created_at' => $sorteo->created_at,
-                    ];
-                }),
-            ]
+            'user' => $user
         ]);
     }
 
@@ -118,5 +101,34 @@ class UserController extends Controller
             'anyoSeleccionado' => $request->anyo,
             'tipoSeleccionado' => $request->tipo,
         ]);
+    }
+
+    public function hacerAdmin(User $user)
+    {
+        if ($user->is_admin) {
+            return redirect()->back()->with('warning', 'El usuario ya es administrador.');
+        }
+
+        $user->is_admin = true;
+        $user->save();
+
+        return redirect()->route('admin.users.show', $user)->with('success', 'El usuario ahora es administrador.');
+    }
+
+    public function deshacerAdmin(User $user)
+    {
+        // No te puedes quitar permisos a ti mismo
+        if (Auth::id() === $user->id) {
+            return redirect()->back()->with('warning', 'No puedes quitarte los permisos de administrador a ti mismo.');
+        }
+
+        if (! $user->is_admin) {
+            return redirect()->back()->with('warning', 'El usuario no es administrador.');
+        }
+
+        $user->is_admin = false;
+        $user->save();
+
+        return redirect()->route('admin.users.show', $user)->with('success', 'Permisos de administrador retirados.');
     }
 }
