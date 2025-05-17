@@ -113,13 +113,16 @@ class ColeccionController extends Controller
      */
     public function show(Coleccion $coleccion)
     {
-        $disponibles = $coleccion->rascas()->where('proporcionado', false)->count();
+        $coleccion->loadCount(['rascas as rascas_restantes' => function ($query) {
+            $query->where('proporcionado', false);
+        }]);
 
         return Inertia::render('Coleccion/Show', [
             'coleccion' => $coleccion,
-            'rascas_disponibles' => $disponibles,
+            'urls' => session('urls', []),
         ]);
     }
+
 
 
     /**
@@ -154,7 +157,6 @@ class ColeccionController extends Controller
 
         $cantidadSolicitada = $validated['cantidad'];
 
-        // Obtener los rascas disponibles (no proporcionados) de forma aleatoria
         $rascasDisponibles = $coleccion->rascas()
             ->where('proporcionado', false)
             ->get()
@@ -168,7 +170,6 @@ class ColeccionController extends Controller
 
         $rascasSeleccionados = $rascasDisponibles->take($cantidadSolicitada);
 
-        // Marcar como proporcionados
         DB::transaction(function () use ($rascasSeleccionados) {
             foreach ($rascasSeleccionados as $rasca) {
                 $rasca->proporcionado = true;
@@ -178,8 +179,8 @@ class ColeccionController extends Controller
 
         $urls = $rascasSeleccionados->map(fn($rasca) => route('rascas.show', $rasca->codigo))->all();
 
-        return response()->json([
-            'urls' => $urls,
-        ]);
+        return redirect()
+            ->route('colecciones.show', $coleccion)
+            ->with('urls', $urls);
     }
 }

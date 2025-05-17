@@ -1,28 +1,15 @@
-import { useState } from 'react';
-import { Head } from '@inertiajs/react';
+import { useForm, usePage, Head } from '@inertiajs/react';
 import MainLayout from '@/Layouts/MainLayout';
-import axios from 'axios';
 import { formatearFecha as ff } from '@/utils/fecha';
 
-export default function Show({ coleccion, rascas_disponibles }) {
-    const [cantidad, setCantidad] = useState(1);
-    const [urls, setUrls] = useState([]);
-    const [error, setError] = useState(null);
+export default function Show({ coleccion, urls }) {
+    const { data, setData, post, processing, errors } = useForm({
+        cantidad: 1,
+    });
 
-    const handleObtenerRascas = async (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
-
-        try {
-            const response = await axios.post(route('colecciones.proporcionarRascas', coleccion.id), {
-                cantidad,
-            });
-            setUrls(response.data.urls);
-            setError(null);
-        } catch (err) {
-            if (err.response?.status === 422) {
-                setError(err.response.data.errors?.cantidad?.[0] || 'Error al validar');
-            }
-        }
+        post(route('colecciones.proporcionarRascas', coleccion.id));
     };
 
     const copiarAlPortapapeles = async () => {
@@ -33,43 +20,39 @@ export default function Show({ coleccion, rascas_disponibles }) {
     return (
         <>
             <Head title="Colección" />
-
             <div className="max-w-6xl mx-auto p-6 space-y-6">
                 <h1 className="text-2xl font-bold text-center">{coleccion.nombre}</h1>
 
                 <div className="space-y-4">
                     <div><strong>Descripción:</strong> <p>{coleccion.descripcion}</p></div>
                     <div><strong>Fecha de creación:</strong> <p>{ff(coleccion.created_at)}</p></div>
+                    <div><strong>Rascas restantes:</strong> {coleccion.rascas_restantes}</div>
                 </div>
 
-                {rascas_disponibles > 0 ? (
-                    <form onSubmit={handleObtenerRascas} className="space-y-4">
-                        <label className="block font-medium">Número de rascas a obtener (quedan {rascas_disponibles})</label>
-
-                        <div className="flex flex-col items-start space-y-2">
+                {coleccion.rascas_restantes > 0 && (
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        <div>
+                            <label className="block font-medium">Número de rascas a obtener</label>
                             <input
                                 type="number"
-                                value={cantidad}
-                                onChange={e => setCantidad(Number(e.target.value))}
+                                value={data.cantidad}
+                                onChange={e => setData('cantidad', e.target.value)}
                                 min={1}
                                 max={9999}
                                 className="border rounded px-3 py-2 w-32"
                             />
-
-                            {error && (
-                                <p className="text-red-600 text-sm">{error}</p>
+                            {errors.cantidad && (
+                                <p className="text-red-600 text-sm mt-1">{errors.cantidad}</p>
                             )}
-
-                            <button
-                                type="submit"
-                                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                            >
-                                Obtener rascas
-                            </button>
                         </div>
+                        <button
+                            type="submit"
+                            disabled={processing}
+                            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                        >
+                            Obtener rascas
+                        </button>
                     </form>
-                ) : (
-                    <p className="text-red-600 font-medium">No quedan rascas disponibles en esta colección.</p>
                 )}
 
                 {urls.length > 0 && (
@@ -93,6 +76,5 @@ export default function Show({ coleccion, rascas_disponibles }) {
         </>
     );
 }
-
 
 Show.layout = page => <MainLayout>{page}</MainLayout>;
