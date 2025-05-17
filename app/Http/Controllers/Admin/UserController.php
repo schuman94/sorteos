@@ -16,39 +16,28 @@ class UserController extends Controller
     {
         $query = User::query()->withCount('sorteos');
 
-        // Filtro por nombre
-        if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                    ->orWhere('email', 'like', '%' . $search . '%');
+            });
         }
 
-        // Filtro por email
-        if ($request->filled('email')) {
-            $query->where('email', 'like', '%' . $request->email . '%');
-        }
+        $sort = $request->input('sort', 'id');
+        $direction = $request->input('direction', 'asc');
 
-        // Ordenación
-        switch ($request->get('orden')) {
-            case 'sorteos':
-                $query->orderByDesc('sorteos_count');
-                break;
-            case 'fecha_asc':
-                $query->orderBy('created_at');
-                break;
-            case 'fecha_desc':
-                $query->orderByDesc('created_at');
-                break;
-            default:
-                $query->orderBy('id');
-                break;
+        // Ordenaciones posibles (protección contra columnas no válidas)
+        if (in_array($sort, ['id', 'name', 'email', 'created_at', 'sorteos_count', 'isAdmin'])) {
+            $query->orderBy($sort, $direction);
         }
-
         $users = $query->paginate(10)->withQueryString();
 
         return Inertia::render('Admin/Users/Index', [
             'users' => $users,
-            'filters' => $request->only(['search', 'email', 'orden']),
+            'filters' => $request->only(['search', 'email', 'sort', 'direction']),
         ]);
     }
+
 
 
     public function show(User $user)
@@ -75,59 +64,59 @@ class UserController extends Controller
     }
 
     public function historial(Request $request, User $user)
-{
-    $query = $user->sorteos()->with('publicacion.host');
+    {
+        $query = $user->sorteos()->with('publicacion.host');
 
-    // Filtro por año
-    if ($request->filled('anyo')) {
-        $query->whereYear('created_at', $request->anyo);
-    } else {
-        $anyoMasReciente = $user->sorteos()
-            ->selectRaw('EXTRACT(YEAR FROM created_at) as anyo')
-            ->orderByDesc('anyo')
-            ->limit(1)
-            ->value('anyo');
-        $request->merge(['anyo' => $anyoMasReciente]);
-        $query->whereYear('created_at', $anyoMasReciente);
-    }
-
-    // Filtro por host
-    if ($request->filled('tipo')) {
-        if ($request->tipo === 'manual') {
-            $query->whereNull('publicacion_id');
+        // Filtro por año
+        if ($request->filled('anyo')) {
+            $query->whereYear('created_at', $request->anyo);
         } else {
-            $query->whereHas('publicacion', function ($q) use ($request) {
-                $q->where('host_id', $request->tipo);
-            });
+            $anyoMasReciente = $user->sorteos()
+                ->selectRaw('EXTRACT(YEAR FROM created_at) as anyo')
+                ->orderByDesc('anyo')
+                ->limit(1)
+                ->value('anyo');
+            $request->merge(['anyo' => $anyoMasReciente]);
+            $query->whereYear('created_at', $anyoMasReciente);
         }
+
+        // Filtro por host
+        if ($request->filled('tipo')) {
+            if ($request->tipo === 'manual') {
+                $query->whereNull('publicacion_id');
+            } else {
+                $query->whereHas('publicacion', function ($q) use ($request) {
+                    $q->where('host_id', $request->tipo);
+                });
+            }
+        }
+
+        $sorteos = $query->orderByDesc('created_at')->get()->map(function ($sorteo) {
+            return [
+                'id' => $sorteo->id,
+                'url' => $sorteo->publicacion?->url,
+                'titulo' => $sorteo->publicacion?->titulo,
+                'tipo' => $sorteo->publicacion?->host?->nombre ?? 'Manual',
+                'num_participantes' => $sorteo->num_participantes,
+                'created_at' => $sorteo->created_at,
+            ];
+        });
+
+        $anyos = $user->sorteos()
+            ->selectRaw('EXTRACT(YEAR FROM created_at) as anyo')
+            ->groupBy('anyo')
+            ->orderByDesc('anyo')
+            ->pluck('anyo');
+
+        $hosts = Host::select('id', 'nombre')->get();
+
+        return Inertia::render('Admin/Users/Historial', [
+            'user' => $user,
+            'sorteos' => $sorteos,
+            'hosts' => $hosts,
+            'anyos' => $anyos,
+            'anyoSeleccionado' => $request->anyo,
+            'tipoSeleccionado' => $request->tipo,
+        ]);
     }
-
-    $sorteos = $query->orderByDesc('created_at')->get()->map(function ($sorteo) {
-        return [
-            'id' => $sorteo->id,
-            'url' => $sorteo->publicacion?->url,
-            'titulo' => $sorteo->publicacion?->titulo,
-            'tipo' => $sorteo->publicacion?->host?->nombre ?? 'Manual',
-            'num_participantes' => $sorteo->num_participantes,
-            'created_at' => $sorteo->created_at,
-        ];
-    });
-
-    $anyos = $user->sorteos()
-        ->selectRaw('EXTRACT(YEAR FROM created_at) as anyo')
-        ->groupBy('anyo')
-        ->orderByDesc('anyo')
-        ->pluck('anyo');
-
-    $hosts = Host::select('id', 'nombre')->get();
-
-    return Inertia::render('Admin/Users/Historial', [
-        'user' => $user,
-        'sorteos' => $sorteos,
-        'hosts' => $hosts,
-        'anyos' => $anyos,
-        'anyoSeleccionado' => $request->anyo,
-        'tipoSeleccionado' => $request->tipo,
-    ]);
-}
 }
