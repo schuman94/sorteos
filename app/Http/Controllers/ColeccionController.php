@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
-
+use Illuminate\Validation\ValidationException;
 
 class ColeccionController extends Controller
 {
@@ -81,9 +81,7 @@ class ColeccionController extends Controller
         }
     }
 
-
-
-    public function crearRascas(Coleccion $coleccion, $numRascas, $premios)
+    private function crearRascas(Coleccion $coleccion, $numRascas, $premios)
     {
         $premiosSecuenciales = [];
         foreach ($premios as $premio) {
@@ -115,10 +113,17 @@ class ColeccionController extends Controller
      */
     public function show(Coleccion $coleccion)
     {
+        $coleccion->loadCount(['rascas as rascas_restantes' => function ($query) {
+            $query->where('proporcionado', false);
+        }]);
+
         return Inertia::render('Coleccion/Show', [
             'coleccion' => $coleccion,
+            'urls' => session('urls', []),
         ]);
     }
+
+
 
     /**
      * Show the form for editing the specified resource.
@@ -142,5 +147,40 @@ class ColeccionController extends Controller
     public function destroy(Coleccion $coleccion)
     {
         //
+    }
+
+    public function proporcionarRascas(Request $request, Coleccion $coleccion)
+    {
+        $validated = $request->validate([
+            'cantidad' => 'required|integer|min:1|max:10000',
+        ]);
+
+        $cantidadSolicitada = $validated['cantidad'];
+
+        $rascasDisponibles = $coleccion->rascas()
+            ->where('proporcionado', false)
+            ->get()
+            ->shuffle();
+
+        if ($rascasDisponibles->count() < $cantidadSolicitada) {
+            throw ValidationException::withMessages([
+                'cantidad' => 'Solo quedan ' . $rascasDisponibles->count() . ' rascas disponibles en esta colección.',
+            ]);
+        }
+
+        $rascasSeleccionados = $rascasDisponibles->take($cantidadSolicitada);
+
+        DB::transaction(function () use ($rascasSeleccionados) {
+            foreach ($rascasSeleccionados as $rasca) {
+                $rasca->proporcionado = true;
+                $rasca->save();
+            }
+        });
+
+        $urls = $rascasSeleccionados->map(fn($rasca) => route('rascas.show', $rasca->codigo))->all();
+
+        return redirect()
+            ->route('colecciones.show', $coleccion)
+            ->with('urls', $urls);
     }
 }

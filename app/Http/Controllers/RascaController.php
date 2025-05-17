@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreRascaRequest;
 use App\Http\Requests\UpdateRascaRequest;
 use App\Models\Rasca;
+use Inertia\Inertia;
 
 class RascaController extends Controller
 {
@@ -33,12 +34,25 @@ class RascaController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Mostrar rasca a partir de su codigo (uuid)
      */
-    public function show(Rasca $rasca)
+    public function show(string $codigo)
     {
-        //
+        $rasca = Rasca::with('coleccion')->where('codigo', $codigo)->firstOrFail();
+
+        return Inertia::render('Rascas/Show', [
+            'rasca' => [
+                'codigo' => $rasca->codigo,
+                'scratched_at' => $rasca->scratched_at,
+                'coleccion' => [
+                    'id' => $rasca->coleccion->id,
+                    'nombre' => $rasca->coleccion->nombre,
+                ],
+            ],
+        ]);
     }
+
+
 
     /**
      * Show the form for editing the specified resource.
@@ -62,5 +76,14 @@ class RascaController extends Controller
     public function destroy(Rasca $rasca)
     {
         //
+    }
+
+    public function mostrarPublico(string $codigo)
+    {
+        $rasca = \App\Models\Rasca::where('codigo', $codigo)->firstOrFail();
+
+        return Inertia::render('Rascas/Publico', [
+            'rasca' => $rasca,
+        ]);
     }
 }
