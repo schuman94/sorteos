@@ -40,20 +40,40 @@ class RascaController extends Controller
      */
     public function show(string $codigo)
     {
-        $rasca = Rasca::with(['coleccion', 'premio'])->where('codigo', $codigo)->firstOrFail();
+        $rasca = Rasca::with(['coleccion.rascas.premio', 'premio'])->where('codigo', $codigo)->firstOrFail();
 
-        // Si el rasca no ha sido proporcionado, abortar con 403
         if (is_null($rasca->provided_at)) {
             abort(403, 'Este rasca no ha sido proporcionado.');
         }
+
+        $coleccion = $rasca->coleccion;
+        $rascasTotales = $coleccion->rascas->count();
+
+        $premios = $coleccion->rascas
+            ->whereNotNull('premio_id')
+            ->groupBy('premio_id')
+            ->map(function ($group) use ($rascasTotales) {
+                $premio = $group->first()->premio;
+                $cantidad = $group->count();
+                $probabilidad = round(($cantidad / $rascasTotales) * 100, 2);
+
+                return [
+                    'nombre' => $premio->nombre,
+                    'cantidad' => $cantidad,
+                    'probabilidad' => $probabilidad,
+                ];
+            })
+            ->values();
 
         return Inertia::render('Rascas/Show', [
             'rasca' => [
                 'codigo' => $rasca->codigo,
                 'scratched_at' => $rasca->scratched_at,
                 'coleccion' => [
-                    'nombre' => $rasca->coleccion->nombre,
-                    'abierta' => $rasca->coleccion->abierta,
+                    'nombre' => $coleccion->nombre,
+                    'abierta' => $coleccion->abierta,
+                    'total_rascas' => $rascasTotales,
+                    'premios' => $premios,
                 ],
                 'premio' => $rasca->scratched_at && $rasca->premio ? [
                     'nombre' => $rasca->premio->nombre,
@@ -64,6 +84,7 @@ class RascaController extends Controller
             ],
         ]);
     }
+
 
 
 
