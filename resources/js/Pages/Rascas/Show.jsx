@@ -20,91 +20,72 @@ export default function Show({ rasca }) {
             <Head title="Rasca" />
 
             <div className="max-w-4xl mx-auto py-12 px-4 space-y-6">
-                <h1 className="text-2xl font-bold text-center mb-4">Rasca</h1>
+                <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">Rasca</h1>
 
-                {/* Mensajes de estado */}
-                {props.success && (
-                    <div className="bg-green-100 border border-green-300 text-green-700 px-4 py-2 rounded">
-                        {props.success}
-                    </div>
-                )}
-                {props.warning && (
-                    <div className="bg-yellow-100 border border-yellow-300 text-yellow-700 px-4 py-2 rounded">
-                        {props.warning}
-                    </div>
-                )}
-                {props.info && (
-                    <div className="bg-blue-100 border border-blue-300 text-blue-700 px-4 py-2 rounded">
-                        {props.info}
-                    </div>
-                )}
+                {/* Estadísticas de la colección */}
+                <div className="bg-white border rounded shadow p-6 space-y-4">
+                    <h2 className="text-lg font-semibold text-gray-800 mb-2">Estadísticas de la colección</h2>
+                    <p><strong>Colección:</strong> {rasca.coleccion.nombre}</p>
+                    <p><strong>Rascas totales:</strong> {rasca.coleccion.total_rascas}</p>
 
-                <div className="bg-white rounded shadow p-6 space-y-4">
-                    <div>
-                        <strong>Colección:</strong> {rasca.coleccion.nombre}
-                    </div>
+                    <table className="min-w-full border text-sm mt-4">
+                        <thead className="bg-gray-100">
+                            <tr>
+                                <th className="border px-3 py-2 text-left">Premio</th>
+                                <th className="border px-3 py-2 text-right">Cantidad</th>
+                                <th className="border px-3 py-2 text-right">Probabilidad (%)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {rasca.coleccion.premios.map((p, i) => (
+                                <tr key={i} className="hover:bg-gray-50">
+                                    <td className="border px-3 py-2">{p.nombre}</td>
+                                    <td className="border px-3 py-2 text-right">{p.cantidad}</td>
+                                    <td className="border px-3 py-2 text-right">{p.probabilidad.toFixed(2)}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
 
-                    <div>
-                        <strong>Código:</strong> {rasca.codigo}
-                    </div>
+                {/* Rasca visual */}
+                <div className="bg-gray-100 border-2 border-gray-300 rounded-lg p-6 text-center shadow-inner relative">
+                    <p className="text-sm text-gray-600 mb-2">Código: {rasca.codigo}</p>
 
-                    {rasca.scratched_at && (
-                        <div>
-                            <span className="text-green-600 font-semibold">
-                                Rascado: {ff(rasca.scratched_at)}
-                            </span>
-                        </div>
-                    )}
-
-                    {!rasca.scratched_at && (
-                        <>
-                            {!rasca.coleccion.abierta ? (
-                                <p className="text-red-600 font-semibold">Esta colección está cerrada. No se puede rascar.</p>
-                            ) : (
-                                <div>
-                                    <button
-                                        onClick={handleRascar}
-                                        disabled={processing}
-                                        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
-                                    >
-                                        {processing ? 'Rascando...' : 'Rascar'}
-                                    </button>
-                                </div>
-                            )}
-                        </>
-                    )}
-
-
-                    {/* Resultado tras rascar */}
-                    {rasca.scratched_at && (
-                        <div className="mt-6 border-t pt-4">
+                    {rasca.scratched_at ? (
+                        <div className="space-y-2">
                             {rasca.premio ? (
                                 <>
-                                    <h2 className="text-lg font-bold text-blue-600">¡Premio obtenido!</h2>
-                                    <p><strong>Nombre:</strong> {rasca.premio.nombre}</p>
-                                    <p><strong>Descripción:</strong> {rasca.premio.descripcion}</p>
+                                    <h2 className="text-xl font-semibold text-green-600">¡Premiado!</h2>
+                                    <p><strong>Has ganado:</strong> {rasca.premio.nombre}</p>
+                                    <p>{rasca.premio.descripcion}</p>
                                     <p><strong>Proveedor:</strong> {rasca.premio.proveedor}</p>
                                     {rasca.premio.link && (
                                         <p>
-                                            <strong>Enlace:</strong>{' '}
-                                            <a
-                                                href={rasca.premio.link}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="text-blue-600 underline"
-                                            >
+                                            <a href={rasca.premio.link} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
                                                 Ver premio
                                             </a>
                                         </p>
                                     )}
                                 </>
                             ) : (
-                                <p className="text-gray-600 italic">Este rasca no ha sido premiado.</p>
+                                <p className="italic text-gray-700">Este rasca no ha sido premiado.</p>
                             )}
                         </div>
+                    ) : !rasca.coleccion.abierta ? (
+                        <p className="text-red-600 font-semibold">Esta colección está cerrada. No se puede rascar.</p>
+                    ) : (
+                        <button
+                            onClick={handleRascar}
+                            disabled={processing}
+                            className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold px-6 py-3 rounded-full text-lg shadow transition"
+                        >
+                            {processing ? 'Rascando...' : '✨ Rascar ✨'}
+                        </button>
                     )}
                 </div>
             </div>
+
         </>
     );
 }
