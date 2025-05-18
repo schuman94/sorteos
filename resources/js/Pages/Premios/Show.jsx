@@ -2,6 +2,8 @@ import MainLayout from '@/Layouts/MainLayout';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import ModalEliminacion from '@/Components/ModalEliminacion';
+import { formatearDinero as dinero} from '@/utils/dinero';
+import { formatearFecha as ff } from '@/utils/fecha';
 
 export default function Show({ premio }) {
     const { errors } = usePage().props;
@@ -49,7 +51,7 @@ export default function Show({ premio }) {
                         <span className="font-semibold">Proveedor:</span> {premio.proveedor}
                     </div>
                     <div>
-                        <span className="font-semibold">Valor:</span> {premio.valor} €
+                        <span className="font-semibold">Valor:</span> {dinero(premio.valor)}
                     </div>
                     <div>
                         <span className="font-semibold">Descripción:</span>{' '}
@@ -72,7 +74,7 @@ export default function Show({ premio }) {
                     </div>
                     <div>
                         <span className="font-semibold">Creado:</span>{' '}
-                        {new Date(premio.created_at).toLocaleString('es-ES')}
+                        {ff(premio.created_at)}
                     </div>
 
                     {/* Botones de acción dentro del recuadro */}
