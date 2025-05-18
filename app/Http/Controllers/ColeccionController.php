@@ -113,16 +113,62 @@ class ColeccionController extends Controller
      */
     public function show(Coleccion $coleccion)
     {
-        $coleccion->loadCount(['rascas as rascas_restantes' => function ($query) {
-            $query->whereNull('provided_at');
-        }]);
+        // Cargar contadores agregados
+        $coleccion->loadCount([
+            'rascas as rascas_restantes' => fn($q) => $q->whereNull('provided_at'),
+            'rascas as total_proporcionados' => fn($q) => $q->whereNotNull('provided_at'),
+            'rascas as total_rascados' => fn($q) => $q->whereNotNull('scratched_at'),
+            'rascas as premios_obtenidos' => fn($q) => $q->whereNotNull('scratched_at')->whereNotNull('premio_id'),
+        ]);
 
+        // Agrupar premios con cantidad y valor total
+        $premios = $coleccion->rascas()
+            ->whereNotNull('premio_id')
+            ->with('premio')
+            ->get()
+            ->groupBy('premio_id')
+            ->map(function ($group) {
+                $premio = $group->first()->premio;
+                $cantidad = $group->count();
+
+                return [
+                    'id'           => $premio->id,
+                    'nombre'       => $premio->nombre,
+                    'proveedor'    => $premio->proveedor,
+                    'link'         => $premio->link,
+                    'cantidad'     => $cantidad,
+                    'valor_total'  => $cantidad * $premio->valor,
+                ];
+            })
+            ->values();
+
+        // Calcular totales
+        $valor_total = $premios->sum('valor_total');
+        $total_premios = $coleccion->rascas()->whereNotNull('premio_id')->count();
+        $premios_restantes = max(0, $total_premios - $coleccion->premios_obtenidos);
+
+        // Devolver vista con datos explícitos
         return Inertia::render('Coleccion/Show', [
-            'coleccion' => $coleccion,
+            'coleccion' => [
+                'id'                => $coleccion->id,
+                'nombre'            => $coleccion->nombre,
+                'descripcion'       => $coleccion->descripcion,
+                'created_at'        => $coleccion->created_at,
+                'updated_at'        => $coleccion->updated_at,
+                'user_id'           => $coleccion->user_id,
+
+                'rascas_restantes'     => $coleccion->rascas_restantes,
+                'total_proporcionados' => $coleccion->total_proporcionados,
+                'total_rascados'       => $coleccion->total_rascados,
+                'premios_obtenidos'    => $coleccion->premios_obtenidos,
+
+                'premios'           => $premios,
+                'valor_total'       => $valor_total,
+                'premios_restantes' => $premios_restantes,
+            ],
             'urls' => session('urls', []),
         ]);
     }
-
 
 
     /**

@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import MiniTablaListado from '@/Components/MiniTablaListado';
 import { formatearFechaCorta as ffc } from '@/utils/fecha';
+import { formatearDinero as dinero} from '@/utils/dinero';
 
 export default function ModalCargarPremio({ onSeleccionar, onClose }) {
     const [data, setData] = useState({ data: [], current_page: 1, last_page: 1 });
@@ -48,7 +49,7 @@ export default function ModalCargarPremio({ onSeleccionar, onClose }) {
             header: 'Valor',
             accessorFn: row => parseFloat(row.valor), // asegura tipo numérico
             id: 'valor', // obligatorio al usar accessorFn
-            cell: info => info.getValue().toFixed(2),
+            cell: info => dinero(info.getValue()),
             sortingFn: 'basic', // sorting numérico básico
         },
 

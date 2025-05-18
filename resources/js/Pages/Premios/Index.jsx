@@ -2,6 +2,7 @@ import MainLayout from '@/Layouts/MainLayout';
 import TablaListado from '@/Components/TablaListado';
 import { Head, Link } from '@inertiajs/react';
 import { formatearFechaCorta as ffc } from '@/utils/fecha';
+import { formatearDinero as dinero} from '@/utils/dinero';
 
 export default function Index({ premios, filters, anyos }) {
     const columns = [
@@ -28,6 +29,7 @@ export default function Index({ premios, filters, anyos }) {
         {
             header: 'Valor',
             accessorKey: 'valor',
+            cell: info => dinero(info.getValue()),
         },
         {
             header: 'Fecha',
