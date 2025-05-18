@@ -87,7 +87,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/premios/store-and-load', [PremioController::class, 'storeAndLoad'])->name('premios.storeAndLoad');
 });
 
-Route::get('/rascas/{codigo}', [RascaController::class, 'show'])->name('rascas.show');
+Route::middleware('auth')->group(function () {
+    Route::get('/rascas/{codigo}', [RascaController::class, 'show'])->name('rascas.show');
+    Route::put('/rascar/{codigo}', [RascaController::class, 'rascar'])->name('rascas.rascar');
+});
 
 
 require __DIR__ . '/auth.php';
