@@ -1,7 +1,7 @@
 import MainLayout from '@/Layouts/MainLayout';
 import { Head } from '@inertiajs/react';
 import TablaListado from '@/Components/TablaListado';
-import { formatearFechaCorta as ffc } from '@/utils/fecha';
+import { formatearFecha as ff } from '@/utils/fecha';
 
 export default function Rascas({ rascas, filters, coleccion }) {
     const columns = [
@@ -26,17 +26,17 @@ export default function Rascas({ rascas, filters, coleccion }) {
         {
             header: 'Proporcionado en',
             accessorKey: 'provided_at',
-            cell: info => info.getValue() ? ffc(info.getValue()) : '—',
+            cell: info => info.getValue() ? ff(info.getValue()) : '',
         },
         {
             header: 'Rascado en',
             accessorKey: 'scratched_at',
-            cell: info => info.getValue() ? ffc(info.getValue()) : '—',
+            cell: info => info.getValue() ? ff(info.getValue()) : '',
         },
         {
             header: 'Rascado por',
             accessorKey: 'scratched_by',
-            cell: info => info.getValue() || '—',
+            cell: info => info.getValue() || '',
         },
     ];
 

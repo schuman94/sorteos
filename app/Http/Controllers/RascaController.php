@@ -6,6 +6,8 @@ use App\Http\Requests\StoreRascaRequest;
 use App\Http\Requests\UpdateRascaRequest;
 use App\Models\Rasca;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class RascaController extends Controller
 {
@@ -38,20 +40,29 @@ class RascaController extends Controller
      */
     public function show(string $codigo)
     {
-        $rasca = Rasca::with('coleccion')->where('codigo', $codigo)->firstOrFail();
+        $rasca = Rasca::with(['coleccion', 'premio'])->where('codigo', $codigo)->firstOrFail();
+
+        // Si el rasca no ha sido proporcionado, abortar con 403
+        if (is_null($rasca->provided_at)) {
+            abort(403, 'Este rasca no ha sido proporcionado.');
+        }
 
         return Inertia::render('Rascas/Show', [
             'rasca' => [
                 'codigo' => $rasca->codigo,
                 'scratched_at' => $rasca->scratched_at,
                 'coleccion' => [
-                    'id' => $rasca->coleccion->id,
                     'nombre' => $rasca->coleccion->nombre,
                 ],
+                'premio' => $rasca->scratched_at && $rasca->premio ? [
+                    'nombre' => $rasca->premio->nombre,
+                    'descripcion' => $rasca->premio->descripcion,
+                    'proveedor' => $rasca->premio->proveedor,
+                    'link' => $rasca->premio->link,
+                ] : null,
             ],
         ]);
     }
-
 
 
     /**
@@ -78,12 +89,24 @@ class RascaController extends Controller
         //
     }
 
-    public function mostrarPublico(string $codigo)
+    public function rascar(string $codigo)
     {
-        $rasca = \App\Models\Rasca::where('codigo', $codigo)->firstOrFail();
+        $rasca = Rasca::with(['coleccion', 'premio'])->where('codigo', $codigo)->firstOrFail();
 
-        return Inertia::render('Rascas/Publico', [
-            'rasca' => $rasca,
-        ]);
+        if (is_null($rasca->provided_at)) {
+            return redirect()->back()->with('warning', 'Este rasca aún no ha sido proporcionado.');
+        }
+
+        if (!is_null($rasca->scratched_at) || !is_null($rasca->scratched_by)) {
+            return redirect()->back()->with('warning', 'Este rasca ya ha sido rascado previamente.');
+        }
+
+        DB::transaction(function () use ($rasca) {
+            $rasca->scratched_at = now();
+            $rasca->scratched_by = Auth::id();
+            $rasca->save();
+        });
+
+        return redirect()->route('rascas.show', $rasca->codigo)->with('success', 'Rascado correctamente.');
     }
 }
