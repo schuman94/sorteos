@@ -80,6 +80,7 @@ Route::middleware('auth')->group(function () {
     ]);
     Route::post('/colecciones/{coleccion}/proporcionar-rascas', [ColeccionController::class, 'proporcionarRascas'])->name('colecciones.proporcionarRascas');
     Route::get('colecciones/{coleccion}/rascas', [ColeccionController::class, 'rascasProporcionados'])->name('colecciones.rascasProporcionados');
+    Route::put('/colecciones/{coleccion}/toggle-estado', [ColeccionController::class, 'toggleEstado'])->name('colecciones.toggleEstado');
 });
 
 Route::middleware('auth')->group(function () {
