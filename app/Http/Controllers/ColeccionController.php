@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Gate;
 
 class ColeccionController extends Controller
 {
@@ -115,6 +116,7 @@ class ColeccionController extends Controller
     {
         // Cargar contadores agregados
         $coleccion->loadCount([
+            'rascas as total_rascas' => fn($q) => $q,
             'rascas as rascas_restantes' => fn($q) => $q->whereNull('provided_at'),
             'rascas as total_proporcionados' => fn($q) => $q->whereNotNull('provided_at'),
             'rascas as total_rascados' => fn($q) => $q->whereNotNull('scratched_at'),
@@ -156,7 +158,9 @@ class ColeccionController extends Controller
                 'created_at'        => $coleccion->created_at,
                 'updated_at'        => $coleccion->updated_at,
                 'user_id'           => $coleccion->user_id,
+                'abierta'           => $coleccion->abierta,
 
+                'total_rascas' => $coleccion->total_rascas,
                 'rascas_restantes'     => $coleccion->rascas_restantes,
                 'total_proporcionados' => $coleccion->total_proporcionados,
                 'total_rascados'       => $coleccion->total_rascados,
@@ -271,5 +275,26 @@ class ColeccionController extends Controller
                 'nombre' => $coleccion->nombre,
             ],
         ]);
+    }
+
+    public function toggleEstado(Coleccion $coleccion)
+    {
+        Gate::authorize('update', $coleccion);
+
+        // Si se intenta abrir la colección, comprobamos si ya todos los rascas están rascados
+        if (!$coleccion->abierta) {
+            $todosRascados = !$coleccion->rascas()
+                ->whereNull('scratched_at')
+                ->exists();
+
+            if ($todosRascados) {
+                return back()->with('warning', 'No se puede abrir la colección porque todos los rascas han sido rascados.');
+            }
+        }
+
+        $coleccion->abierta = !$coleccion->abierta;
+        $coleccion->save();
+
+        return back()->with('success', 'Estado de la colección actualizado.');
     }
 }

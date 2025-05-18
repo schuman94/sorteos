@@ -53,6 +53,7 @@ class RascaController extends Controller
                 'scratched_at' => $rasca->scratched_at,
                 'coleccion' => [
                     'nombre' => $rasca->coleccion->nombre,
+                    'abierta' => $rasca->coleccion->abierta,
                 ],
                 'premio' => $rasca->scratched_at && $rasca->premio ? [
                     'nombre' => $rasca->premio->nombre,
@@ -63,6 +64,7 @@ class RascaController extends Controller
             ],
         ]);
     }
+
 
 
     /**
@@ -101,10 +103,26 @@ class RascaController extends Controller
             return redirect()->back()->with('warning', 'Este rasca ya ha sido rascado previamente.');
         }
 
+        if (!$rasca->coleccion->abierta) {
+            abort(403, 'Esta colección está cerrada. No se puede rascar.');
+        }
+
         DB::transaction(function () use ($rasca) {
             $rasca->scratched_at = now();
             $rasca->scratched_by = Auth::id();
             $rasca->save();
+
+            // Verificar si todos los rascas proporcionados ya han sido rascados
+            $coleccion = $rasca->coleccion;
+
+            $quedanPorRascar = $coleccion->rascas()
+                ->whereNull('scratched_at')
+                ->exists();
+
+            if (!$quedanPorRascar) {
+                $coleccion->abierta = false;
+                $coleccion->save();
+            }
         });
 
         return redirect()->route('rascas.show', $rasca->codigo)->with('success', 'Rascado correctamente.');

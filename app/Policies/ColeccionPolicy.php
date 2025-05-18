@@ -37,7 +37,7 @@ class ColeccionPolicy
      */
     public function update(User $user, Coleccion $coleccion): bool
     {
-        return false;
+        return $user->id === $coleccion->user_id;
     }
 
     /**

@@ -57,16 +57,23 @@ export default function Show({ rasca }) {
                     )}
 
                     {!rasca.scratched_at && (
-                        <div>
-                            <button
-                                onClick={handleRascar}
-                                disabled={processing}
-                                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
-                            >
-                                {processing ? 'Rascando...' : 'Rascar'}
-                            </button>
-                        </div>
+                        <>
+                            {!rasca.coleccion.abierta ? (
+                                <p className="text-red-600 font-semibold">Esta colección está cerrada. No se puede rascar.</p>
+                            ) : (
+                                <div>
+                                    <button
+                                        onClick={handleRascar}
+                                        disabled={processing}
+                                        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+                                    >
+                                        {processing ? 'Rascando...' : 'Rascar'}
+                                    </button>
+                                </div>
+                            )}
+                        </>
                     )}
+
 
                     {/* Resultado tras rascar */}
                     {rasca.scratched_at && (
