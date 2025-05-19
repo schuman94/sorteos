@@ -5,7 +5,6 @@ import { formatearDinero as dinero } from '@/utils/dinero';
 
 export default function Show({ coleccion, urls }) {
     const { data, setData, post, processing, errors } = useForm({ cantidad: 1 });
-    const quedanRascasSinRascar = coleccion.total_rascas - coleccion.total_rascados > 0;
 
     const obtenerRascas = (e) => {
         e.preventDefault();

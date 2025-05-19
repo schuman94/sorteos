@@ -24,7 +24,6 @@ export default function Show({ rasca }) {
 
                 {/* Estadísticas de la colección */}
                 <div className="bg-white border rounded shadow p-6 space-y-4">
-                    <h2 className="text-lg font-semibold text-gray-800 mb-2">Estadísticas de la colección</h2>
                     <p><strong>Colección:</strong> {rasca.coleccion.nombre}</p>
                     <p><strong>Rascas totales:</strong> {rasca.coleccion.total_rascas}</p>
 

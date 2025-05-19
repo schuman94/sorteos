@@ -1,5 +1,5 @@
 import MainLayout from '@/Layouts/MainLayout';
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import TablaListado from '@/Components/TablaListado';
 import { formatearFecha as ff } from '@/utils/fecha';
 
@@ -38,6 +38,24 @@ export default function Rascas({ rascas, filters, coleccion }) {
             accessorKey: 'scratched_by',
             cell: info => info.getValue() || '',
         },
+        {
+            header: 'Premio',
+            accessorKey: 'premio',
+            cell: info => {
+                const row = info.row.original;
+                return row.premio
+                    ? (
+                        <Link
+                            href={route('premios.show', row.premio_id)}
+                            className="text-blue-600 underline hover:text-blue-800"
+                        >
+                            {row.premio}
+                        </Link>
+                    )
+                    : '';
+            }
+        }
+
     ];
 
 
@@ -46,7 +64,15 @@ export default function Rascas({ rascas, filters, coleccion }) {
             <Head title={`Rascas proporcionados - ${coleccion.nombre}`} />
 
             <div className="max-w-6xl mx-auto py-12 px-4 space-y-6">
-                <h1 className="text-2xl font-bold">Rascas proporcionados - {coleccion.nombre}</h1>
+                <div className="flex items-center justify-between">
+                    <h1 className="text-2xl font-bold">Rascas proporcionados - {coleccion.nombre}</h1>
+                    <Link
+                        href={route('colecciones.show', coleccion.id)}
+                        className="inline-block bg-gray-700 hover:bg-gray-800 text-white font-semibold py-2 px-4 rounded"
+                    >
+                        Volver a la colección
+                    </Link>
+                </div>
 
                 <TablaListado
                     data={rascas}
@@ -56,6 +82,7 @@ export default function Rascas({ rascas, filters, coleccion }) {
                     placeholder="Buscar por código..."
                 />
             </div>
+
         </>
     );
 }
