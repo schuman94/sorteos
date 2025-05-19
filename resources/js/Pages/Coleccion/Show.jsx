@@ -15,7 +15,6 @@ export default function Show({ coleccion, urls }) {
 
     const copiarAlPortapapeles = async () => {
         await navigator.clipboard.writeText(urls.join('\n'));
-        alert('Copiado al portapapeles');
     };
 
     return (
@@ -45,8 +44,8 @@ export default function Show({ coleccion, urls }) {
                                     <button
                                         onClick={() => router.put(route('colecciones.toggleEstado', coleccion.id), {}, { preserveScroll: true })}
                                         className={`px-3 py-1 rounded-full text-sm font-medium focus:outline-none transition-colors ${coleccion.abierta
-                                                ? 'bg-green-100 text-green-800 hover:bg-green-200'
-                                                : 'bg-red-100 text-red-800 hover:bg-red-200'
+                                            ? 'bg-green-100 text-green-800 hover:bg-green-200'
+                                            : 'bg-red-100 text-red-800 hover:bg-red-200'
                                             }`}
                                     >
                                         {coleccion.abierta ? 'Abierta' : 'Cerrada'}
@@ -137,10 +136,11 @@ export default function Show({ coleccion, urls }) {
                         />
                         <button
                             onClick={copiarAlPortapapeles}
-                            className="bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded"
+                            className="bg-green-600 hover:bg-green-700 active:scale-95 text-white font-semibold px-4 py-2 rounded transition duration-100 ease-in-out"
                         >
-                            Copiar al portapapeles
+                            Copiar
                         </button>
+
                     </div>
                 )}
 

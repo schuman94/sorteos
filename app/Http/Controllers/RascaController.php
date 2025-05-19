@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\RascaPremiadoUsuario;
+use App\Mail\RascaPremiadoCreador;
 
 class RascaController extends Controller
 {
@@ -200,7 +203,7 @@ class RascaController extends Controller
 
     public function rascar(string $codigo)
     {
-        $rasca = Rasca::with(['coleccion', 'premio'])->where('codigo', $codigo)->firstOrFail();
+        $rasca = Rasca::with(['coleccion.user', 'premio'])->where('codigo', $codigo)->firstOrFail();
 
         if (is_null($rasca->provided_at)) {
             return redirect()->back()->with('warning', 'Este rasca aún no ha sido proporcionado.');
@@ -214,12 +217,19 @@ class RascaController extends Controller
             abort(403, 'Esta colección está cerrada. No se puede rascar.');
         }
 
-        DB::transaction(function () use ($rasca) {
+        // Guardamos si ha sido premiado
+        $premiado = false;
+        $usuario = Auth::user();
+        $coleccion = $rasca->coleccion;
+
+        DB::transaction(function () use ($rasca, $usuario, &$premiado) {
             $rasca->scratched_at = now();
-            $rasca->scratched_by = Auth::id();
+            $rasca->scratched_by = $usuario->id;
             $rasca->save();
 
-            // Verificar si todos los rascas proporcionados ya han sido rascados
+            $premiado = !is_null($rasca->premio);
+
+            // Si todos los rascas han sido rascados, cerramos la colección
             $coleccion = $rasca->coleccion;
 
             $quedanPorRascar = $coleccion->rascas()
@@ -231,6 +241,22 @@ class RascaController extends Controller
                 $coleccion->save();
             }
         });
+
+        // Enviar correos solo si el rasca ha sido premiado
+        if ($premiado) {
+            $premio = $rasca->premio;
+
+            Mail::to($usuario->email)->send(new RascaPremiadoUsuario(
+                rasca: $rasca,
+                premio: $premio,
+            ));
+
+            Mail::to($coleccion->user->email)->send(new RascaPremiadoCreador(
+                usuario: $usuario,
+                rasca: $rasca,
+                premio: $premio,
+            ));
+        }
 
         return redirect()->route('rascas.show', $rasca->codigo)->with('success', 'Rascado correctamente.');
     }
