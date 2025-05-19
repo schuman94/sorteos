@@ -1,10 +1,8 @@
 import MainLayout from '@/Layouts/MainLayout';
 import { Head, router, usePage } from '@inertiajs/react';
-import { formatearFecha as ff } from '@/utils/fecha';
 import { useState } from 'react';
 
 export default function Show({ rasca }) {
-    const { props } = usePage();
     const [processing, setProcessing] = useState(false);
 
     const handleRascar = () => {
@@ -22,7 +20,6 @@ export default function Show({ rasca }) {
             <div className="max-w-4xl mx-auto py-12 px-4 space-y-6">
                 <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">Rasca</h1>
 
-                {/* Estadísticas de la colección */}
                 <div className="bg-white border rounded shadow p-6 space-y-4">
                     <p><strong>Colección:</strong> {rasca.coleccion.nombre}</p>
                     <p><strong>Rascas totales:</strong> {rasca.coleccion.total_rascas}</p>
@@ -47,7 +44,6 @@ export default function Show({ rasca }) {
                     </table>
                 </div>
 
-                {/* Rasca visual */}
                 <div className="bg-gray-100 border-2 border-gray-300 rounded-lg p-6 text-center shadow-inner relative">
                     <p className="text-sm text-gray-600 mb-2">Código: {rasca.codigo}</p>
 
