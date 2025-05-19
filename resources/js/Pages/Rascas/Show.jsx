@@ -52,25 +52,36 @@ export default function Show({ rasca }) {
                     <p className="text-sm text-gray-600 mb-2">Código: {rasca.codigo}</p>
 
                     {rasca.scratched_at ? (
-                        <div className="space-y-2">
-                            {rasca.premio ? (
-                                <>
-                                    <h2 className="text-xl font-semibold text-green-600">¡Premiado!</h2>
-                                    <p><strong>Has ganado:</strong> {rasca.premio.nombre}</p>
-                                    <p>{rasca.premio.descripcion}</p>
-                                    <p><strong>Proveedor:</strong> {rasca.premio.proveedor}</p>
-                                    {rasca.premio.link && (
-                                        <p>
-                                            <a href={rasca.premio.link} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
-                                                Ver premio
-                                            </a>
-                                        </p>
-                                    )}
-                                </>
-                            ) : (
-                                <p className="italic text-gray-700">Este rasca no ha sido premiado.</p>
-                            )}
-                        </div>
+                        rasca.es_propietario ? (
+                            <div className="space-y-2">
+                                {rasca.premio ? (
+                                    <>
+                                        <h2 className="text-xl font-semibold text-green-600">¡Premiado!</h2>
+                                        <p><strong>Has ganado:</strong> {rasca.premio.nombre}</p>
+                                        <p>{rasca.premio.descripcion}</p>
+                                        <p><strong>Proveedor:</strong> {rasca.premio.proveedor}</p>
+                                        {rasca.premio.link && (
+                                            <p>
+                                                <a
+                                                    href={rasca.premio.link}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-blue-600 underline"
+                                                >
+                                                    Ver premio
+                                                </a>
+                                            </p>
+                                        )}
+                                    </>
+                                ) : (
+                                    <p className="italic text-gray-700">Este rasca no ha sido premiado.</p>
+                                )}
+                            </div>
+                        ) : (
+                            <p className="text-gray-600 italic">
+                                Este rasca ya ha sido rascado por otro usuario.
+                            </p>
+                        )
                     ) : !rasca.coleccion.abierta ? (
                         <p className="text-red-600 font-semibold">Esta colección está cerrada. No se puede rascar.</p>
                     ) : (
@@ -84,7 +95,6 @@ export default function Show({ rasca }) {
                     )}
                 </div>
             </div>
-
         </>
     );
 }

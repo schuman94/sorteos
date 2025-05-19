@@ -69,19 +69,20 @@ class RascaController extends Controller
 
         return Inertia::render('Rascas/Show', [
             'rasca' => [
-                'codigo' => $rasca->codigo,
-                'scratched_at' => $rasca->scratched_at,
+                'codigo'         => $rasca->codigo,
+                'scratched_at'   => $rasca->scratched_at,
+                'es_propietario' => Auth::id() && $rasca->scratched_by === Auth::id(),
                 'coleccion' => [
-                    'nombre' => $coleccion->nombre,
-                    'abierta' => $coleccion->abierta,
-                    'total_rascas' => $rascasTotales,
-                    'premios' => $premios,
+                    'nombre'         => $coleccion->nombre,
+                    'abierta'        => $coleccion->abierta,
+                    'total_rascas'   => $rascasTotales,
+                    'premios'        => $premios,
                 ],
                 'premio' => $rasca->scratched_at && $rasca->premio ? [
-                    'nombre' => $rasca->premio->nombre,
-                    'descripcion' => $rasca->premio->descripcion,
-                    'proveedor' => $rasca->premio->proveedor,
-                    'link' => $rasca->premio->link,
+                    'nombre'       => $rasca->premio->nombre,
+                    'descripcion'  => $rasca->premio->descripcion,
+                    'proveedor'    => $rasca->premio->proveedor,
+                    'link'         => $rasca->premio->link,
                 ] : null,
             ],
         ]);
