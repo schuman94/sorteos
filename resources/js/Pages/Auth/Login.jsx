@@ -94,6 +94,14 @@ export default function Login({ status, canResetPassword }) {
                         Log in
                     </PrimaryButton>
                 </div>
+                <div className="mt-4 flex items-center justify-end">
+                    <Link
+                        href={route('register')}
+                        className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                    >
+                        ¿No estas registrado?
+                    </Link>
+                </div>
             </form>
         </GuestLayout>
     );

@@ -6,27 +6,42 @@ export default function Index({ colecciones }) {
         <>
             <Head title="Colecciones" />
 
-            <div className="max-w-5xl mx-auto py-12 px-4">
-                <h1 className="text-2xl font-semibold mb-6">Colecciones</h1>
+            <div className="max-w-5xl mx-auto py-12 px-4 space-y-10">
+                <h1 className="text-2xl font-semibold">Rascas</h1>
 
-                {/* Botones con separación */}
-                <div className="flex flex-wrap gap-4 mb-8">
-                    <button
-                        onClick={() => router.visit(route('colecciones.create'))}
-                        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                    >
-                        Crear Colección
-                    </button>
-
-                    <button
-                        onClick={() => router.visit(route('premios.index'))}
-                        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                    >
-                        Gestionar premios
-                    </button>
+                {/* Acciones del usuario común */}
+                <div>
+                    <div className="flex flex-wrap gap-4 mb-6">
+                        <button
+                            onClick={() => router.visit(route('rascas.premiados'))}
+                            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                        >
+                            Mis rascas premiados
+                        </button>
+                    </div>
                 </div>
 
-                {/* Tarjetas de colecciones */}
+                {/* Acciones para creadores/influencers */}
+                <div>
+                    <h2 className="text-lg font-medium text-gray-700 mb-2">Colecciones de rascas</h2>
+                    <div className="flex flex-wrap gap-4 mb-6">
+                        <button
+                            onClick={() => router.visit(route('colecciones.create'))}
+                            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                        >
+                            Crear Colección
+                        </button>
+
+                        <button
+                            onClick={() => router.visit(route('premios.index'))}
+                            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                        >
+                            Gestionar premios
+                        </button>
+                    </div>
+                </div>
+
+
                 {colecciones.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {colecciones.map((coleccion) => (
@@ -51,6 +66,7 @@ export default function Index({ colecciones }) {
                     <p className="text-center text-gray-500 mt-8">No hay colecciones disponibles.</p>
                 )}
             </div>
+
         </>
     );
 }

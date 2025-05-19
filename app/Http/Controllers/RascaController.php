@@ -8,6 +8,8 @@ use App\Models\Rasca;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class RascaController extends Controller
 {
@@ -67,26 +69,110 @@ class RascaController extends Controller
 
         return Inertia::render('Rascas/Show', [
             'rasca' => [
-                'codigo' => $rasca->codigo,
-                'scratched_at' => $rasca->scratched_at,
+                'codigo'         => $rasca->codigo,
+                'scratched_at'   => $rasca->scratched_at,
+                'es_propietario' => Auth::id() && $rasca->scratched_by === Auth::id(),
                 'coleccion' => [
-                    'nombre' => $coleccion->nombre,
-                    'abierta' => $coleccion->abierta,
-                    'total_rascas' => $rascasTotales,
-                    'premios' => $premios,
+                    'nombre'         => $coleccion->nombre,
+                    'abierta'        => $coleccion->abierta,
+                    'total_rascas'   => $rascasTotales,
+                    'premios'        => $premios,
                 ],
                 'premio' => $rasca->scratched_at && $rasca->premio ? [
-                    'nombre' => $rasca->premio->nombre,
-                    'descripcion' => $rasca->premio->descripcion,
-                    'proveedor' => $rasca->premio->proveedor,
-                    'link' => $rasca->premio->link,
+                    'nombre'       => $rasca->premio->nombre,
+                    'descripcion'  => $rasca->premio->descripcion,
+                    'proveedor'    => $rasca->premio->proveedor,
+                    'link'         => $rasca->premio->link,
                 ] : null,
             ],
         ]);
     }
 
+    public function premiados(Request $request)
+    {
+        $rascasQuery = Rasca::with(['premio', 'coleccion'])
+            ->whereNotNull('premio_id')
+            ->whereNotNull('scratched_at')
+            ->where('scratched_by', Auth::id());
 
+        // Filtro de búsqueda
+        if ($search = $request->input('search')) {
+            $rascasQuery->where(function ($q) use ($search) {
+                $q->whereHas('premio', function ($q2) use ($search) {
+                    $q2->where('nombre', 'ilike', "%{$search}%")
+                        ->orWhere('proveedor', 'ilike', "%{$search}%");
+                })->orWhereHas('coleccion', function ($q2) use ($search) {
+                    $q2->where('nombre', 'ilike', "%{$search}%");
+                });
+            });
+        }
 
+        // Filtro por año
+        if ($anyo = $request->input('anyo')) {
+            $rascasQuery->whereYear('scratched_at', $anyo);
+        }
+
+        $sort = $request->input('sort', 'scratched_at');
+        $direction = $request->input('direction', 'desc');
+        $perPage = 20;
+        $currentPage = LengthAwarePaginator::resolveCurrentPage();
+
+        // Si el ordenamiento es por columna relacionada
+        if (in_array($sort, ['premio', 'proveedor', 'coleccion'])) {
+            $rascas = $rascasQuery->get();
+
+            $rascas = $rascas->sortBy(function ($rasca) use ($sort) {
+                return match ($sort) {
+                    'premio' => $rasca->premio->nombre ?? '',
+                    'proveedor' => $rasca->premio->proveedor ?? '',
+                    'coleccion' => $rasca->coleccion->nombre ?? '',
+                    default => '',
+                };
+            }, SORT_REGULAR, $direction === 'desc')->values();
+
+            // Paginar manualmente
+            $paginated = new LengthAwarePaginator(
+                $rascas->forPage($currentPage, $perPage),
+                $rascas->count(),
+                $perPage,
+                $currentPage,
+                ['path' => request()->url(), 'query' => request()->query()]
+            );
+        } else {
+            // Ordenamiento directo en base de datos
+            $rascasQuery->orderBy($sort, $direction);
+            $paginated = $rascasQuery->paginate($perPage)->withQueryString();
+        }
+
+        // Años disponibles
+        $anyos = Rasca::where('scratched_by', Auth::id())
+            ->whereNotNull('scratched_at')
+            ->selectRaw('DISTINCT EXTRACT(YEAR FROM scratched_at) AS anyo')
+            ->orderByDesc('anyo')
+            ->pluck('anyo');
+
+        // Mapear
+        $final = $paginated->through(fn($rasca) => [
+            'id'           => $rasca->id,
+            'codigo'       => $rasca->codigo,
+            'scratched_at' => $rasca->scratched_at,
+            'premio'       => $rasca->premio?->nombre,
+            'proveedor'    => $rasca->premio?->proveedor,
+            'coleccion'    => $rasca->coleccion?->nombre,
+            'premio_link'  => $rasca->premio?->link,
+        ]);
+
+        return Inertia::render('Rascas/Premiados', [
+            'premiados' => $final,
+            'filters' => [
+                'search' => $search,
+                'anyo' => $anyo,
+                'sort' => $sort,
+                'direction' => $direction,
+            ],
+            'anyos' => $anyos,
+        ]);
+    }
 
     /**
      * Show the form for editing the specified resource.

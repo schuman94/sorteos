@@ -239,14 +239,19 @@ class ColeccionController extends Controller
         $query = $coleccion->rascas()
             ->whereNotNull('provided_at')
             ->leftJoin('users', 'rascas.scratched_by', '=', 'users.id')
+            ->leftJoin('premios', function ($join) {
+                $join->on('rascas.premio_id', '=', 'premios.id')
+                    ->whereNotNull('rascas.scratched_at'); // solo unir si ha sido rascado
+            })
             ->select(
                 'rascas.id',
                 'rascas.codigo',
                 'rascas.provided_at',
                 'rascas.scratched_at',
-                DB::raw("users.name as scratched_by")
+                DB::raw("users.name as scratched_by"),
+                DB::raw("premios.nombre as premio"),
+                'rascas.premio_id'
             );
-
 
         // Filtro de búsqueda
         if ($search = $request->input('search')) {
@@ -257,7 +262,7 @@ class ColeccionController extends Controller
         $sort = $request->input('sort', 'provided_at');
         $direction = $request->input('direction', 'desc');
 
-        if (in_array($sort, ['codigo', 'scratched_at', 'scratched_by', 'provided_at'])) {
+        if (in_array($sort, ['codigo', 'scratched_at', 'scratched_by', 'provided_at', 'premio'])) {
             $query->orderBy($sort, $direction);
         }
 
