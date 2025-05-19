@@ -91,7 +91,7 @@ Route::middleware('auth')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('/rascas/{codigo}', [RascaController::class, 'show'])->name('rascas.show');
     Route::put('/rascar/{codigo}', [RascaController::class, 'rascar'])->name('rascas.rascar');
+    Route::get('/mis-rascas-premiados', [RascaController::class, 'premiados'])->name('rascas.premiados');
 });
-
 
 require __DIR__ . '/auth.php';
