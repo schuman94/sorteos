@@ -32,7 +32,8 @@ class BlueskyService
         ]);
 
         if (!$response->ok()) {
-            throw new \RuntimeException('Error de autenticación con Bluesky.');
+            $mensaje = $response->json()['error'] ?? 'Error desconocido';
+            throw new \RuntimeException('bluesky:auth:' . $mensaje);
         }
 
         $this->authToken = $response['accessJwt'];
@@ -51,10 +52,17 @@ class BlueskyService
             ]);
 
         if (!$response->ok()) {
-            throw new \RuntimeException('No se pudo obtener los datos de la publicación.');
+            throw new \RuntimeException('bluesky:error:post');
         }
 
-        return $response->json()['thread']['post'] ?? [];
+        $json = $response->json();
+
+        // Si la publicación no existe o ha sido eliminada, la clave 'thread' no estará o será null
+        if (!isset($json['thread']['post'])) {
+            throw new \RuntimeException('bluesky:error:no_encontrado');
+        }
+
+        return $json['thread']['post'];
     }
 
     /**
@@ -70,7 +78,8 @@ class BlueskyService
             ]);
 
         if (!$response->ok()) {
-            throw new \RuntimeException('No se pudieron obtener las respuestas.');
+            $mensaje = $response->json()['error'] ?? 'Error desconocido';
+            throw new \RuntimeException('bluesky:comentarios:' . $mensaje);
         }
 
         return $response->json()['thread']['replies'] ?? [];

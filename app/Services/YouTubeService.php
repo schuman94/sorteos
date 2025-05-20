@@ -37,20 +37,35 @@ class YoutubeService
             'key' => $this->apiKey,
         ]);
 
-        return $response->json();
+        $json = $response->json();
+
+        // Verificar errores
+        if (isset($json['error'])) {
+            $message = $json['error']['message'] ?? 'Error desconocido';
+            $code = $json['error']['code'] ?? 0;
+
+            if ($code == 403 && str_contains($message, 'quotaExceeded')) {
+                throw new \RuntimeException('youtube:cuota');
+            }
+
+            throw new \RuntimeException('youtube:error:' . $message);
+        }
+
+        return $json;
     }
 
+
     /**
-    * Obtiene los comentarios de un video de YouTube usando la YouTube Data API v3.
-    *
-    * Este método envía una petición GET a la API, pasando como parámetros:
-    *  - videoId: id del video del que se quieren obtener los comentarios.
-    *  - part: parte de la información que se desea recibir. Snippet recupera los comentarios. Replies tambien recupera las respuestas.
-    *  - key: API KEY obtenida del archivo .env
-    *
-    * @param  string  $videoId  Identificador único del video en YouTube.
-    * @return array   Array asociativo con la respuesta JSON decodificada.
-    */
+     * Obtiene los comentarios de un video de YouTube usando la YouTube Data API v3.
+     *
+     * Este método envía una petición GET a la API, pasando como parámetros:
+     *  - videoId: id del video del que se quieren obtener los comentarios.
+     *  - part: parte de la información que se desea recibir. Snippet recupera los comentarios. Replies tambien recupera las respuestas.
+     *  - key: API KEY obtenida del archivo .env
+     *
+     * @param  string  $videoId  Identificador único del video en YouTube.
+     * @return array   Array asociativo con la respuesta JSON decodificada.
+     */
     public function getComentarios(string $videoId): array
     {
         $url = 'https://www.googleapis.com/youtube/v3/commentThreads';
@@ -72,20 +87,25 @@ class YoutubeService
 
             // Verificar errores
             if (isset($json['error'])) {
-                $message = $json['error']['message'];
-                if (str_contains($message, 'has disabled comments')) {
-                    throw new \RuntimeException('Los comentarios de este video están desactivados.');
+                $message = $json['error']['message'] ?? 'Error desconocido';
+                $code = $json['error']['code'] ?? 0;
+
+                if ($code == 403 && str_contains($message, 'quotaExceeded')) {
+                    throw new \RuntimeException('youtube:cuota');
                 }
 
-                throw new \RuntimeException('Error al obtener los comentarios: ' . $message);
+                if (str_contains($message, 'has disabled comments')) {
+                    throw new \RuntimeException('youtube:comentarios_desactivados');
+                }
+
+                throw new \RuntimeException('youtube:error:' . $message);
             }
+
 
             $comentarios = array_merge($comentarios, $json['items'] ?? []);
             $nextPageToken = $json['nextPageToken'] ?? null;
-
         } while ($nextPageToken);
 
         return $comentarios;
     }
-
 }

@@ -29,7 +29,7 @@ class BlueskyDriver implements PublicacionDriver
         if (count($segments) < 4 || $segments[0] !== 'profile' || $segments[2] !== 'post') {
             throw new \InvalidArgumentException('URL de Bluesky no válida');
         }
-                                   // Ejemplos:
+        // Ejemplos:
         $handle = $segments[1];    // usuario.bsky.social
         $postId = $segments[3];    // 3lnvborea4c2p
 
@@ -41,6 +41,11 @@ class BlueskyDriver implements PublicacionDriver
     {
         $service = app(BlueskyService::class); // Usa el singleton ya registrado
         $post = $service->getPost($this->uri);
+
+        // Validar que los datos clave están presentes
+        if (!isset($post['author']['handle'], $post['record']['createdAt'])) {
+            throw new \RuntimeException('bluesky:error:datos_incompletos');
+        }
 
         $publicacion->autor = $post['author']['handle'] ?? null;
         $publicacion->fecha_publicacion = Carbon::parse($post['record']['createdAt']);
@@ -67,7 +72,7 @@ class BlueskyDriver implements PublicacionDriver
         usort($formateados, fn($a, $b) => strtotime($b['fecha']) <=> strtotime($a['fecha']));
 
         if (empty($formateados)) {
-            throw new \RuntimeException('Esta publicación no tiene respuestas.');
+            throw new \RuntimeException('bluesky:sin_respuestas');
         }
 
         $publicacion->comentarios = $formateados;
