@@ -1,19 +1,16 @@
 import Comentario from '@/Components/Publicacion/Comentario';
 import axios from '@/lib/axios';
 import { useEffect, useState } from 'react';
+import Paginacion from '@/Components/Paginacion';
 
 export default function Comentarios() {
     const [comentarios, setComentarios] = useState([]);
+    const [links, setLinks] = useState([]);
     const [pagina, setPagina] = useState(1);
-    const [hasMore, setHasMore] = useState(true);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    useEffect(() => {
-        cargarComentarios(1);
-    }, []);
-
-    const cargarComentarios = async (paginaActual) => {
+    const cargarComentarios = async (paginaActual = 1) => {
         setLoading(true);
         setError(null);
 
@@ -22,14 +19,9 @@ export default function Comentarios() {
                 params: { page: paginaActual }
             });
 
-            const nuevosComentarios = response.data.data;
-
-            setComentarios(prev => [...prev, ...nuevosComentarios]);
-
-            if (paginaActual >= response.data.last_page) {
-                setHasMore(false);
-            }
-
+            setComentarios(response.data.data);
+            setLinks(response.data.links);
+            setPagina(paginaActual);
         } catch (error) {
             setError('No se pudieron cargar los comentarios');
         } finally {
@@ -37,11 +29,17 @@ export default function Comentarios() {
         }
     };
 
+    useEffect(() => {
+        cargarComentarios();
+    }, []);
 
-    const mostrarMas = () => {
-        const siguientePagina = pagina + 1;
-        setPagina(siguientePagina);
-        cargarComentarios(siguientePagina);
+    const handlePageChange = (url) => {
+        if (!url) return;
+        const urlObj = new URL(url);
+        const nuevaPagina = urlObj.searchParams.get("page");
+        if (nuevaPagina) {
+            cargarComentarios(Number(nuevaPagina));
+        }
     };
 
     return (
@@ -62,17 +60,9 @@ export default function Comentarios() {
                         ))}
                     </ul>
 
-                    {hasMore && (
-                        <div className="mt-6 text-center">
-                            <button
-                                onClick={mostrarMas}
-                                className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-                                disabled={loading}
-                            >
-                                {loading ? 'Cargando...' : 'Cargar más'}
-                            </button>
-                        </div>
-                    )}
+                    <div className="mt-6">
+                        <Paginacion links={links} onPageChange={handlePageChange} />
+                    </div>
                 </>
             )}
         </>

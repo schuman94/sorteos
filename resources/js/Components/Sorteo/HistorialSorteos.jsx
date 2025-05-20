@@ -26,6 +26,11 @@ export default function HistorialSorteos({
         router.get(routeName, params, { preserveScroll: true });
     };
 
+    const handlePageChange = (url) => {
+        if (!url) return;
+        router.get(url, {}, { preserveScroll: true });
+    };
+
     return (
         <>
             <Head title={titulo} />
@@ -46,7 +51,7 @@ export default function HistorialSorteos({
                                 <SorteoCard key={sorteo.id} sorteo={sorteo} />
                             ))}
                         </div>
-                        <Paginacion links={sorteos.links} />
+                        <Paginacion links={sorteos.links} onPageChange={handlePageChange} />
                     </>
                 ) : (
                     <p className="text-center text-gray-500">
