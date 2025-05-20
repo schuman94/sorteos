@@ -9,6 +9,7 @@ import { Head } from '@inertiajs/react';
 
 export default function Manual() {
     const [formData, setFormData] = useState({
+        nombre: '',
         num_ganadores: 1,
         num_suplentes: 0,
         participantes: '',
@@ -67,6 +68,20 @@ export default function Manual() {
                 {!ganadores ? (
                     <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 p-6 rounded shadow mb-8">
                         <h2 className="text-2xl font-semibold mb-4">Sorteo Manual</h2>
+                        <div className="mb-6">
+                            <label htmlFor="nombre" className="block mb-1 font-medium">
+                                Nombre del sorteo
+                            </label>
+                            <input
+                                type="text"
+                                name="nombre"
+                                id="nombre"
+                                value={formData.nombre}
+                                onChange={handleChange}
+                                className="input w-full"
+                                placeholder="Nombre del sorteo"
+                            />
+                        </div>
 
                         <div className="max-w-3xl mx-auto grid gap-6">
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
