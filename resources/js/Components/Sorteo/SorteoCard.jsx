@@ -22,7 +22,7 @@ export default function SorteoCard({ sorteo }) {
                     className="text-blue-600 hover:underline"
                     onClick={(e) => e.stopPropagation()} // Evita que el click en el link dispare el router
                 >
-                    {(sorteo.titulo?.length > 100 ? sorteo.titulo.slice(0, 100) + '...' : sorteo.titulo || 'Sin nombre')}
+                    {(sorteo.titulo?.length > 100 ? sorteo.titulo.slice(0, 100) + '...' : sorteo.titulo || 'Sin título')}
 
                 </a>
             </h2>
