@@ -22,6 +22,7 @@ class SorteoController extends Controller
     public function iniciar_manual(Request $request)
     {
         $request->validate([
+            'nombre' => 'nullable|string|max:255',
             'num_ganadores' => 'required|integer|min:1',
             'num_suplentes' => 'required|integer|min:0',
             'participantes' => 'required|string',
@@ -40,6 +41,7 @@ class SorteoController extends Controller
             // Crear y guardar el modelo Sorteo
             $sorteo = new Sorteo();
             $sorteo->user()->associate(Auth::user());
+            $sorteo->nombre = $request->input('nombre');
             $sorteo->num_participantes = count($participantes);
             $sorteo->codigo_certificado = $this->generarCodigoCertificado();
             $sorteo->save();
@@ -330,7 +332,7 @@ class SorteoController extends Controller
             return [
                 'id' => $sorteo->id,
                 'url' => $sorteo->publicacion?->url,
-                'titulo' => $sorteo->publicacion?->titulo,
+                'titulo' => $sorteo->publicacion?->titulo ?? $sorteo->nombre, // Si es manual, usamos el nombre
                 'tipo' => $sorteo->publicacion?->host?->nombre ?? 'Manual',
                 'num_participantes' => $sorteo->num_participantes,
                 'created_at' => $sorteo->created_at,
@@ -375,7 +377,7 @@ class SorteoController extends Controller
                 'id' => $sorteo->id,
                 'url' => $publicacion?->url,
                 'urlHost' => $publicacion?->host?->url,
-                'titulo' => $publicacion?->titulo,
+                'titulo' => $sorteo->publicacion?->titulo ?? $sorteo->nombre, // Si es manual, usamos el nombre
                 'tipo' => $publicacion?->host?->nombre ?? 'Manual',
                 'num_participantes' => $sorteo->num_participantes,
                 'created_at' => $sorteo->created_at,
