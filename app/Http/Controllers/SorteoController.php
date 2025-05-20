@@ -23,7 +23,7 @@ class SorteoController extends Controller
     public function iniciar_manual(Request $request)
     {
         $request->validate([
-            'nombre' => 'nullable|string|max:255',
+            'nombre' => 'required|string|max:255',
             'num_ganadores' => 'required|integer|min:1',
             'num_suplentes' => 'required|integer|min:0',
             'participantes' => 'required|string',
