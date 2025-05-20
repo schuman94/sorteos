@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('autor'); // canal/usuario
             $table->timestamp('fecha_publicacion');
             $table->unsignedBigInteger('num_comentarios');
-            $table->string('titulo')->nullable(); // título/caption
+            $table->text('titulo')->nullable(); // título/caption
             $table->unsignedBigInteger('likes')->nullable();
             $table->unsignedBigInteger('visualizaciones')->nullable();
             $table->timestamps();
