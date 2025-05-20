@@ -57,9 +57,9 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', AdminMiddleware::class])->group(function () {
     Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users.index');
     Route::get('/admin/users/{user}', [UserController::class, 'show'])->name('admin.users.show');
-    Route::get('/admin/users/{user}/historial', [UserController::class, 'historial'])->name('admin.users.historial');
     Route::put('/admin/users/{user}/hacer-admin', [UserController::class, 'hacerAdmin'])->name('admin.users.hacer');
     Route::put('/admin/users/{user}/deshacer-admin', [UserController::class, 'deshacerAdmin'])->name('admin.users.deshacer');
+    Route::get('/admin/users/{user}/historial', [SorteoController::class, 'historialAdmin'])->name('admin.users.historial');
 });
 
 Route::get('/certificado/{codigo}', [CertificadoController::class, 'show'])->name('certificado.show');

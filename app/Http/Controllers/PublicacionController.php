@@ -103,7 +103,7 @@ class PublicacionController extends Controller
         $paginaActual = LengthAwarePaginator::resolveCurrentPage();
 
         // Número de elementos por página
-        $porPagina = 50;
+        $porPagina = 10;
 
         // Convertimos a colección para usar slice
         $coleccion = new Collection($comentarios);

@@ -19,17 +19,19 @@ class ColeccionController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $colecciones = Auth::user()
             ->colecciones()
             ->latest()
-            ->get();
+            ->paginate(9) // o el número que desees por página
+            ->withQueryString();
 
         return Inertia::render('Coleccion/Index', [
             'colecciones' => $colecciones,
         ]);
     }
+
 
     /**
      * Show the form for creating a new resource.

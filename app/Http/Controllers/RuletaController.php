@@ -39,30 +39,37 @@ class RuletaController extends Controller
         ]);
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $ruletas = Auth::user()
             ->ruletas()
-            ->latest()
-            ->get();
+            ->latest();
 
-        return response()->json($ruletas);
+        if ($request->filled('search')) {
+            $ruletas->where('nombre', 'ilike', '%' . $request->search . '%');
+        }
+
+        return response()->json($ruletas->paginate(6));
     }
+
+
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'nombre' => 'required|string|max:255|unique:ruletas,nombre,NULL,id,user_id,' . Auth::id(),
-            'opciones' => 'required|array|min:1',
-            'opciones.*' => 'string|max:255',
-        ], [
-            'nombre.unique' => 'Ya existe una ruleta con ese nombre.',
-            'nombre.required' => 'Debes introducir un nombre',
-        ]
-    );
+        $request->validate(
+            [
+                'nombre' => 'required|string|max:255|unique:ruletas,nombre,NULL,id,user_id,' . Auth::id(),
+                'opciones' => 'required|array|min:1',
+                'opciones.*' => 'string|max:255',
+            ],
+            [
+                'nombre.unique' => 'Ya existe una ruleta con ese nombre.',
+                'nombre.required' => 'Debes introducir un nombre',
+            ]
+        );
 
         $ruleta = new Ruleta();
         $ruleta->nombre = $request->nombre;
