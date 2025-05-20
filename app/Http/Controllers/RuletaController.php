@@ -41,15 +41,15 @@ class RuletaController extends Controller
 
     public function index(Request $request)
     {
-        $query = Auth::user()
+        $ruletas = Auth::user()
             ->ruletas()
             ->latest();
 
         if ($request->filled('search')) {
-            $query->where('nombre', 'ilike', '%' . $request->search . '%');
+            $ruletas->where('nombre', 'ilike', '%' . $request->search . '%');
         }
 
-        return response()->json($query->paginate(6));
+        return response()->json($ruletas->paginate(6));
     }
 
 
