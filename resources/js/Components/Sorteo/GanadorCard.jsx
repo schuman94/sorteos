@@ -7,16 +7,16 @@ export default function GanadorCard({ nombre, posicion, comentario, likes, fecha
 
         const username = nombre.startsWith('@') ? nombre.slice(1) : nombre;
 
-        // Aseguramos que no haya doble barra
+        // Eliminamos barra del final
         const base = urlHost.endsWith('/') ? urlHost.slice(0, -1) : urlHost;
 
-        // Si la plataforma es YouTube, incluimos @ en la URL
         if (base.includes('youtube')) {
             return `${base}/@${username}`;
         }
 
-        // En otras plataformas como Instagram, sin @
-        return `${base}/${username}`;
+        if (base.includes('bsky')) {
+            return `${base}/profile/${username}`;
+        }
     };
 
     const perfilUrl = construirPerfil();
