@@ -1,5 +1,6 @@
 import MainLayout from '@/Layouts/MainLayout';
 import { Head, router } from '@inertiajs/react';
+import Paginacion from '@/Components/Paginacion';
 
 export default function Index({ colecciones }) {
     return (
@@ -42,26 +43,37 @@ export default function Index({ colecciones }) {
                 </div>
 
 
-                {colecciones.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {colecciones.map((coleccion) => (
-                            <div
-                                key={coleccion.id}
-                                onClick={() => router.visit(route('colecciones.show', coleccion.id))}
-                                className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition cursor-pointer"
-                            >
-                                <h2 className="text-lg font-semibold text-gray-900 dark:text-white break-words">
-                                    {coleccion.nombre}
-                                </h2>
-                                <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
-                                    {coleccion.descrpipcion}
-                                </p>
-                                <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
-                                    Estado: {coleccion.abierta ? 'Abierta' : 'Cerrada'}
-                                </p>
-                            </div>
-                        ))}
-                    </div>
+                {colecciones.data.length > 0 ? (
+                    <>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {colecciones.data.map((coleccion) => (
+                                <div
+                                    key={coleccion.id}
+                                    onClick={() => router.visit(route('colecciones.show', coleccion.id))}
+                                    className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition cursor-pointer"
+                                >
+                                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white break-words">
+                                        {coleccion.nombre}
+                                    </h2>
+                                    <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
+                                        {coleccion.descripcion}
+                                    </p>
+                                    <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
+                                        Estado: {coleccion.abierta ? 'Abierta' : 'Cerrada'}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+
+                        <Paginacion
+                            links={colecciones.links}
+                            onPageChange={(url) => {
+                                if (!url) return;
+                                router.visit(url);
+                            }}
+                        />
+
+                    </>
                 ) : (
                     <p className="text-center text-gray-500 mt-8">No hay colecciones disponibles.</p>
                 )}
