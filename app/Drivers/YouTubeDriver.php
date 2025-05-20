@@ -21,29 +21,36 @@ class YouTubeDriver implements PublicacionDriver
         $query = parse_url($url, PHP_URL_QUERY);
         parse_str($query, $params);
 
-        if (isset($params['v'])) {
+        if (isset($params['v']) && $params['v'] !== '') {
             return $params['v'];
         }
 
-        $path = parse_url($url, PHP_URL_PATH);
-        if ($path) {
-            return ltrim($path, '/'); // quita la barra inicial
+        $path = trim(parse_url($url, PHP_URL_PATH), '/');
+
+        // Si es de tipo /shorts/{id}, lo extraemos.
+        if (str_starts_with($path, 'shorts/')) {
+            $segments = explode('/', $path);
+            if (isset($segments[1]) && $segments[1] !== '') {
+                return $segments[1];
+            }
         }
 
-        // En caso de no poder extraerlo, lanza excepción
+        // Si es un path corto tipo youtu.be/{id}
+        // La cadena debe tener exactamente 11 caracteres alfanuméricos o guiones, sin nada antes ni después.
+        if (preg_match('/^[\w-]{11}$/', $path)) {
+            return $path;
+        }
+
+        // Si llega aquí, no es un ID válido
         throw new \InvalidArgumentException('No se pudo extraer el ID de YouTube');
     }
+
+
 
     public function cargarDatos(Publicacion $publicacion): void
     {
         $service = app(YouTubeService::class);
         $response = $service->getVideoData($this->id);
-
-        // Verificar si hay algún error o si la estructura es la esperada
-        if (isset($response['error'])) {
-            // Manejo de errores (podrías lanzar una excepción o dejarlo en null)
-            throw new \RuntimeException('Error en la API de YouTube: ' . $response['error']['message']);
-        }
 
         // Extraer la información del primer item (si existe)
         $items = $response['items'] ?? [];
@@ -116,7 +123,7 @@ class YouTubeDriver implements PublicacionDriver
         });
 
         if (empty($comentarios)) {
-            throw new \RuntimeException('El video no tiene comentarios aún.');
+            throw new \RuntimeException('youtube:sin_comentarios');
         }
 
         // Asignar los comentarios al modelo
