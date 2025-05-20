@@ -16,6 +16,7 @@ use App\Models\Comentario;
 use App\Models\Host;
 use App\Models\Publicacion;
 use Illuminate\Support\Str;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class SorteoController extends Controller
 {
@@ -298,16 +299,14 @@ class SorteoController extends Controller
     }
 
 
-    public function historial(Request $request)
+    private function obtenerHistorial(Request $request, $user)
     {
-        $query = Auth::user()->sorteos()->with('publicacion.host');
+        $query = $user->sorteos()->with('publicacion.host');
 
-        // Filtrar por año
         if ($request->filled('anyo')) {
             $query->whereYear('created_at', $request->anyo);
         } else {
-            $anyoMasReciente = Auth::user()
-                ->sorteos()
+            $anyoMasReciente = $user->sorteos()
                 ->selectRaw('EXTRACT(YEAR FROM created_at) as anyo')
                 ->orderByDesc('anyo')
                 ->limit(1)
@@ -316,37 +315,44 @@ class SorteoController extends Controller
             $query->whereYear('created_at', $anyoMasReciente);
         }
 
-        // Filtrar por tipo/host si está indicado
         if ($request->filled('tipo')) {
             if ($request->tipo === 'manual') {
                 $query->whereNull('publicacion_id');
             } else {
-                $query->whereHas('publicacion', function ($q) use ($request) {
-                    $q->where('host_id', $request->tipo);
-                });
+                $query->whereHas('publicacion', fn($q) => $q->where('host_id', $request->tipo));
             }
         }
 
-        // Mapear resultados
-        $sorteos = $query->orderByDesc('created_at')->get()->map(function ($sorteo) {
-            return [
+        $sorteos = $query->orderByDesc('created_at')
+            ->paginate(10)
+            ->withQueryString()
+            ->through(fn($sorteo) => [
                 'id' => $sorteo->id,
                 'url' => $sorteo->publicacion?->url,
-                'titulo' => $sorteo->publicacion?->titulo ?? $sorteo->nombre, // Si es manual, usamos el nombre
+                'titulo' => $sorteo->publicacion?->titulo ?? $sorteo->nombre,
                 'tipo' => $sorteo->publicacion?->host?->nombre ?? 'Manual',
                 'num_participantes' => $sorteo->num_participantes,
                 'created_at' => $sorteo->created_at,
                 'certificado' => $sorteo->codigo_certificado,
-            ];
-        });
+            ]);
 
-        $anyos = Auth::user()->sorteos()
+        $anyos = $user->sorteos()
             ->selectRaw('EXTRACT(YEAR FROM created_at) as anyo')
             ->groupBy('anyo')
             ->orderByDesc('anyo')
             ->pluck('anyo');
 
-        $hosts = Host::select('id', 'nombre')->get();
+        $hosts = \App\Models\Host::select('id', 'nombre')->get();
+
+        return [$sorteos, $anyos, $hosts];
+    }
+
+
+
+    public function historial(Request $request)
+    {
+        $user = auth()->user();
+        [$sorteos, $anyos, $hosts] = $this->obtenerHistorial($request, $user);
 
         return Inertia::render('Sorteo/Historial', [
             'sorteos' => $sorteos,
@@ -356,6 +362,22 @@ class SorteoController extends Controller
             'hosts' => $hosts,
         ]);
     }
+
+    public function historialAdmin(Request $request, \App\Models\User $user)
+    {
+        [$sorteos, $anyos, $hosts] = $this->obtenerHistorial($request, $user);
+
+        return Inertia::render('Admin/Users/Historial', [
+            'user' => $user,
+            'sorteos' => $sorteos,
+            'anyos' => $anyos,
+            'anyoSeleccionado' => $request->anyo,
+            'tipoSeleccionado' => $request->tipo,
+            'hosts' => $hosts,
+        ]);
+    }
+
+
 
     /**
      * Display the specified resource.

@@ -45,63 +45,6 @@ class UserController extends Controller
         ]);
     }
 
-    public function historial(Request $request, User $user)
-    {
-        $query = $user->sorteos()->with('publicacion.host');
-
-        // Filtro por año
-        if ($request->filled('anyo')) {
-            $query->whereYear('created_at', $request->anyo);
-        } else {
-            $anyoMasReciente = $user->sorteos()
-                ->selectRaw('EXTRACT(YEAR FROM created_at) as anyo')
-                ->orderByDesc('anyo')
-                ->limit(1)
-                ->value('anyo');
-            $request->merge(['anyo' => $anyoMasReciente]);
-            $query->whereYear('created_at', $anyoMasReciente);
-        }
-
-        // Filtro por host
-        if ($request->filled('tipo')) {
-            if ($request->tipo === 'manual') {
-                $query->whereNull('publicacion_id');
-            } else {
-                $query->whereHas('publicacion', function ($q) use ($request) {
-                    $q->where('host_id', $request->tipo);
-                });
-            }
-        }
-
-        $sorteos = $query->orderByDesc('created_at')->get()->map(function ($sorteo) {
-            return [
-                'id' => $sorteo->id,
-                'url' => $sorteo->publicacion?->url,
-                'titulo' => $sorteo->publicacion?->titulo,
-                'tipo' => $sorteo->publicacion?->host?->nombre ?? 'Manual',
-                'num_participantes' => $sorteo->num_participantes,
-                'created_at' => $sorteo->created_at,
-            ];
-        });
-
-        $anyos = $user->sorteos()
-            ->selectRaw('EXTRACT(YEAR FROM created_at) as anyo')
-            ->groupBy('anyo')
-            ->orderByDesc('anyo')
-            ->pluck('anyo');
-
-        $hosts = Host::select('id', 'nombre')->get();
-
-        return Inertia::render('Admin/Users/Historial', [
-            'user' => $user,
-            'sorteos' => $sorteos,
-            'hosts' => $hosts,
-            'anyos' => $anyos,
-            'anyoSeleccionado' => $request->anyo,
-            'tipoSeleccionado' => $request->tipo,
-        ]);
-    }
-
     public function hacerAdmin(User $user)
     {
         if ($user->is_admin) {
