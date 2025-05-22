@@ -69,11 +69,13 @@ export default function Manual() {
             erroresTemp.cuenta_regresiva = 'La cuenta atrás debe estar entre 3 y 15 segundos.';
         }
 
-        const totalGanadores = parseInt(formData.num_ganadores) + parseInt(formData.num_suplentes);
+        const suplentes = parseInt(formData.num_suplentes);
+        const totalGanadores = parseInt(formData.num_ganadores) + (suplentes > 0 ? suplentes : 0);
+
         const totalParticipantes = contarParticipantes();
 
         if (totalGanadores > totalParticipantes) {
-            erroresTemp.participantes = `Hay ${totalParticipantes} participantes pero se requieren al menos ${totalGanadores}`;
+            erroresTemp.participantes = `Hay ${totalParticipantes} participantes pero se requieren al menos ${totalGanadores}.`;
         }
 
         setErrores(erroresTemp);
