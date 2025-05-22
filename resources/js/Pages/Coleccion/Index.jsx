@@ -1,8 +1,24 @@
 import MainLayout from '@/Layouts/MainLayout';
 import { Head, router } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
 import Paginacion from '@/Components/Paginacion';
 
-export default function Index({ colecciones }) {
+export default function Index({ colecciones, filters }) {
+    const [search, setSearch] = useState(filters?.search || '');
+
+    // Debounce: espera 400ms tras dejar de escribir antes de enviar la petición
+    useEffect(() => {
+        const delayDebounce = setTimeout(() => {
+            router.get(route('colecciones.index'), { search }, {
+                preserveScroll: true,
+                preserveState: true,
+                replace: true,
+            });
+        }, 400);
+
+        return () => clearTimeout(delayDebounce);
+    }, [search]);
+
     return (
         <>
             <Head title="Colecciones" />
@@ -42,6 +58,16 @@ export default function Index({ colecciones }) {
                     </div>
                 </div>
 
+                {/* Buscador */}
+                <div className="mb-6">
+                    <input
+                        type="text"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        placeholder="Buscar por nombre..."
+                        className="input w-full max-w-md"
+                    />
+                </div>
 
                 {colecciones.data.length > 0 ? (
                     <>
@@ -69,16 +95,18 @@ export default function Index({ colecciones }) {
                             links={colecciones.links}
                             onPageChange={(url) => {
                                 if (!url) return;
-                                router.visit(url);
+                                router.visit(url, {
+                                    preserveScroll: true,
+                                    preserveState: true,
+                                    data: { search },
+                                });
                             }}
                         />
-
                     </>
                 ) : (
                     <p className="text-center text-gray-500 mt-8">No hay colecciones disponibles.</p>
                 )}
             </div>
-
         </>
     );
 }

@@ -5,8 +5,6 @@ import axios from '@/lib/axios';
 import { useState, useEffect } from 'react';
 import { Head } from '@inertiajs/react';
 
-
-
 export default function Manual() {
     const [formData, setFormData] = useState({
         nombre: '',
@@ -17,9 +15,9 @@ export default function Manual() {
         cuenta_regresiva: 5,
     });
 
+    const [errores, setErrores] = useState({});
     const [cargando, setCargando] = useState(false);
     const [ganadores, setGanadores] = useState(null);
-
     const [mostrarGanadores, setMostrarGanadores] = useState(false);
     const [cuentaRegresiva, setCuentaRegresiva] = useState(null);
 
@@ -45,7 +43,53 @@ export default function Manual() {
         });
     };
 
+    const contarParticipantes = () => {
+        const lineas = formData.participantes
+            .split('\n')
+            .map(line => line.trim())
+            .filter(line => line.length > 0);
+
+        if (formData.eliminar_duplicados) {
+            return [...new Set(lineas)].length;
+        }
+
+        return lineas.length;
+    };
+
+    const validarFormulario = () => {
+        const erroresTemp = {};
+
+        if (!formData.nombre.trim()) {
+            erroresTemp.nombre = 'El nombre del sorteo es obligatorio.';
+        }
+
+        if (formData.num_ganadores < 1) {
+            erroresTemp.num_ganadores = 'Debe haber al menos un ganador.';
+        }
+
+        if (formData.num_suplentes < 0) {
+            erroresTemp.num_suplentes = 'El número de suplentes no puede ser negativo.';
+        }
+
+        if (formData.cuenta_regresiva < 3 || formData.cuenta_regresiva > 15) {
+            erroresTemp.cuenta_regresiva = 'La cuenta atrás debe estar entre 3 y 15 segundos.';
+        }
+
+        const suplentes = parseInt(formData.num_suplentes);
+        const totalGanadores = parseInt(formData.num_ganadores) + (suplentes > 0 ? suplentes : 0);
+        const totalParticipantes = contarParticipantes();
+
+        if (totalGanadores > totalParticipantes) {
+            erroresTemp.participantes = `Hay ${totalParticipantes} participantes pero se requieren al menos ${totalGanadores}.`;
+        }
+
+        setErrores(erroresTemp);
+        return Object.keys(erroresTemp).length === 0;
+    };
+
     const iniciarSorteo = async () => {
+        if (!validarFormulario()) return;
+
         setCargando(true);
         try {
             const response = await axios.post(route('sorteo.manual.iniciar'), formData);
@@ -60,7 +104,6 @@ export default function Manual() {
         }
     };
 
-
     return (
         <>
             <Head title="Sorteo Manual" />
@@ -68,6 +111,7 @@ export default function Manual() {
                 {!ganadores ? (
                     <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 p-6 rounded shadow mb-8">
                         <h2 className="text-2xl font-semibold mb-4">Sorteo Manual</h2>
+
                         <div className="mb-6">
                             <label htmlFor="nombre" className="block mb-1 font-medium">
                                 Nombre del sorteo
@@ -81,6 +125,7 @@ export default function Manual() {
                                 className="input w-full"
                                 placeholder="Nombre del sorteo"
                             />
+                            {errores.nombre && <p className="text-red-600 text-sm mt-1">{errores.nombre}</p>}
                         </div>
 
                         <div className="max-w-3xl mx-auto grid gap-6">
@@ -93,10 +138,12 @@ export default function Manual() {
                                         type="number"
                                         name="num_ganadores"
                                         id="num_ganadores"
+                                        min={1}
                                         value={formData.num_ganadores}
                                         onChange={handleChange}
                                         className="input w-full"
                                     />
+                                    {errores.num_ganadores && <p className="text-red-600 text-sm mt-1">{errores.num_ganadores}</p>}
                                 </div>
 
                                 <div>
@@ -107,10 +154,12 @@ export default function Manual() {
                                         type="number"
                                         name="num_suplentes"
                                         id="num_suplentes"
+                                        min={0}
                                         value={formData.num_suplentes}
                                         onChange={handleChange}
                                         className="input w-full"
                                     />
+                                    {errores.num_suplentes && <p className="text-red-600 text-sm mt-1">{errores.num_suplentes}</p>}
                                 </div>
 
                                 <div>
@@ -127,6 +176,7 @@ export default function Manual() {
                                         onChange={handleChange}
                                         className="input w-full"
                                     />
+                                    {errores.cuenta_regresiva && <p className="text-red-600 text-sm mt-1">{errores.cuenta_regresiva}</p>}
                                 </div>
                             </div>
 
@@ -142,6 +192,7 @@ export default function Manual() {
                                     onChange={handleChange}
                                     className="input w-full min-h-[140px] resize-y"
                                 />
+                                {errores.participantes && <p className="text-red-600 text-sm mt-1">{errores.participantes}</p>}
                             </div>
 
                             <div className="text-sm text-gray-700 dark:text-gray-300">

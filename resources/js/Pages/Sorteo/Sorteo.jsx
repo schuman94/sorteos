@@ -19,11 +19,34 @@ export default function Sorteo({ publicacion }) {
         cuenta_regresiva: 5,
     });
 
+
     const [urlHost, setUrlHost] = useState('');
     const [cargando, setCargando] = useState(false);
     const [ganadores, setGanadores] = useState(null);
     const [mostrarGanadores, setMostrarGanadores] = useState(false);
     const [cuentaRegresiva, setCuentaRegresiva] = useState(null);
+
+    const [errores, setErrores] = useState({});
+
+    const validarFormulario = () => {
+        const erroresTemp = {};
+
+        if (formData.num_ganadores < 1) {
+            erroresTemp.num_ganadores = 'Debe haber al menos un ganador.';
+        }
+
+        if (formData.num_suplentes < 0) {
+            erroresTemp.num_suplentes = 'El número de suplentes no puede ser negativo.';
+        }
+
+        if (formData.cuenta_regresiva < 3 || formData.cuenta_regresiva > 15) {
+            erroresTemp.cuenta_regresiva = 'La cuenta atrás debe estar entre 3 y 15 segundos.';
+        }
+
+        setErrores(erroresTemp);
+
+        return Object.keys(erroresTemp).length === 0;
+    };
 
     useEffect(() => {
         if (cuentaRegresiva !== null && cuentaRegresiva > 0) {
@@ -52,6 +75,8 @@ export default function Sorteo({ publicacion }) {
     };
 
     const iniciarSorteo = async () => {
+        if (!validarFormulario()) return;
+
         setCargando(true);
         try {
             const response = await axios.post(route('sorteo.iniciar'), formData);
@@ -73,6 +98,7 @@ export default function Sorteo({ publicacion }) {
             setCargando(false);
         }
     };
+
 
     return (
         <>
@@ -100,6 +126,7 @@ export default function Sorteo({ publicacion }) {
                                             onChange={handleChange}
                                             className="input w-full"
                                         />
+                                        {errores.num_ganadores && <p className="text-red-600 text-sm mt-1">{errores.num_ganadores}</p>}
                                     </div>
                                     <div>
                                         <label htmlFor="num_suplentes" className="block mb-1 font-medium whitespace-nowrap">Suplentes</label>
@@ -111,6 +138,7 @@ export default function Sorteo({ publicacion }) {
                                             onChange={handleChange}
                                             className="input w-full"
                                         />
+                                        {errores.num_suplentes && <p className="text-red-600 text-sm mt-1">{errores.num_suplentes}</p>}
                                     </div>
                                     <div>
                                         <label htmlFor="cuenta_regresiva" className="block mb-1 font-medium whitespace-nowrap">Cuenta atrás (s)</label>
@@ -124,6 +152,7 @@ export default function Sorteo({ publicacion }) {
                                             onChange={handleChange}
                                             className="input w-full"
                                         />
+                                        {errores.cuenta_regresiva && <p className="text-red-600 text-sm mt-1">{errores.cuenta_regresiva}</p>}
                                     </div>
                                 </div>
 
