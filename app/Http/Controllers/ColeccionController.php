@@ -21,16 +21,25 @@ class ColeccionController extends Controller
      */
     public function index(Request $request)
     {
-        $colecciones = Auth::user()
+        $query = Auth::user()
             ->colecciones()
+            ->when($request->filled('search'), function ($q) use ($request) {
+                $q->where('nombre', 'ILIKE', '%' . $request->search . '%');
+            });
+
+        $colecciones = $query
             ->latest()
-            ->paginate(9) // o el número que desees por página
+            ->paginate(9)
             ->withQueryString();
 
         return Inertia::render('Coleccion/Index', [
             'colecciones' => $colecciones,
+            'filters' => [
+                'search' => $request->search,
+            ],
         ]);
     }
+
 
 
     /**
