@@ -44,10 +44,16 @@ export default function Manual() {
     };
 
     const contarParticipantes = () => {
-        return formData.participantes
+        const lineas = formData.participantes
             .split('\n')
             .map(line => line.trim())
-            .filter(line => line.length > 0).length;
+            .filter(line => line.length > 0);
+
+        if (formData.eliminar_duplicados) {
+            return [...new Set(lineas)].length;
+        }
+
+        return lineas.length;
     };
 
     const validarFormulario = () => {
@@ -71,7 +77,6 @@ export default function Manual() {
 
         const suplentes = parseInt(formData.num_suplentes);
         const totalGanadores = parseInt(formData.num_ganadores) + (suplentes > 0 ? suplentes : 0);
-
         const totalParticipantes = contarParticipantes();
 
         if (totalGanadores > totalParticipantes) {
