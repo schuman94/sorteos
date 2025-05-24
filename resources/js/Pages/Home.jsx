@@ -4,6 +4,7 @@ import axios from '@/lib/axios';
 import { useState } from 'react';
 import { Head, Link, usePage, router } from '@inertiajs/react';
 import { Ticket, LifeBuoy } from 'lucide-react';
+import BotonPrimario from '@/Components/Botones/BotonPrimario';
 
 export default function Home() {
     const [url, setUrl] = useState('');
@@ -70,16 +71,13 @@ export default function Home() {
                             type="text"
                             value={url}
                             onChange={(e) => setUrl(e.target.value)}
-                            className="flex-1 rounded-lg border-2 border-[#1cc2b5] px-4 py-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1cc2b5]"
+                            className="flex-1 rounded-lg border-2 border-[#1cc2b5] px-4 py-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1cc2b5] focus:border-[#1cc2b5]"
                             placeholder="URL de YouTube o Bluesky"
                         />
-                        <button
-                            type="submit"
-                            className="rounded-lg bg-[#1cc2b5] px-6 py-3 text-sm font-semibold text-white hover:bg-[#17b0a6] transition"
-                            disabled={loading}
-                        >
+                        <BotonPrimario type="submit" disabled={loading}>
                             {loading ? 'Buscando...' : 'Buscar'}
-                        </button>
+                        </BotonPrimario>
+
                     </form>
 
                     {/* Errores */}
@@ -92,12 +90,10 @@ export default function Home() {
                             <div className="mt-12">
                                 <Publicacion {...publicacion} />
                             </div>
-                            <button
-                                onClick={cargarComentarios}
-                                className="mt-4 px-6 py-2 bg-[#1cc2b5] text-white rounded hover:bg-[#17b0a6] transition"
-                            >
+                            <BotonPrimario onClick={cargarComentarios} className="mt-4">
                                 Cargar comentarios
-                            </button>
+                            </BotonPrimario>
+
                         </>
                     )}
 

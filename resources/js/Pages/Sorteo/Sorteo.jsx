@@ -7,6 +7,7 @@ import axios from '@/lib/axios';
 import { useState, useEffect } from 'react';
 import { Head } from '@inertiajs/react';
 import { SlidersHorizontal, Sparkles } from 'lucide-react';
+import BotonPrimario from '@/Components/Botones/BotonPrimario';
 
 export default function Sorteo({ publicacion }) {
     const [formData, setFormData] = useState({
@@ -112,7 +113,7 @@ export default function Sorteo({ publicacion }) {
                                                 max={field.max}
                                                 value={formData[field.id]}
                                                 onChange={handleChange}
-                                                className="w-full px-4 py-2 border-[1.5px] border-[#1cc2b5] rounded-md bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1cc2b5]"
+                                                className="w-full px-4 py-2 border-[1.5px] border-[#1cc2b5] rounded-md bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1cc2b5] focus:border-[#1cc2b5]"
                                             />
                                             {errores[field.id] && <p className="text-red-600 text-sm mt-1">{errores[field.id]}</p>}
                                         </div>
@@ -161,7 +162,7 @@ export default function Sorteo({ publicacion }) {
                                         value={formData.hashtag}
                                         onChange={handleChange}
                                         placeholder="#hashtag"
-                                        className="w-full px-4 py-2 border-[1.5px] border-[#1cc2b5] rounded-md bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1cc2b5]"
+                                        className="w-full px-4 py-2 border-[1.5px] border-[#1cc2b5] rounded-md bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1cc2b5] focus:border-[#1cc2b5]"
                                     />
                                 </div>
 
@@ -181,7 +182,7 @@ export default function Sorteo({ publicacion }) {
                                                 value={formData[field.id]}
                                                 onChange={handleChange}
                                                 placeholder={field.placeholder}
-                                                className="w-full px-4 py-2 border-[1.5px] border-[#1cc2b5] rounded-md bg-white text-gray-800 min-h-[140px] resize-y focus:outline-none focus:ring-2 focus:ring-[#1cc2b5]"
+                                                className="w-full px-4 py-2 border-[1.5px] border-[#1cc2b5] rounded-md bg-white text-gray-800 min-h-[140px] resize-y focus:outline-none focus:ring-2 focus:ring-[#1cc2b5] focus:border-[#1cc2b5]"
                                             />
                                         </div>
                                     ))}
@@ -189,14 +190,10 @@ export default function Sorteo({ publicacion }) {
 
                                 {/* Botón */}
                                 <div className="flex justify-center">
-                                    <button
-                                        onClick={iniciarSorteo}
-                                        disabled={cargando}
-                                        className="mt-4 px-6 py-2 bg-[#1cc2b5] text-white rounded-md hover:bg-[#17b0a6] transition flex items-center justify-center gap-2"
-                                    >
+                                    <BotonPrimario onClick={iniciarSorteo} disabled={cargando} className="mt-4 flex items-center justify-center gap-2">
                                         <Sparkles className="w-4 h-4" />
                                         {cargando ? 'Iniciando...' : 'Iniciar Sorteo'}
-                                    </button>
+                                    </BotonPrimario>
                                 </div>
                             </div>
                         </div>

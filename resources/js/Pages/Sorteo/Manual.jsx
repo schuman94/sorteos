@@ -5,6 +5,7 @@ import axios from '@/lib/axios';
 import { useState, useEffect } from 'react';
 import { Head } from '@inertiajs/react';
 import { ScrollText, Gift } from 'lucide-react';
+import BotonPrimario from '@/Components/Botones/BotonPrimario';
 
 export default function Manual() {
     const [formData, setFormData] = useState({
@@ -113,7 +114,9 @@ export default function Manual() {
                                     id="nombre"
                                     value={formData.nombre}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-2 border-[1.5px] border-[#1cc2b5] rounded-md bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1cc2b5]"
+                                    className="w-full px-4 py-2 border-[1.5px] border-[#1cc2b5] rounded-md bg-white text-gray-800
+    focus:outline-none focus:ring-2 focus:ring-[#1cc2b5] focus:border-[#1cc2b5]"
+
                                     placeholder="Nombre del sorteo"
                                 />
                                 {errores.nombre && <p className="text-red-600 text-sm mt-1">{errores.nombre}</p>}
@@ -140,7 +143,9 @@ export default function Manual() {
                                             max={field.max}
                                             value={formData[field.id]}
                                             onChange={handleChange}
-                                            className="w-full px-4 py-2 border border-[#1cc2b5] rounded-md bg-white text-gray-800 focus:ring-2 focus:ring-[#1cc2b5]"
+                                            className="w-full px-4 py-2 border-[1.5px] border-[#1cc2b5] rounded-md bg-white text-gray-800
+    focus:outline-none focus:ring-2 focus:ring-[#1cc2b5] focus:border-[#1cc2b5]"
+
                                         />
                                         {errores[field.id] && <p className="text-red-600 text-sm mt-1">{errores[field.id]}</p>}
                                     </div>
@@ -158,7 +163,9 @@ export default function Manual() {
                                     placeholder="Un nombre por línea"
                                     value={formData.participantes}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-2 border border-[#1cc2b5] rounded-md bg-white text-gray-800 min-h-[140px] resize-y focus:outline-none focus:ring-2 focus:ring-[#1cc2b5]"
+                                    className="w-full px-4 py-2 border border-[#1cc2b5] rounded-md bg-white text-gray-800 min-h-[140px] resize-y
+    focus:outline-none focus:ring-2 focus:ring-[#1cc2b5] focus:border-[#1cc2b5]"
+
                                 />
                                 {errores.participantes && <p className="text-red-600 text-sm mt-1">{errores.participantes}</p>}
                             </div>
@@ -190,14 +197,10 @@ export default function Manual() {
 
                             {/* Botón */}
                             <div className="flex justify-center">
-                                <button
-                                    onClick={iniciarSorteo}
-                                    disabled={cargando}
-                                    className="mt-4 px-6 py-2 bg-[#1cc2b5] text-white rounded-md hover:bg-[#17b0a6] transition flex items-center justify-center gap-2"
-                                >
+                                <BotonPrimario onClick={iniciarSorteo} disabled={cargando}>
                                     <Gift className="w-4 h-4" />
                                     {cargando ? 'Iniciando...' : 'Iniciar Sorteo'}
-                                </button>
+                                </BotonPrimario>
                             </div>
                         </div>
                     </div>

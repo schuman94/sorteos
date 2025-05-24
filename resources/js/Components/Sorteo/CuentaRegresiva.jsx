@@ -27,7 +27,7 @@ export default function CuentaRegresiva({ segundos, onComplete }) {
     }, [animando]);
 
     return (
-        <div className="relative flex flex-col items-center justify-center h-[500px] sm:h-[600px] w-full bg-gradient-to-br from-white via-[#e6f8f7] to-white dark:from-black dark:via-[#0a2e2d] dark:to-black transition">
+        <div className="relative flex flex-col items-center justify-center h-[500px] sm:h-[600px] w-full bg-[radial-gradient(circle,_#e6f8f7,_#ffffff)] dark:bg-[radial-gradient(circle,_#0a2e2d,_#000000)] transition">
             {/* Círculo decorativo */}
             <div className="absolute w-72 h-72 sm:w-96 sm:h-96 bg-[#1cc2b5]/10 rounded-full blur-2xl animate-pulse" />
 

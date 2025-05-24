@@ -19,7 +19,7 @@ export default function SorteoCard({ sorteo }) {
                     href={sorteo.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline"
+                    className="text-[#1cc2b5] hover:underline"
                     onClick={(e) => e.stopPropagation()} // Evita que el click en el link dispare el router
                 >
                     {(sorteo.titulo?.length > 100 ? sorteo.titulo.slice(0, 100) + '...' : sorteo.titulo || 'Sin título')}
