@@ -31,13 +31,13 @@ export default function GanadorCard({ nombre, posicion, comentario, likes, fecha
             {/* Contenido */}
             <div className="p-5 space-y-3">
                 {/* Nombre */}
-                <div className="text-lg font-semibold">
+                <div className="text-lg font-semibold text-[#1cc2b5]">
                     {perfilUrl ? (
                         <a
                             href={perfilUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-[#1cc2b5] hover:underline"
+                            className="hover:underline"
                         >
                             {nombre}
                         </a>
@@ -45,6 +45,7 @@ export default function GanadorCard({ nombre, posicion, comentario, likes, fecha
                         nombre
                     )}
                 </div>
+
 
                 {/* Comentario */}
                 {comentario && (

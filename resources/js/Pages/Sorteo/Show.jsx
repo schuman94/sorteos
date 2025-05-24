@@ -27,19 +27,24 @@ export default function Show({ sorteo }) {
             <Head title="Sorteo" />
 
             <div className="max-w-4xl mx-auto py-12 px-4 space-y-8">
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-                    <h2 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white break-words mb-4">
-                        <a
-                            href={sorteo.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-600 hover:underline"
-                        >
-                            {sorteo.titulo}
-                        </a>
-                    </h2>
+                {/* Caja principal estilo SorteoCard */}
+                <div className="rounded-xl shadow-lg overflow-hidden bg-white dark:bg-gray-800">
+                    {/* Cabecera turquesa */}
+                    <div className="bg-[#1cc2b5] px-5 py-2 flex items-center gap-2">
+                        <h2 className="text-lg sm:text-xl font-semibold text-white break-words line-clamp-2">
+                            <a
+                                href={sorteo.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="hover:underline"
+                            >
+                                {sorteo.titulo || 'Sin título'}
+                            </a>
+                        </h2>
+                    </div>
 
-                    <div className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
+                    {/* Detalles */}
+                    <div className="p-5 text-sm text-gray-700 dark:text-gray-300 space-y-2">
                         <p><strong>Fecha:</strong> {ff(sorteo.created_at)}</p>
                         <p><strong>Participantes:</strong> {sorteo.num_participantes}</p>
                         <p><strong>Tipo:</strong> {sorteo.tipo.split('\\').pop()}</p>
@@ -47,7 +52,7 @@ export default function Show({ sorteo }) {
                             <strong>Certificado:</strong>{' '}
                             <a
                                 href={`/certificado/${sorteo.certificado}`}
-                                className="text-blue-600 hover:underline"
+                                className="text-[#1cc2b5] hover:underline"
                                 target="_blank"
                                 rel="noopener noreferrer"
                             >
@@ -59,27 +64,26 @@ export default function Show({ sorteo }) {
 
                 {sorteo.filtro && <Filtro filtro={sorteo.filtro} />}
 
-                <div className="flex flex-col sm:flex-row gap-4">
-                    {isOwner && (
-                        <>
+                {/* Botones de acción */}
+                {isOwner && (
+                    <div className="flex flex-col sm:flex-row gap-4">
+                        {hayGanadoresTitulares && (
                             <button
-                                onClick={() => setConfirmarVisible(true)}
-                                className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded"
+                                onClick={handleEnviarARuleta}
+                                className="bg-[#1cc2b5] hover:bg-[#17b0a6] text-white font-semibold py-2 px-4 rounded transition-colors duration-200 shadow-sm"
                             >
-                                Eliminar sorteo
+                                Enviar a ruleta
                             </button>
+                        )}
 
-                            {hayGanadoresTitulares && (
-                                <button
-                                    onClick={handleEnviarARuleta}
-                                    className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded"
-                                >
-                                    Enviar a ruleta
-                                </button>
-                            )}
-                        </>
-                    )}
-                </div>
+                        <button
+                            onClick={() => setConfirmarVisible(true)}
+                            className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded transition"
+                        >
+                            Eliminar sorteo
+                        </button>
+                    </div>
+                )}
 
                 <Ganadores ganadores={sorteo.ganadores} urlHost={sorteo.urlHost} />
             </div>
