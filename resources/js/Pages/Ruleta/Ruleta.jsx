@@ -29,12 +29,30 @@ export default function Ruleta({ opcionesPrecargadas }) {
         : [{ option: '...' }, { option: '...' }, { option: '...' }];
 
     const coloresDisponibles = [
-        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
-        '#9966FF', '#FF9F40', '#00A878', '#FF5E5B',
-        '#3D348B', '#E4B363', '#2EC4B6', '#E71D36',
-        '#F4D35E', '#0081A7', '#F07167', '#70C1B3',
-        '#9B5DE5', '#00BBF9', '#00F5D4', '#F15BB5',
+        '#1cc2b5', // principal turquesa
+        '#2e2b4a', // violeta oscuro
+        '#FF6384', // rosa fuerte
+        '#36A2EB', // azul claro
+        '#9966FF', // violeta claro
+        '#FF9F40', // naranja
+        '#FF5E5B', // rojo coral
+        '#3D348B', // púrpura intenso
+        '#E4B363', // beige dorado
+        '#E71D36', // rojo oscuro
+        '#F4D35E', // amarillo claro suave
+        '#F07167', // coral claro
+        '#9B5DE5', // morado
+        '#00BBF9', // celeste
+        '#F15BB5', // rosa claro
+        '#227C9D', // azul oscuro
+        '#8D6A9F', // lila oscuro
+        '#61C0BF', // verde pálido
+        '#FFA69E', // rosado pastel
+        '#FFCE56', // amarillo fuerte
     ];
+
+
+
     const backgroundColors = opcionesVisuales.map((_, i) => coloresDisponibles[i % coloresDisponibles.length]);
 
     const [ruletaCargada, setRuletaCargada] = useState(null);
@@ -75,13 +93,14 @@ export default function Ruleta({ opcionesPrecargadas }) {
             <Head title="Ruleta" />
 
             <div className="max-w-6xl mx-auto p-6">
-                <h1 className="text-2xl font-bold mb-8 text-center">
+                <h1 className="text-3xl font-semibold text-gray-900 dark:text-white text-center mb-8">
                     {ruletaCargada ? ruletaCargada.nombre : 'Ruleta aleatoria'}
                 </h1>
 
                 <div className="flex flex-col md:flex-row gap-32 justify-center items-start mb-8">
                     <textarea
-                        className="w-full md:w-64 border rounded p-2 h-[500px] resize-none font-mono overflow-x-auto whitespace-pre text-sm disabled:opacity-50"
+                        className="w-full md:w-64 h-[500px] px-4 py-2 border-[1.5px] border-[#1cc2b5] rounded-md bg-white text-gray-800 text-sm font-mono resize-none overflow-x-auto whitespace-pre disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[#1cc2b5] focus:border-[#1cc2b5]"
+                        value={input}
                         value={input}
                         onChange={(e) => {
                             const valor = e.target.value;
@@ -121,49 +140,50 @@ export default function Ruleta({ opcionesPrecargadas }) {
                         />
 
                         {user ? (
-                            <div className="mt-4 flex gap-4">
+                            <div className="mt-6 flex flex-wrap gap-4 justify-center">
                                 <button
-                                    className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 disabled:opacity-50"
                                     onClick={nuevaRuleta}
                                     disabled={girando}
+                                    className="inline-flex items-center gap-2 px-6 py-2 rounded-md bg-[#1cc2b5] text-white font-semibold hover:bg-[#17b0a6] transition-colors duration-200 shadow-sm disabled:opacity-50"
                                 >
                                     Nueva
                                 </button>
                                 <button
-                                    className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 disabled:opacity-50"
                                     onClick={() => setMostrarModalCargar(true)}
                                     disabled={girando}
+                                    className="inline-flex items-center gap-2 px-6 py-2 rounded-md bg-[#2e2b4a] text-white font-semibold hover:bg-[#403d61] transition-colors duration-200 shadow-sm disabled:opacity-50"
                                 >
                                     Cargar
                                 </button>
                                 <button
-                                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:opacity-50"
                                     onClick={() => setMostrarModalGuardar(true)}
                                     disabled={girando || opciones.length < 1}
+                                    className="inline-flex items-center gap-2 px-6 py-2 rounded-md bg-[#FF6384] text-white font-semibold hover:bg-[#e55072] transition-colors duration-200 shadow-sm disabled:opacity-50"
                                 >
                                     Guardar
                                 </button>
                                 <button
-                                    className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 disabled:opacity-50"
                                     onClick={girarRuleta}
                                     disabled={girando || opciones.length < 2}
+                                    className={`inline-flex items-center justify-center gap-2 px-6 py-2 rounded-md bg-[#36A2EB] text-white font-semibold hover:bg-[#2d8bd3] transition-colors duration-200 shadow-sm disabled:opacity-50`}
                                 >
                                     Girar
                                 </button>
+
                             </div>
-
-
                         ) : (
-                            <div className="mt-4">
+                            <div className="mt-6 text-center">
                                 <button
-                                    className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 disabled:opacity-50"
                                     onClick={girarRuleta}
                                     disabled={girando || opciones.length < 2}
+                                    className={`inline-flex items-center justify-center gap-2 px-6 py-2 rounded-md bg-[#36A2EB] text-white font-semibold hover:bg-[#2d8bd3] transition-colors duration-200 shadow-sm disabled:opacity-50`}
                                 >
                                     Girar
                                 </button>
+
                             </div>
                         )}
+
 
                     </div>
                 </div>

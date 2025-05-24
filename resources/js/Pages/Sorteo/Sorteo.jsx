@@ -6,7 +6,7 @@ import CuentaRegresiva from '@/Components/Sorteo/CuentaRegresiva';
 import axios from '@/lib/axios';
 import { useState, useEffect } from 'react';
 import { Head } from '@inertiajs/react';
-import { SlidersHorizontal, Sparkles } from 'lucide-react';
+import { SlidersHorizontal, Sparkles, ChevronDown } from 'lucide-react';
 import BotonPrimario from '@/Components/Botones/BotonPrimario';
 
 export default function Sorteo({ publicacion }) {
@@ -27,6 +27,7 @@ export default function Sorteo({ publicacion }) {
     const [mostrarGanadores, setMostrarGanadores] = useState(false);
     const [cuentaRegresiva, setCuentaRegresiva] = useState(null);
     const [errores, setErrores] = useState({});
+    const [mostrarOpciones, setMostrarOpciones] = useState(true);
 
     const validarFormulario = () => {
         const erroresTemp = {};
@@ -48,14 +49,10 @@ export default function Sorteo({ publicacion }) {
     }, [cuentaRegresiva]);
 
     const handleChange = (e) => {
-        // Desestructuracion de objeto: declaramos las variables name, type, value y checked y les damos su valor correspondiente del input.
         const { name, type, value, checked } = e.target;
-        // La funcion set creada con useState recibe como parametro un objeto, ya que ese es el tipo de dato de la variable formData.
-        setFormData({ // Forma abreviada de React para indicar el objeto con el valor actualizado.
-            ...formData, // Se crea una copia del objeto
-            [name]: type === 'checkbox' ? checked : value, // y se modifica solo la propiedad que nos interesa mediante una asignación automatica de [clave]: valor.
-            // La variable name contiene el nombre de la propiedad y la variable value contiene el nuevo valor del input.
-            // El operador terciario es por si se trata de un campo de tipo checkbox, en este caso no se asigna value, sino checked.
+        setFormData({
+            ...formData,
+            [name]: type === 'checkbox' ? checked : value,
         });
     };
 
@@ -89,12 +86,28 @@ export default function Sorteo({ publicacion }) {
                         </div>
 
                         <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden mb-8">
-                            <div className="bg-[#1cc2b5] px-6 py-5 flex items-center gap-3">
-                                <SlidersHorizontal className="w-7 h-7 text-white" />
-                                <h2 className="text-3xl font-semibold text-white">Opciones del Sorteo</h2>
+                            {/* Cabecera desplegable */}
+                            <div
+                                className="bg-[#1cc2b5] px-6 py-5 flex items-center justify-between cursor-pointer"
+                                onClick={() => setMostrarOpciones(!mostrarOpciones)}
+                            >
+                                <div className="flex items-center gap-3">
+                                    <SlidersHorizontal className="w-7 h-7 text-white" />
+                                    <h2 className="text-3xl font-semibold text-white">Opciones del Sorteo</h2>
+                                </div>
+                                <ChevronDown
+                                    className={`w-6 h-6 text-white transition-transform ${mostrarOpciones ? 'rotate-180' : 'rotate-0'}`}
+                                />
                             </div>
 
-                            <div className="p-6 space-y-6">
+                            {/* Contenido colapsable */}
+                            <div
+                                className={`transition-opacity transition-transform duration-300 ease-in-out ${mostrarOpciones
+                                        ? 'opacity-100 translate-y-0 pointer-events-auto p-6 space-y-6'
+                                        : 'opacity-0 -translate-y-4 pointer-events-none h-0 overflow-hidden'
+                                    }`}
+                            >
+
                                 <div className="flex flex-col sm:flex-row gap-4">
                                     {[
                                         { id: "num_ganadores", label: "Nº de ganadores", min: 1 },
@@ -120,7 +133,6 @@ export default function Sorteo({ publicacion }) {
                                     ))}
                                 </div>
 
-                                {/* Checkboxes */}
                                 <div className="space-y-3 text-sm text-gray-700 dark:text-gray-300">
                                     {[
                                         { id: "permitir_autores_duplicados", label: "Permitir usuarios duplicados (mismo usuario con comentarios distintos)" },
@@ -150,7 +162,6 @@ export default function Sorteo({ publicacion }) {
                                     ))}
                                 </div>
 
-                                {/* Hashtag */}
                                 <div>
                                     <label htmlFor="hashtag" className="block mb-1 font-medium text-gray-700 dark:text-gray-300">
                                         Filtrar por palabra o #hashtag
@@ -166,7 +177,6 @@ export default function Sorteo({ publicacion }) {
                                     />
                                 </div>
 
-                                {/* Textareas */}
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                     {[
                                         { id: "participantes_manuales", label: "Añadir participantes", placeholder: "Lista de participantes manuales..." },
@@ -188,7 +198,6 @@ export default function Sorteo({ publicacion }) {
                                     ))}
                                 </div>
 
-                                {/* Botón */}
                                 <div className="flex justify-center">
                                     <BotonPrimario onClick={iniciarSorteo} disabled={cargando} className="mt-4 flex items-center justify-center gap-2">
                                         <Sparkles className="w-4 h-4" />
