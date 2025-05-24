@@ -60,7 +60,7 @@ export default function Home() {
                         </div>
                         <h1 className="text-4xl font-bold text-gray-900 dark:text-white">Sorteo en redes</h1>
                         <p className="max-w-xl text-base text-gray-600 dark:text-gray-400">
-                            Elige un ganador entre los comentarios de un video/short de <strong>YouTube</strong> o un post de <strong>Bluesky</strong>. Próximamente disponible para posts de <strong>Instagram</strong>.
+                            Elige un ganador entre los comentarios de un video/short de <strong>YouTube</strong> o un post de <strong>BlueSky</strong>. Próximamente disponible para posts de <strong>Instagram</strong>.
                         </p>
                     </div>
 
