@@ -103,14 +103,10 @@ export default function MainLayout({ header, children }) {
                                             <User className="w-4 h-4 mr-2 inline" />
                                             Perfil
                                         </Dropdown.Link>
-                                        <Dropdown.Link href={route('dashboard')}>
-                                            <LayoutDashboard className="w-4 h-4 mr-2 inline" />
-                                            Dashboard
-                                        </Dropdown.Link>
                                         {user.is_admin && (
                                             <Dropdown.Link href={route('admin.users.index')}>
                                                 <LayoutDashboard className="w-4 h-4 mr-2 inline" />
-                                                Panel de Administración
+                                                Administración
                                             </Dropdown.Link>
                                         )}
                                         <Dropdown.Link method="post" href={route('logout')} as="button">
@@ -121,14 +117,23 @@ export default function MainLayout({ header, children }) {
                                 </Dropdown>
                             ) : (
                                 <>
-                                    <Link href={route('login')} className="px-4 py-2 text-sm text-white hover:text-gray-300">
+                                    <Link
+                                        href={route('login')}
+                                        className="px-4 py-2 text-sm text-white border border-white rounded hover:bg-white hover:text-black transition"
+                                    >
                                         <LogIn className="w-4 h-4 inline-block mr-1" />
                                         Iniciar sesión
                                     </Link>
-                                    <Link href={route('register')} className="px-4 py-2 text-sm bg-white text-black rounded hover:bg-gray-200">
+
+                                    <Link
+                                        href={route('register')}
+                                        className="px-4 py-2 text-sm text-white border border-white rounded hover:bg-white hover:text-black transition"
+                                    >
                                         <UserPlus className="w-4 h-4 inline-block mr-1" />
                                         Registrarse
                                     </Link>
+
+
                                 </>
                             )}
                         </div>
@@ -170,9 +175,6 @@ export default function MainLayout({ header, children }) {
 
                                 <ResponsiveNavLink href={route('profile.edit')} active={route().current('profile.edit')}>
                                     Perfil
-                                </ResponsiveNavLink>
-                                <ResponsiveNavLink href={route('dashboard')} active={route().current('dashboard')}>
-                                    Dashboard
                                 </ResponsiveNavLink>
                                 {user?.is_admin && (
                                     <ResponsiveNavLink href={route('admin.users.index')} active={route().current('admin.users.index')}>

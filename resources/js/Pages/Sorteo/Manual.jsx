@@ -4,6 +4,7 @@ import CuentaRegresiva from '@/Components/Sorteo/CuentaRegresiva';
 import axios from '@/lib/axios';
 import { useState, useEffect } from 'react';
 import { Head } from '@inertiajs/react';
+import { ScrollText, Gift } from 'lucide-react';
 
 export default function Manual() {
     const [formData, setFormData] = useState({
@@ -26,10 +27,8 @@ export default function Manual() {
             const timer = setTimeout(() => {
                 setCuentaRegresiva(cuentaRegresiva - 1);
             }, 1000);
-
             return () => clearTimeout(timer);
         }
-
         if (cuentaRegresiva === 0) {
             setMostrarGanadores(true);
         }
@@ -58,27 +57,13 @@ export default function Manual() {
 
     const validarFormulario = () => {
         const erroresTemp = {};
+        if (!formData.nombre.trim()) erroresTemp.nombre = 'El nombre del sorteo es obligatorio.';
+        if (formData.num_ganadores < 1) erroresTemp.num_ganadores = 'Debe haber al menos un ganador.';
+        if (formData.num_suplentes < 0) erroresTemp.num_suplentes = 'El número de suplentes no puede ser negativo.';
+        if (formData.cuenta_regresiva < 3 || formData.cuenta_regresiva > 15) erroresTemp.cuenta_regresiva = 'La cuenta atrás debe estar entre 3 y 15 segundos.';
 
-        if (!formData.nombre.trim()) {
-            erroresTemp.nombre = 'El nombre del sorteo es obligatorio.';
-        }
-
-        if (formData.num_ganadores < 1) {
-            erroresTemp.num_ganadores = 'Debe haber al menos un ganador.';
-        }
-
-        if (formData.num_suplentes < 0) {
-            erroresTemp.num_suplentes = 'El número de suplentes no puede ser negativo.';
-        }
-
-        if (formData.cuenta_regresiva < 3 || formData.cuenta_regresiva > 15) {
-            erroresTemp.cuenta_regresiva = 'La cuenta atrás debe estar entre 3 y 15 segundos.';
-        }
-
-        const suplentes = parseInt(formData.num_suplentes);
-        const totalGanadores = parseInt(formData.num_ganadores) + (suplentes > 0 ? suplentes : 0);
+        const totalGanadores = parseInt(formData.num_ganadores) + parseInt(formData.num_suplentes);
         const totalParticipantes = contarParticipantes();
-
         if (totalGanadores > totalParticipantes) {
             erroresTemp.participantes = `Hay ${totalParticipantes} participantes pero se requieren al menos ${totalGanadores}.`;
         }
@@ -109,79 +94,62 @@ export default function Manual() {
             <Head title="Sorteo Manual" />
             <div className="min-h-screen bg-gray-50 dark:bg-black text-black/70 dark:text-white/70 py-16 px-4">
                 {!ganadores ? (
-                    <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 p-6 rounded shadow mb-8">
-                        <h2 className="text-2xl font-semibold mb-4">Sorteo Manual</h2>
-
-                        <div className="mb-6">
-                            <label htmlFor="nombre" className="block mb-1 font-medium">
-                                Nombre del sorteo
-                            </label>
-                            <input
-                                type="text"
-                                name="nombre"
-                                id="nombre"
-                                value={formData.nombre}
-                                onChange={handleChange}
-                                className="input w-full"
-                                placeholder="Nombre del sorteo"
-                            />
-                            {errores.nombre && <p className="text-red-600 text-sm mt-1">{errores.nombre}</p>}
+                    <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+                        {/* Header con fondo y título */}
+                        <div className="bg-[#1cc2b5] px-6 py-5 flex items-center gap-3">
+                            <ScrollText className="w-8 h-8 text-white" />
+                            <h2 className="text-3xl font-semibold text-white">Sorteo Manual</h2>
                         </div>
 
-                        <div className="max-w-3xl mx-auto grid gap-6">
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                                <div>
-                                    <label htmlFor="num_ganadores" className="block mb-1 font-medium whitespace-nowrap">
-                                        Nº de ganadores
-                                    </label>
-                                    <input
-                                        type="number"
-                                        name="num_ganadores"
-                                        id="num_ganadores"
-                                        min={1}
-                                        value={formData.num_ganadores}
-                                        onChange={handleChange}
-                                        className="input w-full"
-                                    />
-                                    {errores.num_ganadores && <p className="text-red-600 text-sm mt-1">{errores.num_ganadores}</p>}
-                                </div>
-
-                                <div>
-                                    <label htmlFor="num_suplentes" className="block mb-1 font-medium whitespace-nowrap">
-                                        Nº de suplentes
-                                    </label>
-                                    <input
-                                        type="number"
-                                        name="num_suplentes"
-                                        id="num_suplentes"
-                                        min={0}
-                                        value={formData.num_suplentes}
-                                        onChange={handleChange}
-                                        className="input w-full"
-                                    />
-                                    {errores.num_suplentes && <p className="text-red-600 text-sm mt-1">{errores.num_suplentes}</p>}
-                                </div>
-
-                                <div>
-                                    <label htmlFor="cuenta_regresiva" className="block mb-1 font-medium whitespace-nowrap">
-                                        Cuenta atrás
-                                    </label>
-                                    <input
-                                        type="number"
-                                        name="cuenta_regresiva"
-                                        id="cuenta_regresiva"
-                                        min={3}
-                                        max={15}
-                                        value={formData.cuenta_regresiva || 5}
-                                        onChange={handleChange}
-                                        className="input w-full"
-                                    />
-                                    {errores.cuenta_regresiva && <p className="text-red-600 text-sm mt-1">{errores.cuenta_regresiva}</p>}
-                                </div>
+                        <div className="p-6 space-y-6">
+                            {/* Campo nombre */}
+                            <div>
+                                <label htmlFor="nombre" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Nombre del sorteo
+                                </label>
+                                <input
+                                    type="text"
+                                    name="nombre"
+                                    id="nombre"
+                                    value={formData.nombre}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-2 border-[1.5px] border-[#1cc2b5] rounded-md bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1cc2b5]"
+                                    placeholder="Nombre del sorteo"
+                                />
+                                {errores.nombre && <p className="text-red-600 text-sm mt-1">{errores.nombre}</p>}
                             </div>
 
+
+
+                            {/* Campos numéricos */}
+                            <div className="flex flex-col sm:flex-row gap-4">
+                                {[
+                                    { id: "num_ganadores", label: "Nº de ganadores", min: 1 },
+                                    { id: "num_suplentes", label: "Nº de suplentes", min: 0 },
+                                    { id: "cuenta_regresiva", label: "Cuenta atrás", min: 3, max: 15 }
+                                ].map((field, i) => (
+                                    <div className="flex-1" key={i}>
+                                        <label htmlFor={field.id} className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                            {field.label}
+                                        </label>
+                                        <input
+                                            type="number"
+                                            name={field.id}
+                                            id={field.id}
+                                            min={field.min}
+                                            max={field.max}
+                                            value={formData[field.id]}
+                                            onChange={handleChange}
+                                            className="w-full px-4 py-2 border border-[#1cc2b5] rounded-md bg-white text-gray-800 focus:ring-2 focus:ring-[#1cc2b5]"
+                                        />
+                                        {errores[field.id] && <p className="text-red-600 text-sm mt-1">{errores[field.id]}</p>}
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Participantes */}
                             <div>
-                                <label htmlFor="participantes" className="block mb-1 font-medium">
+                                <label htmlFor="participantes" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                     Participantes
                                 </label>
                                 <textarea
@@ -190,32 +158,48 @@ export default function Manual() {
                                     placeholder="Un nombre por línea"
                                     value={formData.participantes}
                                     onChange={handleChange}
-                                    className="input w-full min-h-[140px] resize-y"
+                                    className="w-full px-4 py-2 border border-[#1cc2b5] rounded-md bg-white text-gray-800 min-h-[140px] resize-y focus:outline-none focus:ring-2 focus:ring-[#1cc2b5]"
                                 />
                                 {errores.participantes && <p className="text-red-600 text-sm mt-1">{errores.participantes}</p>}
                             </div>
 
-                            <div className="text-sm text-gray-700 dark:text-gray-300">
-                                <label className="flex items-center gap-2">
-                                    <input
-                                        type="checkbox"
-                                        name="eliminar_duplicados"
-                                        id="eliminar_duplicados"
-                                        checked={formData.eliminar_duplicados}
-                                        onChange={handleChange}
-                                    />
-                                    Eliminar nombres duplicados
-                                </label>
+                            {/* Checkbox */}
+                            <label className="flex items-center gap-3 text-sm text-gray-700 dark:text-gray-300 cursor-pointer select-none">
+                                <input
+                                    type="checkbox"
+                                    name="eliminar_duplicados"
+                                    checked={formData.eliminar_duplicados}
+                                    onChange={handleChange}
+                                    className="sr-only"
+                                    id="eliminar_duplicados"
+                                />
+                                <div
+                                    className={`w-5 h-5 flex items-center justify-center rounded-md border transition
+            ${formData.eliminar_duplicados ? 'bg-[#1cc2b5] border-[#1cc2b5]' : 'border-[#1cc2b5] bg-white'}
+        `}
+                                >
+                                    {formData.eliminar_duplicados && (
+                                        <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    )}
+                                </div>
+                                <span>Eliminar nombres duplicados</span>
+                            </label>
+
+
+                            {/* Botón */}
+                            <div className="flex justify-center">
+                                <button
+                                    onClick={iniciarSorteo}
+                                    disabled={cargando}
+                                    className="mt-4 px-6 py-2 bg-[#1cc2b5] text-white rounded-md hover:bg-[#17b0a6] transition flex items-center justify-center gap-2"
+                                >
+                                    <Gift className="w-4 h-4" />
+                                    {cargando ? 'Iniciando...' : 'Iniciar Sorteo'}
+                                </button>
                             </div>
                         </div>
-
-                        <button
-                            onClick={iniciarSorteo}
-                            disabled={cargando}
-                            className="mt-4 px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
-                        >
-                            {cargando ? 'Iniciando...' : 'Iniciar Sorteo'}
-                        </button>
                     </div>
                 ) : !mostrarGanadores ? (
                     <CuentaRegresiva
