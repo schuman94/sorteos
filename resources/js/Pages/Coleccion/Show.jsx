@@ -179,7 +179,7 @@ export default function Show({ coleccion, urls }) {
                     <td className="border-t border-gray-200 px-3 py-2">
                         <Link
                             href={route('premios.show', p.id)}
-                            className="text-[#1cc2b5] underline hover:text-[#17b0a6]"
+                             className="text-blue-600 underline hover:text-blue-800"
                         >
                             {p.nombre}
                         </Link>

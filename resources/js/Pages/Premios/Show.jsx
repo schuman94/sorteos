@@ -2,8 +2,11 @@ import MainLayout from '@/Layouts/MainLayout';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import ModalEliminacion from '@/Components/ModalEliminacion';
-import { formatearDinero as dinero} from '@/utils/dinero';
+import { formatearDinero as dinero } from '@/utils/dinero';
 import { formatearFecha as ff } from '@/utils/fecha';
+import BotonPrimario from '@/Components/Botones/BotonPrimario';
+import BotonRojo from '@/Components/Botones/BotonRojo';
+import { Gift } from 'lucide-react';
 
 export default function Show({ premio }) {
     const { errors } = usePage().props;
@@ -26,27 +29,32 @@ export default function Show({ premio }) {
         <>
             <Head title={`Premio: ${premio.nombre}`} />
 
-            <div className="max-w-4xl mx-auto py-12 px-4 space-y-6">
-                {/* Botón superior derecho */}
-                <div className="flex justify-between items-center">
-                    <h1 className="text-3xl font-bold">{premio.nombre}</h1>
+            <div className="max-w-3xl mx-auto mt-12 bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+                {/* Cabecera */}
+                <div className="bg-[#1cc2b5] px-6 py-4 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <Gift className="w-6 h-6 text-white" />
+                        <h1 className="text-xl font-semibold text-white break-all">
+                            {premio.nombre}
+                        </h1>
+                    </div>
 
                     <Link
                         href={route('premios.index')}
-                        className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition"
+                        className="inline-block text-white font-medium text-sm hover:underline"
                     >
                         Gestionar premios
                     </Link>
                 </div>
 
-                {errorEliminar && (
-                    <div className="bg-red-100 text-red-700 px-4 py-2 rounded border border-red-300 text-sm">
-                        {errorEliminar}
-                    </div>
-                )}
+                {/* Cuerpo */}
+                <div className="p-6 space-y-4 text-sm text-gray-800 dark:text-gray-200">
+                    {errorEliminar && (
+                        <div className="bg-red-100 text-red-700 px-4 py-2 rounded border border-red-300 text-sm">
+                            {errorEliminar}
+                        </div>
+                    )}
 
-                {/* Recuadro de información con botones al final */}
-                <div className="bg-white dark:bg-gray-800 shadow rounded p-6 space-y-4 text-sm">
                     <div>
                         <span className="font-semibold">Proveedor:</span> {premio.proveedor}
                     </div>
@@ -55,14 +63,16 @@ export default function Show({ premio }) {
                     </div>
                     <div>
                         <span className="font-semibold">Descripción:</span>{' '}
-                        {premio.descripcion || <span className="italic text-gray-400">Sin descripción</span>}
+                        {premio.descripcion || (
+                            <span className="italic text-gray-400">Sin descripción</span>
+                        )}
                     </div>
                     <div>
                         <span className="font-semibold">Link:</span>{' '}
                         {premio.link ? (
                             <a
                                 href={premio.link}
-                                className="text-blue-600 underline"
+                                className="text-[#1cc2b5] underline hover:text-[#17b0a6]"
                                 target="_blank"
                                 rel="noopener noreferrer"
                             >
@@ -73,24 +83,21 @@ export default function Show({ premio }) {
                         )}
                     </div>
                     <div>
-                        <span className="font-semibold">Creado:</span>{' '}
-                        {ff(premio.created_at)}
+                        <span className="font-semibold">Creado:</span> {ff(premio.created_at)}
                     </div>
 
-                    {/* Botones de acción dentro del recuadro */}
-                    <div className="flex gap-2 pt-4 border-t">
+                    {/* Botones */}
+                    <div className="pt-4 border-t flex gap-4">
                         <Link
                             href={route('premios.edit', premio.id)}
-                            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+                            className="inline-flex items-center justify-center gap-2 px-6 py-2 rounded-md bg-[#1cc2b5] text-white font-semibold hover:bg-[#17b0a6] shadow-sm active:scale-95 transition-transform duration-100 ease-in-out"
                         >
                             Editar
                         </Link>
-                        <button
-                            onClick={() => setModalVisible(true)}
-                            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
-                        >
+
+                        <BotonRojo onClick={() => setModalVisible(true)}>
                             Eliminar
-                        </button>
+                        </BotonRojo>
                     </div>
                 </div>
             </div>
