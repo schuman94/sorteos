@@ -2,6 +2,8 @@ import MainLayout from '@/Layouts/MainLayout';
 import { Head, router } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import Paginacion from '@/Components/Paginacion';
+import BotonPrimario from '@/Components/Botones/BotonPrimario';
+import BotonAzul from '@/Components/Botones/BotonAzul';
 
 export default function Index({ colecciones, filters }) {
     const [search, setSearch] = useState(filters?.search || '');
@@ -25,36 +27,15 @@ export default function Index({ colecciones, filters }) {
 
             <div className="max-w-5xl mx-auto py-12 px-4 space-y-10">
                 <h1 className="text-2xl font-semibold">Rascas</h1>
-
-                {/* Acciones del usuario común */}
                 <div>
                     <div className="flex flex-wrap gap-4 mb-6">
-                        <button
-                            onClick={() => router.visit(route('rascas.premiados'))}
-                            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-                        >
-                            Mis rascas premiados
-                        </button>
-                    </div>
-                </div>
-
-                {/* Acciones para creadores/influencers */}
-                <div>
-                    <h2 className="text-lg font-medium text-gray-700 mb-2">Colecciones de rascas</h2>
-                    <div className="flex flex-wrap gap-4 mb-6">
-                        <button
-                            onClick={() => router.visit(route('colecciones.create'))}
-                            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                        >
+                        <BotonPrimario onClick={() => router.visit(route('colecciones.create'))}>
                             Crear Colección
-                        </button>
+                        </BotonPrimario>
 
-                        <button
-                            onClick={() => router.visit(route('premios.index'))}
-                            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                        >
+                        <BotonAzul onClick={() => router.visit(route('premios.index'))}>
                             Gestionar premios
-                        </button>
+                        </BotonAzul>
                     </div>
                 </div>
 
@@ -65,9 +46,11 @@ export default function Index({ colecciones, filters }) {
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         placeholder="Buscar por nombre..."
-                        className="input w-full max-w-md"
+                        className="w-full max-w-md px-4 py-2 border-[1.5px] border-[#1cc2b5] rounded-md bg-white text-gray-800
+                   focus:outline-none focus:ring-2 focus:ring-[#1cc2b5] focus:border-[#1cc2b5]"
                     />
                 </div>
+
 
                 {colecciones.data.length > 0 ? (
                     <>

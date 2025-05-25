@@ -2,11 +2,14 @@ import MainLayout from '@/Layouts/MainLayout';
 import ModalGuardarRuleta from '@/Components/Ruleta/ModalGuardarRuleta';
 import ModalCargarRuleta from '@/Components/Ruleta/ModalCargarRuleta';
 import ModalGanador from '@/Components/Ruleta/ModalGanador';
-import axios from '@/lib/axios';
 import { useState } from 'react';
 import { Head, usePage } from '@inertiajs/react';
 import { Wheel } from 'react-custom-roulette';
 import { jsonToWheel, jsonToText } from '@/utils/ruleta';
+import BotonOscuro from '@/Components/Botones/BotonOscuro';
+import BotonPrimario from '@/Components/Botones/BotonPrimario';
+import BotonAzul from '@/Components/Botones/BotonAzul';
+import BotonRosa from '@/Components/Botones/BotonRosa';
 
 export default function Ruleta({ opcionesPrecargadas }) {
     const user = usePage().props.auth?.user;
@@ -101,7 +104,6 @@ export default function Ruleta({ opcionesPrecargadas }) {
                     <textarea
                         className="w-full md:w-64 h-[500px] px-4 py-2 border-[1.5px] border-[#1cc2b5] rounded-md bg-white text-gray-800 text-sm font-mono resize-none overflow-x-auto whitespace-pre disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[#1cc2b5] focus:border-[#1cc2b5]"
                         value={input}
-                        value={input}
                         onChange={(e) => {
                             const valor = e.target.value;
                             setInput(valor);
@@ -141,49 +143,29 @@ export default function Ruleta({ opcionesPrecargadas }) {
 
                         {user ? (
                             <div className="mt-6 flex flex-wrap gap-4 justify-center">
-                                <button
-                                    onClick={nuevaRuleta}
-                                    disabled={girando}
-                                    className="inline-flex items-center gap-2 px-6 py-2 rounded-md bg-[#2e2b4a] text-white font-semibold hover:bg-[#403d61] transition-colors duration-200 shadow-sm disabled:opacity-50"
-                                >
+                                <BotonOscuro onClick={nuevaRuleta} disabled={girando}>
                                     Nueva
-                                </button>
-                                <button
-                                    onClick={() => setMostrarModalCargar(true)}
-                                    disabled={girando}
-                                    className="inline-flex items-center gap-2 px-6 py-2 rounded-md bg-[#1cc2b5] text-white font-semibold hover:bg-[#17b0a6] transition-colors duration-200 shadow-sm disabled:opacity-50"
-                                >
-                                    Cargar
-                                </button>
-                                <button
-                                    onClick={() => setMostrarModalGuardar(true)}
-                                    disabled={girando || opciones.length < 1}
-                                    className={`inline-flex items-center justify-center gap-2 px-6 py-2 rounded-md bg-[#36A2EB] text-white font-semibold hover:bg-[#2d8bd3] transition-colors duration-200 shadow-sm disabled:opacity-50`}
-                                >
-                                    Guardar
-                                </button>
-                                <button
-                                    onClick={girarRuleta}
-                                    disabled={girando || opciones.length < 2}
-                                    className="inline-flex items-center gap-2 px-6 py-2 rounded-md bg-[#FF6384] text-white font-semibold hover:bg-[#e55072] transition-colors duration-200 shadow-sm disabled:opacity-50"
-                                >
-                                    Girar
-                                </button>
+                                </BotonOscuro>
 
+                                <BotonPrimario onClick={() => setMostrarModalCargar(true)} disabled={girando}>
+                                    Cargar
+                                </BotonPrimario>
+
+                                <BotonAzul onClick={() => setMostrarModalGuardar(true)} disabled={girando || opciones.length < 1}>
+                                    Guardar
+                                </BotonAzul>
+
+                                <BotonRosa onClick={girarRuleta} disabled={girando || opciones.length < 2}>
+                                    Girar
+                                </BotonRosa>
                             </div>
                         ) : (
                             <div className="mt-6 text-center">
-                                <button
-                                    onClick={girarRuleta}
-                                    disabled={girando || opciones.length < 2}
-                                    className={`inline-flex items-center justify-center gap-2 px-6 py-2 rounded-md bg-[#36A2EB] text-white font-semibold hover:bg-[#2d8bd3] transition-colors duration-200 shadow-sm disabled:opacity-50`}
-                                >
+                                <BotonPrimario onClick={girarRuleta} disabled={girando || opciones.length < 2}>
                                     Girar
-                                </button>
-
+                                </BotonPrimario>
                             </div>
                         )}
-
 
                     </div>
                 </div>

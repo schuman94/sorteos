@@ -93,8 +93,10 @@ export default function ModalCargarRuleta({ visible, onClose, onSeleccionar, rul
                         setPagina(1); // Volver a primera página
                     }}
                     placeholder="Buscar por nombre..."
-                    className="w-full border rounded px-3 py-2 mb-4"
+                    className="w-full px-4 py-2 border-[1.5px] border-[#1cc2b5] rounded-md bg-white text-gray-800 mb-4
+               focus:outline-none focus:ring-2 focus:ring-[#1cc2b5] focus:border-[#1cc2b5]"
                 />
+
 
                 {cargando && <p className="text-gray-600">Cargando ruletas...</p>}
                 {error && <p className="text-red-600">{error}</p>}
