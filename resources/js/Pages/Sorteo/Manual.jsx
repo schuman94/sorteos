@@ -6,6 +6,10 @@ import { useState, useEffect } from 'react';
 import { Head } from '@inertiajs/react';
 import { ScrollText, Gift } from 'lucide-react';
 import BotonPrimario from '@/Components/Botones/BotonPrimario';
+import Checkbox from '@/Components/Checkbox';
+import Confetti from 'react-confetti';
+import { useWindowSize } from '@react-hook/window-size';
+
 
 export default function Manual() {
     const [formData, setFormData] = useState({
@@ -23,6 +27,9 @@ export default function Manual() {
     const [mostrarGanadores, setMostrarGanadores] = useState(false);
     const [cuentaRegresiva, setCuentaRegresiva] = useState(null);
 
+    const [mostrarConfetti, setMostrarConfetti] = useState(false);
+    const [width, height] = useWindowSize();
+
     useEffect(() => {
         if (cuentaRegresiva !== null && cuentaRegresiva > 0) {
             const timer = setTimeout(() => {
@@ -31,9 +38,11 @@ export default function Manual() {
             return () => clearTimeout(timer);
         }
         if (cuentaRegresiva === 0) {
+            setMostrarConfetti(true);
             setMostrarGanadores(true);
         }
     }, [cuentaRegresiva]);
+
 
     const handleChange = (e) => {
         const { name, type, value, checked } = e.target;
@@ -93,6 +102,7 @@ export default function Manual() {
     return (
         <>
             <Head title="Sorteo Manual" />
+            {mostrarConfetti && <Confetti width={width} height={height} />}
             <div className="min-h-screen bg-gray-50 dark:bg-black text-black/70 dark:text-white/70 py-16 px-4">
                 {!ganadores ? (
                     <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
@@ -172,25 +182,11 @@ export default function Manual() {
 
                             {/* Checkbox */}
                             <label className="flex items-center gap-3 text-sm text-gray-700 dark:text-gray-300 cursor-pointer select-none">
-                                <input
-                                    type="checkbox"
+                                <Checkbox
                                     name="eliminar_duplicados"
                                     checked={formData.eliminar_duplicados}
                                     onChange={handleChange}
-                                    className="sr-only"
-                                    id="eliminar_duplicados"
                                 />
-                                <div
-                                    className={`w-5 h-5 flex items-center justify-center rounded-md border transition
-            ${formData.eliminar_duplicados ? 'bg-[#1cc2b5] border-[#1cc2b5]' : 'border-[#1cc2b5] bg-white'}
-        `}
-                                >
-                                    {formData.eliminar_duplicados && (
-                                        <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                        </svg>
-                                    )}
-                                </div>
                                 <span>Eliminar nombres duplicados</span>
                             </label>
 

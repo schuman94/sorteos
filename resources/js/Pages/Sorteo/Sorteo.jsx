@@ -8,6 +8,9 @@ import { useState, useEffect } from 'react';
 import { Head } from '@inertiajs/react';
 import { SlidersHorizontal, Sparkles, ChevronDown } from 'lucide-react';
 import BotonPrimario from '@/Components/Botones/BotonPrimario';
+import Checkbox from '@/Components/Checkbox';
+import Confetti from 'react-confetti';
+import { useWindowSize } from '@react-hook/window-size';
 
 export default function Sorteo({ publicacion }) {
     const [formData, setFormData] = useState({
@@ -29,6 +32,9 @@ export default function Sorteo({ publicacion }) {
     const [errores, setErrores] = useState({});
     const [mostrarOpciones, setMostrarOpciones] = useState(true);
 
+    const [mostrarConfetti, setMostrarConfetti] = useState(false);
+    const [width, height] = useWindowSize();
+
     const validarFormulario = () => {
         const erroresTemp = {};
         if (formData.num_ganadores < 1) erroresTemp.num_ganadores = 'Debe haber al menos un ganador.';
@@ -45,7 +51,10 @@ export default function Sorteo({ publicacion }) {
             }, 1000);
             return () => clearTimeout(timer);
         }
-        if (cuentaRegresiva === 0) setMostrarGanadores(true);
+        if (cuentaRegresiva === 0) {
+            setMostrarConfetti(true);
+            setMostrarGanadores(true);
+        }
     }, [cuentaRegresiva]);
 
     const handleChange = (e) => {
@@ -78,6 +87,7 @@ export default function Sorteo({ publicacion }) {
     return (
         <>
             <Head title="Sorteo" />
+            {mostrarConfetti && <Confetti width={width} height={height} />}
             <div className="min-h-screen bg-gray-50 dark:bg-black text-black/70 dark:text-white/70 py-16 px-4">
                 {!ganadores ? (
                     <>
@@ -103,8 +113,8 @@ export default function Sorteo({ publicacion }) {
                             {/* Contenido colapsable */}
                             <div
                                 className={`transition-opacity transition-transform duration-300 ease-in-out ${mostrarOpciones
-                                        ? 'opacity-100 translate-y-0 pointer-events-auto p-6 space-y-6'
-                                        : 'opacity-0 -translate-y-4 pointer-events-none h-0 overflow-hidden'
+                                    ? 'opacity-100 translate-y-0 pointer-events-auto p-6 space-y-6'
+                                    : 'opacity-0 -translate-y-4 pointer-events-none h-0 overflow-hidden'
                                     }`}
                             >
 
@@ -139,28 +149,16 @@ export default function Sorteo({ publicacion }) {
                                         { id: "mencion", label: "Solo comentarios que mencionen a un amigo" }
                                     ].map((field, i) => (
                                         <label key={i} className="flex items-center gap-3 cursor-pointer select-none">
-                                            <input
-                                                type="checkbox"
+                                            <Checkbox
                                                 name={field.id}
                                                 checked={formData[field.id]}
                                                 onChange={handleChange}
-                                                className="sr-only"
                                             />
-                                            <div
-                                                className={`w-5 h-5 flex items-center justify-center rounded-md border transition
-                                                    ${formData[field.id] ? 'bg-[#1cc2b5] border-[#1cc2b5]' : 'border-[#1cc2b5] bg-white'}
-                                                `}
-                                            >
-                                                {formData[field.id] && (
-                                                    <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                                    </svg>
-                                                )}
-                                            </div>
                                             <span>{field.label}</span>
                                         </label>
                                     ))}
                                 </div>
+
 
                                 <div>
                                     <label htmlFor="hashtag" className="block mb-1 font-medium text-gray-700 dark:text-gray-300">

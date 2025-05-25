@@ -21,8 +21,10 @@
         "vite": "^6.0.11"
     },
     "dependencies": {
+        "@react-hook/window-size": "^3.1.1",
         "@tanstack/react-table": "^8.21.3",
         "lucide-react": "^0.510.0",
+        "react-confetti": "^6.4.0",
         "react-custom-roulette": "^1.4.1"
     }
 }
