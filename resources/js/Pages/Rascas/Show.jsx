@@ -84,7 +84,7 @@ export default function Show({ rasca }) {
                         <button
                             onClick={handleRascar}
                             disabled={processing}
-                            className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold px-6 py-3 rounded-full text-lg shadow transition"
+                            className="z hover:bg-yellow-600 text-white font-bold px-6 py-3 rounded-full text-lg shadow transition"
                         >
                             {processing ? 'Rascando...' : '✨ Rascar ✨'}
                         </button>

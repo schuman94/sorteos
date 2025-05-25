@@ -9,7 +9,7 @@ export default function FiltroHistorial({ anyoSeleccionado, tipoSeleccionado, an
                     name="anyo"
                     value={anyoSeleccionado || ''}
                     onChange={onChange}
-                    className="rounded border-gray-300 text-sm shadow-sm"
+                    className="rounded border-gray-300 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1cc2b5] focus:border-[#1cc2b5]"
                 >
                     {anyos.map((a) => (
                         <option key={a} value={a}>
@@ -23,7 +23,7 @@ export default function FiltroHistorial({ anyoSeleccionado, tipoSeleccionado, an
                     name="tipo"
                     value={tipoSeleccionado || ''}
                     onChange={onChange}
-                    className="rounded border-gray-300 text-sm shadow-sm"
+                    className="rounded border-gray-300 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1cc2b5] focus:border-[#1cc2b5]"
                 >
                     <option value="">Todos</option>
                     <option value="manual">Manual</option>

@@ -3,6 +3,9 @@ import Paginacion from '@/Components/Paginacion';
 import axios from '@/lib/axios';
 import { useEffect, useState } from 'react';
 import { formatearFecha as ff } from '@/utils/fecha';
+import BotonPrimario from '@/Components/Botones/BotonPrimario';
+import BotonGris from '@/Components/Botones/BotonGris';
+import BotonRojo from '@/Components/Botones/BotonRojo';
 
 export default function ModalCargarRuleta({ visible, onClose, onSeleccionar, ruletaCargadaId, onEliminarActual }) {
     const [ruletas, setRuletas] = useState([]); // Ruletas actuales de la página
@@ -77,12 +80,9 @@ export default function ModalCargarRuleta({ visible, onClose, onSeleccionar, rul
             <div className="bg-white rounded-lg p-6 w-full max-w-4xl shadow-lg max-h-[90vh] overflow-y-auto min-h-[500px]">
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-xl font-semibold">Mis ruletas</h2>
-                    <button
-                        onClick={onClose}
-                        className="px-4 py-1 bg-gray-400 text-white rounded hover:bg-gray-500 text-sm"
-                    >
+                    <BotonGris onClick={onClose} className="text-sm px-4 py-1">
                         Cancelar
-                    </button>
+                    </BotonGris>
                 </div>
 
                 <input
@@ -93,8 +93,10 @@ export default function ModalCargarRuleta({ visible, onClose, onSeleccionar, rul
                         setPagina(1); // Volver a primera página
                     }}
                     placeholder="Buscar por nombre..."
-                    className="w-full border rounded px-3 py-2 mb-4"
+                    className="w-full px-4 py-2 border-[1.5px] border-[#1cc2b5] rounded-md bg-white text-gray-800 mb-4
+               focus:outline-none focus:ring-2 focus:ring-[#1cc2b5] focus:border-[#1cc2b5]"
                 />
+
 
                 {cargando && <p className="text-gray-600">Cargando ruletas...</p>}
                 {error && <p className="text-red-600">{error}</p>}
@@ -110,21 +112,22 @@ export default function ModalCargarRuleta({ visible, onClose, onSeleccionar, rul
                                         </h3>
                                         <p className="text-xs text-gray-500">{ff(ruleta.created_at)}</p>
                                         <div className="mt-2 flex justify-end gap-2">
-                                            <button
+                                            <BotonPrimario
                                                 onClick={() => {
                                                     onSeleccionar(ruleta);
                                                     onClose();
                                                 }}
-                                                className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                                className="px-3 py-1"
                                             >
                                                 Cargar
-                                            </button>
-                                            <button
+                                            </BotonPrimario>
+                                            <BotonRojo
                                                 onClick={() => confirmarEliminar(ruleta)}
-                                                className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                                                className="px-3 py-1"
                                             >
                                                 Eliminar
-                                            </button>
+                                            </BotonRojo>
+
                                         </div>
                                     </div>
                                 ))}

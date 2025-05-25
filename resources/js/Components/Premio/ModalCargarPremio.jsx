@@ -2,7 +2,8 @@ import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import MiniTablaListado from '@/Components/MiniTablaListado';
 import { formatearFechaCorta as ffc } from '@/utils/fecha';
-import { formatearDinero as dinero} from '@/utils/dinero';
+import { formatearDinero as dinero } from '@/utils/dinero';
+import BotonGris from '@/Components/Botones/BotonGris';
 
 export default function ModalCargarPremio({ onSeleccionar, onClose }) {
     const [data, setData] = useState({ data: [], current_page: 1, last_page: 1 });
@@ -65,12 +66,9 @@ export default function ModalCargarPremio({ onSeleccionar, onClose }) {
             <div className="bg-white rounded-lg shadow-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6 space-y-4">
                 <div className="flex items-center justify-between">
                     <h2 className="text-xl font-bold">Seleccionar premio</h2>
-                    <button
-                        onClick={onClose}
-                        className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold px-4 py-2 rounded"
-                    >
+                    <BotonGris onClick={onClose}>
                         Cancelar
-                    </button>
+                    </BotonGris>
                 </div>
 
                 <MiniTablaListado

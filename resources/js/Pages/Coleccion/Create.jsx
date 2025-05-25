@@ -3,6 +3,10 @@ import ModalCrearPremio from '@/Components/Premio/ModalCrearPremio';
 import ModalCargarPremio from '@/Components/Premio/ModalCargarPremio';
 import { useState } from 'react';
 import { Head, router, usePage } from '@inertiajs/react';
+import BotonPrimario from '@/Components/Botones/BotonPrimario';
+import BotonRosa from '@/Components/Botones/BotonRosa';
+import BotonRojo from '@/Components/Botones/BotonRojo';
+import { TicketCheck } from 'lucide-react';
 
 export default function Index() {
     const { errors } = usePage().props;
@@ -17,17 +21,16 @@ export default function Index() {
         const index = premios.findIndex(p => p.premio.id === nuevoPremio.id);
 
         if (index !== -1) {
-            // Ya existe: incrementa cantidad
             const nuevos = [...premios];
             nuevos[index].cantidad += 1;
             setPremios(nuevos);
         } else {
-            // No existe: lo añade como nuevo
             setPremios([...premios, { premio: nuevoPremio, cantidad: 1 }]);
         }
 
         setShowPremiosModal(false);
     };
+
     const handleCreatePremio = (nuevoPremio) => {
         setPremios([...premios, { premio: nuevoPremio, cantidad: 1 }]);
         setShowNuevoPremioModal(false);
@@ -60,68 +63,63 @@ export default function Index() {
     return (
         <>
             <Head title="Colecciones" />
-            <div className="max-w-6xl mx-auto p-6">
-                <h1 className="text-2xl font-bold mb-8 text-center">Crear Colección</h1>
+            <div className="max-w-3xl mx-auto mt-12 bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+                <div className="bg-[#1cc2b5] px-6 py-4 flex items-center gap-3">
+                    <TicketCheck className="w-6 h-6 text-white" />
+                    <h1 className="text-xl font-semibold text-white">Crear Colección</h1>
+                </div>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="p-6 space-y-6">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">Nombre de la Colección</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre de la Colección</label>
                         <input
                             type="text"
                             value={nombre}
                             onChange={(e) => setNombre(e.target.value)}
-                            className="w-full border rounded px-3 py-2"
+                            className="w-full px-4 py-2 border border-[#1cc2b5] rounded-md bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1cc2b5] focus:border-[#1cc2b5]"
                             placeholder="Nombre de la colección"
                             required
                         />
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">Descripción</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Descripción</label>
                         <textarea
                             value={descripcion}
                             onChange={(e) => setDescripcion(e.target.value)}
-                            className="w-full border rounded px-3 py-2"
+                            className="w-full px-4 py-2 border border-[#1cc2b5] rounded-md bg-white text-gray-800 min-h-[100px] resize-y focus:outline-none focus:ring-2 focus:ring-[#1cc2b5] focus:border-[#1cc2b5]"
                             placeholder="Descripción de la colección"
                             required
                         />
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">Número de Rascas</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Número de Rascas</label>
                         <input
                             type="number"
                             value={numeroRascas}
                             onChange={(e) => setNumeroRascas(Number(e.target.value))}
                             min="1"
-                            className="w-full border rounded px-3 py-2"
+                            className="w-full px-4 py-2 border border-[#1cc2b5] rounded-md bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1cc2b5] focus:border-[#1cc2b5]"
                             required
                         />
                     </div>
 
                     <div className="flex gap-4">
-                        <button
-                            type="button"
-                            onClick={() => setShowPremiosModal(true)}
-                            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                        >
+                        <BotonPrimario type="button" onClick={() => setShowPremiosModal(true)}>
                             Añadir Premio
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setShowNuevoPremioModal(true)}
-                            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-                        >
+                        </BotonPrimario>
+                        <BotonRosa type="button" onClick={() => setShowNuevoPremioModal(true)}>
                             Nuevo Premio
-                        </button>
+                        </BotonRosa>
                     </div>
 
                     <div className="mt-4">
                         {premios.length > 0 && (
                             <div className="space-y-2">
                                 {premios.map((premioData, index) => (
-                                    <div key={index} className="flex justify-between items-center">
-                                        <span>{premioData.premio.nombre}</span>
+                                    <div key={index} className="flex justify-between items-center gap-4 bg-gray-100 dark:bg-gray-700 px-4 py-2 rounded-md">
+                                        <span className="flex-1">{premioData.premio.nombre}</span>
                                         <input
                                             type="number"
                                             value={premioData.cantidad}
@@ -130,33 +128,30 @@ export default function Index() {
                                                 newPremios[index].cantidad = Number(e.target.value);
                                                 setPremios(newPremios);
                                             }}
-                                            className="w-16 rounded-md border-gray-300 shadow-sm"
+                                            className="w-16 border border-[#1cc2b5] rounded-md text-center"
                                             min="1"
                                         />
-                                        <button
-                                            type="button"
-                                            onClick={() => handleDeletePremio(index)}
-                                            className="text-red-600"
-                                        >
+                                        <BotonRojo type="button" onClick={() => handleDeletePremio(index)}>
                                             Eliminar
-                                        </button>
+                                        </BotonRojo>
                                     </div>
                                 ))}
                             </div>
                         )}
                     </div>
+
                     {errors.premios && (
                         <div className="bg-red-100 border border-red-300 text-red-700 px-4 py-2 rounded text-sm">
                             {errors.premios}
                         </div>
                     )}
 
-                    <button
-                        type="submit"
-                        className="w-full bg-blue-600 text-white p-2 rounded-md"
-                    >
-                        Crear Colección
-                    </button>
+                    {premios.length > 0 && (
+                        <div className="flex justify-center">
+                            <BotonPrimario type="submit">Crear rascas</BotonPrimario>
+                        </div>
+                    )}
+
                 </form>
 
                 {showPremiosModal && (
@@ -165,7 +160,6 @@ export default function Index() {
                         onSeleccionar={handleAddPremio}
                     />
                 )}
-
 
                 <ModalCrearPremio
                     visible={showNuevoPremioModal}

@@ -19,7 +19,6 @@ export default function CuentaRegresiva({ segundos, onComplete }) {
         return () => clearInterval(intervalo);
     }, [contador, onComplete]);
 
-    // Resetear animación cada vez que cambia el número
     useEffect(() => {
         if (animando) {
             const timeout = setTimeout(() => setAnimando(false), 300);
@@ -28,21 +27,31 @@ export default function CuentaRegresiva({ segundos, onComplete }) {
     }, [animando]);
 
     return (
-        <div className="flex items-center justify-center h-64">
+        <div className="relative flex flex-col items-center justify-center h-[500px] sm:h-[600px] w-full bg-[radial-gradient(circle,_#e6f8f7,_#ffffff)] dark:bg-[radial-gradient(circle,_#0a2e2d,_#000000)] transition">
+            {/* Círculo decorativo */}
+            <div className="absolute w-72 h-72 sm:w-96 sm:h-96 bg-[#1cc2b5]/10 rounded-full blur-2xl animate-pulse" />
+
+            {/* Número */}
             <div
                 className={`
-                    text-[180px]
+                    text-[160px] sm:text-[180px]
                     font-extrabold
                     text-transparent
                     bg-clip-text
-                    bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500
-                    drop-shadow-[0_0_25px_rgba(255,255,255,0.6)]
+                    bg-gradient-to-br from-[#1cc2b5] to-[#0a9086]
                     transition-transform duration-300 ease-in-out
                     ${animando ? 'scale-125' : 'scale-100'}
+                    drop-shadow-lg dark:drop-shadow-[0_0_25px_rgba(28,194,181,0.5)]
+                    z-10
                 `}
             >
                 {contador}
             </div>
+
+            {/* Texto debajo */}
+            <p className="mt-4 text-lg sm:text-xl text-gray-700 dark:text-gray-300 z-10">
+                Realizando sorteo...
+            </p>
         </div>
     );
 }

@@ -2,7 +2,7 @@ import MainLayout from '@/Layouts/MainLayout';
 import TablaListado from '@/Components/TablaListado';
 import { Head, Link } from '@inertiajs/react';
 import { formatearFechaCorta as ffc } from '@/utils/fecha';
-import { formatearDinero as dinero} from '@/utils/dinero';
+import { formatearDinero as dinero } from '@/utils/dinero';
 
 export default function Index({ premios, filters, anyos }) {
     const columns = [
@@ -47,10 +47,11 @@ export default function Index({ premios, filters, anyos }) {
                     <h1 className="text-2xl font-bold">Premios</h1>
                     <Link
                         href={route('premios.create')}
-                        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+                        className="inline-flex items-center justify-center gap-2 px-6 py-2 rounded-md bg-[#1cc2b5] text-white font-semibold hover:bg-[#17b0a6] shadow-sm active:scale-95 transition-transform duration-100 ease-in-out"
                     >
                         Nuevo premio
                     </Link>
+
                 </div>
                 <TablaListado
                     data={premios}

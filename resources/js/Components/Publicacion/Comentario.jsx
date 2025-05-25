@@ -11,7 +11,7 @@ export default function Comentario({ autor, fecha, texto, likes }) {
             <p className="mt-1">{texto}</p>
             {likes != null && (
                 <div className="mt-1 text-sm text-gray-600 dark:text-gray-400 inline-flex items-center gap-1">
-                    <ThumbsUp className="w-4 h-4 text-blue-500" />
+                    <ThumbsUp className="w-4 h-4 text-[#1cc2b5]" />
                     {likes}
                 </div>
             )}

@@ -2,6 +2,9 @@ import { useForm, Head, Link, router, usePage } from '@inertiajs/react';
 import MainLayout from '@/Layouts/MainLayout';
 import { formatearFecha as ff } from '@/utils/fecha';
 import { formatearDinero as dinero } from '@/utils/dinero';
+import BotonPrimario from '@/Components/Botones/BotonPrimario';
+import BotonRojo from '@/Components/Botones/BotonRojo';
+import BotonGris from '@/Components/Botones/BotonGris';
 
 export default function Show({ coleccion, urls }) {
     const { data, setData, post, processing, errors } = useForm({ cantidad: 1 });
@@ -41,15 +44,33 @@ export default function Show({ coleccion, urls }) {
                             <h2 className="text-sm font-semibold text-gray-600 mb-1">Estado</h2>
                             <div className="flex items-center">
                                 {coleccion.abierta || (coleccion.total_rascas - coleccion.total_rascados > 0) ? (
-                                    <button
-                                        onClick={() => router.put(route('colecciones.toggleEstado', coleccion.id), {}, { preserveScroll: true })}
-                                        className={`px-3 py-1 rounded-full text-sm font-medium focus:outline-none transition-colors ${coleccion.abierta
-                                            ? 'bg-green-100 text-green-800 hover:bg-green-200'
-                                            : 'bg-red-100 text-red-800 hover:bg-red-200'
-                                            }`}
-                                    >
-                                        {coleccion.abierta ? 'Abierta' : 'Cerrada'}
-                                    </button>
+                                    coleccion.abierta ? (
+                                        <BotonPrimario
+                                            className="!text-sm !px-3 !py-1 !rounded-full"
+                                            onClick={() =>
+                                                router.put(
+                                                    route('colecciones.toggleEstado', coleccion.id),
+                                                    {},
+                                                    { preserveScroll: true }
+                                                )
+                                            }
+                                        >
+                                            Abierta
+                                        </BotonPrimario>
+                                    ) : (
+                                        <BotonRojo
+                                            className="!text-sm !px-3 !py-1 !rounded-full"
+                                            onClick={() =>
+                                                router.put(
+                                                    route('colecciones.toggleEstado', coleccion.id),
+                                                    {},
+                                                    { preserveScroll: true }
+                                                )
+                                            }
+                                        >
+                                            Cerrada
+                                        </BotonRojo>
+                                    )
                                 ) : (
                                     <span className="px-3 py-1 rounded-full text-sm font-medium bg-gray-200 text-gray-600 cursor-not-allowed">
                                         Cerrada
@@ -88,11 +109,10 @@ export default function Show({ coleccion, urls }) {
                     </div>
                 </div>
 
-
                 <div className="text-center">
                     <Link
                         href={route('colecciones.rascasProporcionados', coleccion.id)}
-                        className="inline-block bg-gray-700 hover:bg-gray-800 text-white font-semibold py-2 px-6 rounded"
+                        className="inline-block bg-[#1cc2b5] hover:bg-[#17b0a6] text-white font-semibold py-2 px-6 rounded-md shadow-sm active:scale-95 transition-transform duration-100 ease-in-out"
                     >
                         Ver rascas proporcionados
                     </Link>
@@ -115,13 +135,9 @@ export default function Show({ coleccion, urls }) {
                             )}
                         </div>
 
-                        <button
-                            type="submit"
-                            disabled={processing}
-                            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded"
-                        >
+                        <BotonPrimario type="submit" disabled={processing}>
                             Obtener rascas
-                        </button>
+                        </BotonPrimario>
                     </form>
                 )}
 
@@ -134,12 +150,12 @@ export default function Show({ coleccion, urls }) {
                             className="w-full border rounded p-2 font-mono text-sm"
                             value={urls.join('\n')}
                         />
-                        <button
+                        <BotonPrimario
                             onClick={copiarAlPortapapeles}
-                            className="bg-green-600 hover:bg-green-700 active:scale-95 text-white font-semibold px-4 py-2 rounded transition duration-100 ease-in-out"
+                            className="active:scale-95 transition duration-100 ease-in-out"
                         >
                             Copiar
-                        </button>
+                        </BotonPrimario>
 
                     </div>
                 )}
@@ -148,49 +164,41 @@ export default function Show({ coleccion, urls }) {
                     <div className="bg-white border rounded-lg p-6 shadow-sm">
                         <h2 className="text-lg font-semibold mb-4 text-gray-800">Premios de la colección</h2>
                         <div className="overflow-auto">
-                            <table className="min-w-full border text-sm">
-                                <thead className="bg-gray-100">
-                                    <tr>
-                                        <th className="border px-3 py-2 text-left">Nombre</th>
-                                        <th className="border px-3 py-2 text-left">Proveedor</th>
-                                        <th className="border px-3 py-2 text-left">Enlace</th>
-                                        <th className="border px-3 py-2 text-right">Cantidad</th>
-                                        <th className="border px-3 py-2 text-right">Valor</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {coleccion.premios.map((p, i) => (
-                                        <tr key={i} className="hover:bg-gray-50">
-                                            <td className="border px-3 py-2">
-                                                <Link
-                                                    href={route('premios.show', p.id)}
-                                                    className="text-blue-600 underline hover:text-blue-800"
-                                                >
-                                                    {p.nombre}
-                                                </Link>
-                                            </td>
+    <table className="min-w-full text-sm bg-white shadow border border-[#1cc2b5] rounded-md overflow-hidden">
+        <thead className="bg-[#1cc2b5] text-white">
+            <tr>
+                <th className="px-3 py-2 text-left">Nombre</th>
+                <th className="px-3 py-2 text-left">Proveedor</th>
+                <th className="px-3 py-2 text-right">Cantidad</th>
+                <th className="px-3 py-2 text-right">Valor</th>
+            </tr>
+        </thead>
+        <tbody>
+            {coleccion.premios.map((p, i) => (
+                <tr key={i} className="hover:bg-gray-50">
+                    <td className="border-t border-gray-200 px-3 py-2">
+                        <Link
+                            href={route('premios.show', p.id)}
+                             className="text-blue-600 underline hover:text-blue-800"
+                        >
+                            {p.nombre}
+                        </Link>
+                    </td>
+                    <td className="border-t border-gray-200 px-3 py-2">{p.proveedor}</td>
+                    <td className="border-t border-gray-200 px-3 py-2 text-right">{p.cantidad}</td>
+                    <td className="border-t border-gray-200 px-3 py-2 text-right">{dinero(p.valor_total)}</td>
+                </tr>
+            ))}
+        </tbody>
+        <tfoot>
+            <tr className="bg-gray-100 font-semibold text-gray-700">
+                <td colSpan="3" className="px-3 py-2 text-right">Valor total:</td>
+                <td className="px-3 py-2 text-right">{dinero(coleccion.valor_total)}</td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
 
-                                            <td className="border px-3 py-2">{p.proveedor}</td>
-                                            <td className="border px-3 py-2">
-                                                {p.link ? (
-                                                    <a href={p.link} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
-                                                        Ver enlace
-                                                    </a>
-                                                ) : '—'}
-                                            </td>
-                                            <td className="border px-3 py-2 text-right">{p.cantidad}</td>
-                                            <td className="border px-3 py-2 text-right">{dinero(p.valor_total)}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                                <tfoot>
-                                    <tr className="bg-gray-100 font-semibold">
-                                        <td colSpan="4" className="px-3 py-2 text-right">Valor total:</td>
-                                        <td className="px-3 py-2 text-right">{dinero(coleccion.valor_total)}</td>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                        </div>
                     </div>
                 )}
             </div>

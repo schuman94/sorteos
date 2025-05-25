@@ -2,6 +2,7 @@ import Comentario from '@/Components/Publicacion/Comentario';
 import axios from '@/lib/axios';
 import { useEffect, useState } from 'react';
 import Paginacion from '@/Components/Paginacion';
+import { MessageCircle } from 'lucide-react';
 
 export default function Comentarios() {
     const [comentarios, setComentarios] = useState([]);
@@ -43,28 +44,34 @@ export default function Comentarios() {
     };
 
     return (
-        <>
-            <h2 className="text-2xl font-semibold mb-4">Lista de comentarios</h2>
+        <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+            {/* Cabecera turquesa */}
+            <div className="bg-[#1cc2b5] px-6 py-4 flex items-center gap-2">
+                <MessageCircle className="w-5 h-5 text-white" />
+                <h2 className="text-lg sm:text-xl font-semibold text-white">Lista de comentarios</h2>
+            </div>
+            {/* Contenido */}
+            <div className="p-6">
+                {loading && comentarios.length === 0 ? (
+                    <p className="text-gray-500 dark:text-gray-400">Cargando comentarios...</p>
+                ) : error ? (
+                    <p className="text-red-600">{error}</p>
+                ) : comentarios.length === 0 ? (
+                    <p className="text-gray-500 dark:text-gray-400">No se han encontrado comentarios.</p>
+                ) : (
+                    <>
+                        <ul className="space-y-4">
+                            {comentarios.map((comentario, index) => (
+                                <Comentario key={index} {...comentario} />
+                            ))}
+                        </ul>
 
-            {loading && comentarios.length === 0 ? (
-                <p className="text-gray-500 dark:text-gray-400">Cargando comentarios...</p>
-            ) : error ? (
-                <p className="text-red-600">{error}</p>
-            ) : comentarios.length === 0 ? (
-                <p className="text-gray-500 dark:text-gray-400">No se han encontrado comentarios.</p>
-            ) : (
-                <>
-                    <ul className="space-y-4">
-                        {comentarios.map((comentario, index) => (
-                            <Comentario key={index} {...comentario} />
-                        ))}
-                    </ul>
-
-                    <div className="mt-6">
-                        <Paginacion links={links} onPageChange={handlePageChange} />
-                    </div>
-                </>
-            )}
-        </>
+                        <div className="mt-6">
+                            <Paginacion links={links} onPageChange={handlePageChange} />
+                        </div>
+                    </>
+                )}
+            </div>
+        </div>
     );
 }
