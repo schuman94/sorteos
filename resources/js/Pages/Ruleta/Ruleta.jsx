@@ -144,28 +144,28 @@ export default function Ruleta({ opcionesPrecargadas }) {
                                 <button
                                     onClick={nuevaRuleta}
                                     disabled={girando}
-                                    className="inline-flex items-center gap-2 px-6 py-2 rounded-md bg-[#1cc2b5] text-white font-semibold hover:bg-[#17b0a6] transition-colors duration-200 shadow-sm disabled:opacity-50"
+                                    className="inline-flex items-center gap-2 px-6 py-2 rounded-md bg-[#2e2b4a] text-white font-semibold hover:bg-[#403d61] transition-colors duration-200 shadow-sm disabled:opacity-50"
                                 >
                                     Nueva
                                 </button>
                                 <button
                                     onClick={() => setMostrarModalCargar(true)}
                                     disabled={girando}
-                                    className="inline-flex items-center gap-2 px-6 py-2 rounded-md bg-[#2e2b4a] text-white font-semibold hover:bg-[#403d61] transition-colors duration-200 shadow-sm disabled:opacity-50"
+                                    className="inline-flex items-center gap-2 px-6 py-2 rounded-md bg-[#1cc2b5] text-white font-semibold hover:bg-[#17b0a6] transition-colors duration-200 shadow-sm disabled:opacity-50"
                                 >
                                     Cargar
                                 </button>
                                 <button
                                     onClick={() => setMostrarModalGuardar(true)}
                                     disabled={girando || opciones.length < 1}
-                                    className="inline-flex items-center gap-2 px-6 py-2 rounded-md bg-[#FF6384] text-white font-semibold hover:bg-[#e55072] transition-colors duration-200 shadow-sm disabled:opacity-50"
+                                    className={`inline-flex items-center justify-center gap-2 px-6 py-2 rounded-md bg-[#36A2EB] text-white font-semibold hover:bg-[#2d8bd3] transition-colors duration-200 shadow-sm disabled:opacity-50`}
                                 >
                                     Guardar
                                 </button>
                                 <button
                                     onClick={girarRuleta}
                                     disabled={girando || opciones.length < 2}
-                                    className={`inline-flex items-center justify-center gap-2 px-6 py-2 rounded-md bg-[#36A2EB] text-white font-semibold hover:bg-[#2d8bd3] transition-colors duration-200 shadow-sm disabled:opacity-50`}
+                                    className="inline-flex items-center gap-2 px-6 py-2 rounded-md bg-[#FF6384] text-white font-semibold hover:bg-[#e55072] transition-colors duration-200 shadow-sm disabled:opacity-50"
                                 >
                                     Girar
                                 </button>

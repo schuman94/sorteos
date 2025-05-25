@@ -1,5 +1,8 @@
 import axios from '@/lib/axios';
 import { useState, useEffect } from 'react';
+import BotonPrimario from '@/Components/Botones/BotonPrimario';
+import BotonGris from '@/Components/Botones/BotonGris';
+import BotonAzul from '@/Components/Botones/BotonAzul';
 
 export default function ModalGuardarRuleta({ visible, onClose, ruletaCargada, onGuardado, opciones }) {
     const [nombre, setNombre] = useState('');
@@ -64,39 +67,36 @@ export default function ModalGuardarRuleta({ visible, onClose, ruletaCargada, on
                         setNombre(e.target.value);
                         setErrorNombre(null);
                     }}
-                    className={`w-full border rounded px-3 py-2 mb-1 ${errorNombre ? 'border-red-500' : ''}`}
+                    className={`w-full px-4 py-2 border-[1.5px] rounded-md bg-white text-gray-800
+        focus:outline-none focus:ring-2 focus:ring-[#1cc2b5] focus:border-[#1cc2b5]
+        ${errorNombre ? 'border-red-500' : 'border-[#1cc2b5]'}`}
                     placeholder="Nombre de la ruleta"
                     autoFocus
                     disabled={guardando}
                 />
+
                 {errorNombre && <p className="text-red-600 text-sm mb-2">{errorNombre}</p>}
 
                 <div className="flex justify-end gap-2 mt-4">
-                    <button
-                        onClick={onClose}
-                        className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
-                        disabled={guardando}
-                    >
+                    <BotonGris onClick={onClose} disabled={guardando}>
                         Cancelar
-                    </button>
+                    </BotonGris>
 
                     {ruletaCargada && (
-                        <button
+                        <BotonAzul
                             onClick={() => guardar('actualizar')}
-                            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                             disabled={guardando}
                         >
                             Actualizar
-                        </button>
+                        </BotonAzul>
                     )}
 
-                    <button
+                    <BotonPrimario
                         onClick={() => guardar('nueva')}
-                        className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
                         disabled={guardando}
                     >
-                        {ruletaCargada ? 'Guardar como nueva' : 'Guardar'}
-                    </button>
+                        Guardar
+                    </BotonPrimario>
                 </div>
             </div>
         </div>

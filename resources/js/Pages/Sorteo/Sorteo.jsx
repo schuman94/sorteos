@@ -205,9 +205,8 @@ export default function Sorteo({ publicacion }) {
                             </div>
                         </div>
 
-                        <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
-                            <Comentarios />
-                        </div>
+                        <Comentarios />
+
                     </>
                 ) : !mostrarGanadores ? (
                     <CuentaRegresiva
