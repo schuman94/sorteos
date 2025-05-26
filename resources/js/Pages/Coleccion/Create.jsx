@@ -16,6 +16,7 @@ export default function Index() {
     const [premios, setPremios] = useState([]);
     const [showPremiosModal, setShowPremiosModal] = useState(false);
     const [showNuevoPremioModal, setShowNuevoPremioModal] = useState(false);
+    const [enviando, setEnviando] = useState(false);
 
     const handleAddPremio = (nuevoPremio) => {
         const index = premios.findIndex(p => p.premio.id === nuevoPremio.id);
@@ -43,6 +44,8 @@ export default function Index() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setEnviando(true);
+
         const data = {
             nombre,
             descripcion,
@@ -54,11 +57,15 @@ export default function Index() {
         };
 
         try {
-            await router.post(route('colecciones.store'), data);
+            await router.post(route('colecciones.store'), data, {
+                onFinish: () => setEnviando(false),
+            });
         } catch (error) {
             console.error('Error al crear colección:', error);
+            setEnviando(false);
         }
     };
+
 
     return (
         <>
@@ -100,6 +107,7 @@ export default function Index() {
                             value={numeroRascas}
                             onChange={(e) => setNumeroRascas(Number(e.target.value))}
                             min="1"
+                            max="9999"
                             className="w-full px-4 py-2 border border-[#1cc2b5] rounded-md bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1cc2b5] focus:border-[#1cc2b5]"
                             required
                         />
@@ -128,8 +136,9 @@ export default function Index() {
                                                 newPremios[index].cantidad = Number(e.target.value);
                                                 setPremios(newPremios);
                                             }}
-                                            className="w-16 border border-[#1cc2b5] rounded-md text-center"
+                                            className="w-18 border border-[#1cc2b5] rounded-md text-center"
                                             min="1"
+                                            max="9999"
                                         />
                                         <BotonRojo type="button" onClick={() => handleDeletePremio(index)}>
                                             Eliminar
@@ -147,9 +156,10 @@ export default function Index() {
                     )}
 
                     {premios.length > 0 && (
-                        <div className="flex justify-center">
-                            <BotonPrimario type="submit">Crear rascas</BotonPrimario>
-                        </div>
+                        <BotonPrimario type="submit" disabled={enviando}>
+                            {enviando ? 'Creando...' : 'Crear rascas'}
+                        </BotonPrimario>
+
                     )}
 
                 </form>
