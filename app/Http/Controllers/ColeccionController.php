@@ -21,25 +21,70 @@ class ColeccionController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Auth::user()
+        $colecciones = Auth::user()
             ->colecciones()
-            ->when($request->filled('search'), function ($q) use ($request) {
-                $q->where('nombre', 'ILIKE', '%' . $request->search . '%');
-            });
+            ->withCount([
+                'rascas',
+                'rascas as total_proporcionados' => fn($q) => $q->whereNotNull('provided_at'),
+                'rascas as total_rascados' => fn($q) => $q->whereNotNull('scratched_at'),
+                'rascas as premios_obtenidos' => fn($q) => $q->whereNotNull('scratched_at')->whereNotNull('premio_id'),
+                'rascas as premios_totales' => fn($q) => $q->whereNotNull('premio_id'),
+            ])
+            ->select([
+                'colecciones.*',
+                DB::raw('(SELECT COALESCE(SUM(premios.valor), 0) FROM rascas JOIN premios ON premios.id = rascas.premio_id WHERE rascas.coleccion_id = colecciones.id) AS valor_total'),
+                DB::raw('(SELECT COUNT(*) FROM rascas WHERE rascas.coleccion_id = colecciones.id) AS rascas_count'),
+                DB::raw('(SELECT COUNT(*) FROM rascas WHERE rascas.coleccion_id = colecciones.id AND provided_at IS NOT NULL) AS total_proporcionados'),
+                DB::raw('(SELECT COUNT(*) FROM rascas WHERE rascas.coleccion_id = colecciones.id AND scratched_at IS NOT NULL) AS total_rascados'),
+                DB::raw('(SELECT COUNT(*) FROM rascas WHERE rascas.coleccion_id = colecciones.id AND premio_id IS NOT NULL) AS premios_totales'),
+                DB::raw('(SELECT COUNT(*) FROM rascas WHERE rascas.coleccion_id = colecciones.id AND scratched_at IS NOT NULL AND premio_id IS NOT NULL) AS premios_obtenidos'),
+            ]);
 
-        $colecciones = $query
-            ->latest()
-            ->paginate(9)
-            ->withQueryString();
+        // Filtros
+        if ($search = $request->input('search')) {
+            $colecciones->where('nombre', 'ilike', '%' . $search . '%');
+        }
+
+        if ($anyo = $request->input('anyo')) {
+            $colecciones->whereYear('created_at', $anyo);
+        }
+
+        $sort = $request->input('sort', 'created_at');
+        $direction = $request->input('direction', 'desc');
+
+        if (in_array($sort, [
+            'nombre',
+            'created_at',
+            'abierta',
+            'rascas_count',
+            'total_proporcionados',
+            'total_rascados',
+            'premios_totales',
+            'premios_obtenidos',
+            'valor_total',
+        ])) {
+            $colecciones->orderBy($sort, $direction);
+        }
+
+        $perPage = 20;
+        $colecciones = $colecciones->paginate($perPage)->withQueryString();
+
+        $anyos = Auth::user()->colecciones()
+            ->selectRaw('DISTINCT EXTRACT(YEAR FROM created_at) AS anyo')
+            ->orderByDesc('anyo')
+            ->pluck('anyo');
 
         return Inertia::render('Coleccion/Index', [
             'colecciones' => $colecciones,
             'filters' => [
-                'search' => $request->search,
+                'search' => $search,
+                'anyo' => $anyo,
+                'sort' => $sort,
+                'direction' => $direction,
             ],
+            'anyos' => $anyos,
         ]);
     }
-
 
 
     /**
