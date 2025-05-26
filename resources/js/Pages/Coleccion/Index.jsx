@@ -1,5 +1,5 @@
 import MainLayout from '@/Layouts/MainLayout';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import TablaListado from '@/Components/TablaListado';
 import BotonPrimario from '@/Components/Botones/BotonPrimario';
 import BotonAzul from '@/Components/Botones/BotonAzul';
@@ -67,19 +67,19 @@ export default function Index({ colecciones, filters, anyos }) {
     return (
         <>
             <Head title="Colecciones" />
-
             <div className="max-w-6xl mx-auto py-12 px-4 space-y-6">
                 <div className="flex items-center justify-between mb-4">
                     <h1 className="text-2xl font-bold">Colecciones</h1>
+                    <div>
+                        <div className="flex flex-wrap gap-4 mb-6">
+                            <BotonPrimario onClick={() => router.visit(route('colecciones.create'))}>
+                                Crear Colección
+                            </BotonPrimario>
 
-                    <div className="flex flex-wrap gap-4">
-                        <BotonPrimario onClick={() => route().visit(route('colecciones.create'))}>
-                            Crear Colección
-                        </BotonPrimario>
-
-                        <BotonAzul onClick={() => route().visit(route('premios.index'))}>
-                            Gestionar premios
-                        </BotonAzul>
+                            <BotonAzul onClick={() => router.visit(route('premios.index'))}>
+                                Gestionar premios
+                            </BotonAzul>
+                        </div>
                     </div>
                 </div>
 
