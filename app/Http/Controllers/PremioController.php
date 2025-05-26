@@ -91,7 +91,7 @@ class PremioController extends Controller
             'nombre' => 'required|string|max:255|unique:premios,nombre',
             'proveedor' => 'required|string|max:255',
             'valor' => 'required|numeric|min:0',
-            'descripcion' => 'nullable|string',
+            'descripcion' => 'nullable|string|max:255',
             'link' => 'nullable|url',
         ]);
 
@@ -108,7 +108,7 @@ class PremioController extends Controller
             'nombre' => 'required|string|max:255|unique:premios,nombre',
             'proveedor' => 'required|string|max:255',
             'valor' => 'required|numeric|min:0',
-            'descripcion' => 'nullable|string',
+            'descripcion' => 'nullable|string|max:255',
             'link' => 'nullable|url',
         ]);
 
