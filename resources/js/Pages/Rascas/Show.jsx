@@ -66,7 +66,7 @@ export default function Show({ rasca }) {
                     </div>
 
                     <table className="min-w-full border text-sm">
-                        <thead className="bg-gray-100">
+                        <thead className="bg-[#1cc2b5] text-white">
                             <tr>
                                 <th className="border px-3 py-2 text-left">Premio</th>
                                 <th className="border px-3 py-2 text-right">Cantidad</th>
@@ -76,7 +76,20 @@ export default function Show({ rasca }) {
                         <tbody>
                             {rasca.coleccion.premios.map((p, i) => (
                                 <tr key={i} className="hover:bg-gray-50">
-                                    <td className="border px-3 py-2">{p.nombre}</td>
+                                    <td className="border px-3 py-2">
+                                        {p.link ? (
+                                            <a
+                                                href={p.link}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-blue-600 underline hover:text-blue-800"
+                                            >
+                                                {p.nombre}
+                                            </a>
+                                        ) : (
+                                            p.nombre
+                                        )}
+                                    </td>
                                     <td className="border px-3 py-2 text-right">{p.cantidad}</td>
                                     <td className="border px-3 py-2 text-right">{p.probabilidad.toFixed(2)}</td>
                                 </tr>
@@ -84,11 +97,11 @@ export default function Show({ rasca }) {
                         </tbody>
                     </table>
 
+
                     {/* Zona de rasca */}
                     <div className="relative w-full border border-gray-300 rounded-md shadow-inner overflow-hidden bg-white">
-                        <div className={`p-6 text-center space-y-2 relative z-10 h-[240px] overflow-y-auto ${
-                            revelado && !rasca.scratched_at ? 'animate-text-reveal' : ''
-                        }`}>
+                        <div className={`p-6 text-center space-y-2 relative z-10 h-[240px] overflow-y-auto ${revelado && !rasca.scratched_at ? 'animate-text-reveal' : ''
+                            }`}>
                             {rasca.scratched_at || revelado ? (
                                 rasca.es_propietario ? (
                                     resultado === 'premio' ? (

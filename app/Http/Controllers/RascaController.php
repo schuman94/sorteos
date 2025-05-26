@@ -64,6 +64,7 @@ class RascaController extends Controller
 
                 return [
                     'nombre' => $premio->nombre,
+                    'link' => $premio->link,
                     'cantidad' => $cantidad,
                     'probabilidad' => $probabilidad,
                 ];
