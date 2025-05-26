@@ -21,7 +21,7 @@ class ColeccionPolicy
      */
     public function view(User $user, Coleccion $coleccion): bool
     {
-        return false;
+        return $user->id === $coleccion->user_id;
     }
 
     /**
@@ -45,7 +45,7 @@ class ColeccionPolicy
      */
     public function delete(User $user, Coleccion $coleccion): bool
     {
-        return false;
+        return $user->id === $coleccion->user_id;
     }
 
     /**
