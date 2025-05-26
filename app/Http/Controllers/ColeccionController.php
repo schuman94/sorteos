@@ -125,6 +125,8 @@ class ColeccionController extends Controller
      */
     public function show(Coleccion $coleccion)
     {
+        Gate::authorize('view', $coleccion);
+
         // Cargar contadores agregados
         $coleccion->loadCount([
             'rascas as total_rascas' => fn($q) => $q,
@@ -191,23 +193,81 @@ class ColeccionController extends Controller
      */
     public function edit(Coleccion $coleccion)
     {
-        //
+        Gate::authorize('update', $coleccion);
+
+        return Inertia::render('Coleccion/Edit', [
+            'coleccion' => [
+                'id' => $coleccion->id,
+                'nombre' => $coleccion->nombre,
+                'descripcion' => $coleccion->descripcion,
+            ],
+        ]);
     }
+
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateColeccionRequest $request, Coleccion $coleccion)
+    public function update(Request $request, Coleccion $coleccion)
     {
-        //
+        Gate::authorize('update', $coleccion);
+
+        $validated = $request->validate([
+            'nombre' => 'required|string|max:255',
+            'descripcion' => 'required|string',
+        ]);
+
+        try {
+            DB::transaction(function () use ($coleccion, $validated) {
+                $coleccion->update([
+                    'nombre' => $validated['nombre'],
+                    'descripcion' => $validated['descripcion'],
+                ]);
+            });
+
+            return Inertia::location(route('colecciones.show', $coleccion));
+        } catch (\Throwable $e) {
+            // Opcional: log error
+            // Log::error($e);
+
+            return back()->withErrors([
+                'general' => 'Ocurrió un error al actualizar la colección. Intenta de nuevo.',
+            ])->withInput();
+        }
     }
+
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Coleccion $coleccion)
+    public function destroy(Request $request, Coleccion $coleccion)
     {
-        //
+        Gate::authorize('delete', $coleccion);
+
+        if ($coleccion->abierta) {
+            return back()->withErrors([
+                'borrado' => 'No se puede eliminar una colección abierta. Ciérrala primero.',
+            ]);
+        }
+
+        if ($coleccion->rascas()->whereNotNull('scratched_at')->exists()) {
+            return back()->withErrors([
+                'borrado' => 'No se puede eliminar la colección porque algunos rascas ya han sido rascados.',
+            ]);
+        }
+
+        try {
+            DB::transaction(function () use ($coleccion) {
+                $coleccion->rascas()->delete();
+                $coleccion->delete();
+            });
+
+            return redirect()->route('colecciones.index')->with('success', 'Colección eliminada correctamente.');
+        } catch (\Throwable $e) {
+            return back()->withErrors([
+                'borrado' => 'Ocurrió un error al intentar eliminar la colección.',
+            ]);
+        }
     }
 
     public function proporcionarRascas(Request $request, Coleccion $coleccion)

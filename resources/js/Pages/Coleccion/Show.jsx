@@ -1,13 +1,18 @@
 import { useForm, Head, Link, router, usePage } from '@inertiajs/react';
+import { useState } from 'react';
 import MainLayout from '@/Layouts/MainLayout';
 import { formatearFecha as ff } from '@/utils/fecha';
 import { formatearDinero as dinero } from '@/utils/dinero';
 import BotonPrimario from '@/Components/Botones/BotonPrimario';
+import BotonAzul from '@/Components/Botones/BotonAzul';
 import BotonRojo from '@/Components/Botones/BotonRojo';
-import BotonGris from '@/Components/Botones/BotonGris';
+
+import ModalEliminacion from '@/Components/ModalEliminacion';
 
 export default function Show({ coleccion, urls }) {
+    const borradoError = usePage().props.errors?.borrado;
     const { data, setData, post, processing, errors } = useForm({ cantidad: 1 });
+    const [modalEliminarVisible, setModalEliminarVisible] = useState(false);
 
     const obtenerRascas = (e) => {
         e.preventDefault();
@@ -20,6 +25,12 @@ export default function Show({ coleccion, urls }) {
         await navigator.clipboard.writeText(urls.join('\n'));
     };
 
+    const confirmarEliminacion = () => {
+        router.delete(route('colecciones.destroy', coleccion.id), {
+            preserveScroll: true,
+        });
+    };
+
     return (
         <>
             <Head title="Colección" />
@@ -29,58 +40,72 @@ export default function Show({ coleccion, urls }) {
 
                 <div className="space-y-4">
 
-                    <div className="bg-white border rounded-lg p-4 shadow-sm">
-                        <h2 className="text-sm font-semibold text-gray-600 mb-1">Descripción</h2>
-                        <p className="text-gray-800 whitespace-pre-line">{coleccion.descripcion}</p>
-                    </div>
+                    {coleccion.descripcion && (
+                        <div className="bg-white border rounded-lg p-4 shadow-sm text-center">
+                            <p className="text-gray-800 whitespace-pre-line">{coleccion.descripcion}</p>
+                        </div>
+                    )}
 
-                    <div className="grid sm:grid-cols-2 gap-6">
-                        <div className="bg-white border rounded-lg p-4 shadow-sm">
+
+                    <div className="grid sm:grid-cols-3 gap-6 text-center">
+                        {/* Fecha de creación */}
+                        <div className="bg-white border rounded-lg p-4 shadow-sm flex flex-col items-center justify-center">
                             <h2 className="text-sm font-semibold text-gray-600 mb-1">Fecha de creación</h2>
                             <p className="text-gray-800">{ff(coleccion.created_at)}</p>
                         </div>
 
-                        <div className="bg-white border rounded-lg p-4 shadow-sm space-y-2">
+                        {/* Estado */}
+                        <div className="bg-white border rounded-lg p-4 shadow-sm flex flex-col items-center justify-center space-y-2">
                             <h2 className="text-sm font-semibold text-gray-600 mb-1">Estado</h2>
-                            <div className="flex items-center">
+                            <div>
                                 {coleccion.abierta || (coleccion.total_rascas - coleccion.total_rascados > 0) ? (
                                     coleccion.abierta ? (
                                         <BotonPrimario
-                                            className="!text-sm !px-3 !py-1 !rounded-full"
+                                            className="!text-sm !px-4 !py-1 !rounded-full !w-auto"
                                             onClick={() =>
-                                                router.put(
-                                                    route('colecciones.toggleEstado', coleccion.id),
-                                                    {},
-                                                    { preserveScroll: true }
-                                                )
+                                                router.put(route('colecciones.toggleEstado', coleccion.id), {}, { preserveScroll: true })
                                             }
                                         >
                                             Abierta
                                         </BotonPrimario>
                                     ) : (
                                         <BotonRojo
-                                            className="!text-sm !px-3 !py-1 !rounded-full"
+                                            className="!text-sm !px-4 !py-1 !rounded-full !w-auto"
                                             onClick={() =>
-                                                router.put(
-                                                    route('colecciones.toggleEstado', coleccion.id),
-                                                    {},
-                                                    { preserveScroll: true }
-                                                )
+                                                router.put(route('colecciones.toggleEstado', coleccion.id), {}, { preserveScroll: true })
                                             }
                                         >
                                             Cerrada
                                         </BotonRojo>
                                     )
                                 ) : (
-                                    <span className="px-3 py-1 rounded-full text-sm font-medium bg-gray-200 text-gray-600 cursor-not-allowed">
+                                    <span className="px-4 py-1 rounded-full text-sm font-medium bg-gray-200 text-gray-600 cursor-not-allowed">
                                         Cerrada
                                     </span>
                                 )}
                             </div>
-
                         </div>
 
+                        {/* Acciones */}
+                        <div className="bg-white border rounded-lg p-4 shadow-sm flex flex-col items-center justify-center space-y-2">
+                            <h2 className="text-sm font-semibold text-gray-600 mb-1">Acciones</h2>
+                            <div className="flex gap-2">
+                                <BotonAzul
+                                    className="!text-sm !px-4 !py-1 !rounded-md !w-auto"
+                                    onClick={() => router.visit(route('colecciones.edit', coleccion.id))}
+                                >
+                                    Editar
+                                </BotonAzul>
+                                <BotonRojo
+                                    className="!text-sm !px-4 !py-1 !rounded-md !w-auto"
+                                    onClick={() => setModalEliminarVisible(true)}
+                                >
+                                    Eliminar
+                                </BotonRojo>
+                            </div>
+                        </div>
                     </div>
+
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 text-center text-sm">
                     <div className="bg-gray-50 border rounded-lg p-4">
@@ -150,12 +175,12 @@ export default function Show({ coleccion, urls }) {
                             className="w-full border rounded p-2 font-mono text-sm"
                             value={urls.join('\n')}
                         />
-                        <BotonPrimario
+                        <BotonAzul
                             onClick={copiarAlPortapapeles}
                             className="active:scale-95 transition duration-100 ease-in-out"
                         >
                             Copiar
-                        </BotonPrimario>
+                        </BotonAzul>
 
                     </div>
                 )}
@@ -164,44 +189,58 @@ export default function Show({ coleccion, urls }) {
                     <div className="bg-white border rounded-lg p-6 shadow-sm">
                         <h2 className="text-lg font-semibold mb-4 text-gray-800">Premios de la colección</h2>
                         <div className="overflow-auto">
-    <table className="min-w-full text-sm bg-white shadow border border-[#1cc2b5] rounded-md overflow-hidden">
-        <thead className="bg-[#1cc2b5] text-white">
-            <tr>
-                <th className="px-3 py-2 text-left">Nombre</th>
-                <th className="px-3 py-2 text-left">Proveedor</th>
-                <th className="px-3 py-2 text-right">Cantidad</th>
-                <th className="px-3 py-2 text-right">Valor</th>
-            </tr>
-        </thead>
-        <tbody>
-            {coleccion.premios.map((p, i) => (
-                <tr key={i} className="hover:bg-gray-50">
-                    <td className="border-t border-gray-200 px-3 py-2">
-                        <Link
-                            href={route('premios.show', p.id)}
-                             className="text-blue-600 underline hover:text-blue-800"
-                        >
-                            {p.nombre}
-                        </Link>
-                    </td>
-                    <td className="border-t border-gray-200 px-3 py-2">{p.proveedor}</td>
-                    <td className="border-t border-gray-200 px-3 py-2 text-right">{p.cantidad}</td>
-                    <td className="border-t border-gray-200 px-3 py-2 text-right">{dinero(p.valor_total)}</td>
-                </tr>
-            ))}
-        </tbody>
-        <tfoot>
-            <tr className="bg-gray-100 font-semibold text-gray-700">
-                <td colSpan="3" className="px-3 py-2 text-right">Valor total:</td>
-                <td className="px-3 py-2 text-right">{dinero(coleccion.valor_total)}</td>
-            </tr>
-        </tfoot>
-    </table>
-</div>
+                            <table className="min-w-full text-sm bg-white shadow border border-[#1cc2b5] rounded-md overflow-hidden">
+                                <thead className="bg-[#1cc2b5] text-white">
+                                    <tr>
+                                        <th className="px-3 py-2 text-left">Nombre</th>
+                                        <th className="px-3 py-2 text-left">Proveedor</th>
+                                        <th className="px-3 py-2 text-right">Cantidad</th>
+                                        <th className="px-3 py-2 text-right">Valor</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {coleccion.premios.map((p, i) => (
+                                        <tr key={i} className="hover:bg-gray-50">
+                                            <td className="border-t border-gray-200 px-3 py-2">
+                                                <Link
+                                                    href={route('premios.show', p.id)}
+                                                    className="text-blue-600 underline hover:text-blue-800"
+                                                >
+                                                    {p.nombre}
+                                                </Link>
+                                            </td>
+                                            <td className="border-t border-gray-200 px-3 py-2">{p.proveedor}</td>
+                                            <td className="border-t border-gray-200 px-3 py-2 text-right">{p.cantidad}</td>
+                                            <td className="border-t border-gray-200 px-3 py-2 text-right">{dinero(p.valor_total)}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                                <tfoot>
+                                    <tr className="bg-gray-100 font-semibold text-gray-700">
+                                        <td colSpan="3" className="px-3 py-2 text-right">Valor total:</td>
+                                        <td className="px-3 py-2 text-right">{dinero(coleccion.valor_total)}</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
 
                     </div>
                 )}
             </div>
+
+            <ModalEliminacion
+                visible={modalEliminarVisible}
+                titulo="Eliminar colección"
+                mensaje={borradoError || '¿Deseas eliminar esta colección? Esta acción no se puede deshacer.'}
+                error={!!borradoError}
+                onConfirmar={() => router.delete(route('colecciones.destroy', coleccion.id))}
+                onCancelar={() => {
+                    setModalEliminarVisible(false);
+                    if (borradoError) {
+                        router.reload({ only: [] }); // Limpia errores sin recargar página
+                    }
+                }}
+            />
         </>
     );
 }
