@@ -98,7 +98,8 @@ export default function Home() {
                     )}
 
                     {/* Sección informativa */}
-                    <section className="mt-20 max-w-2xl text-left">
+                    <section className="mt-8 max-w-2xl text-left">
+
                         <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">¿Cómo funciona?</h2>
                         <ul className="list-disc pl-6 text-gray-700 dark:text-gray-300 text-sm space-y-2">
                             <li>Introduce la URL de una publicación de YouTube o Bluesky.</li>
@@ -110,13 +111,14 @@ export default function Home() {
 
                     {/* Sorteo manual */}
                     <div className="mt-12">
-                        <Link href={route('sorteo.manual')} className="text-[#1cc2b5] hover:underline text-sm font-medium">
-                            ¿Ya tienes la lista de participantes? También puedes hacer un sorteo manual →
+                        <Link href={route('sorteo.manual')} className="text-[#1cc2b5] hover:underline text-m font-medium">
+                            <p>¿Ya tienes la lista de participantes?</p>
+                            <p>También puedes hacer un sorteo manual →</p>
                         </Link>
                     </div>
 
                     {/* Otras herramientas */}
-                    <section className="mt-16 w-full max-w-4xl text-center">
+                    <section className="mt-12 w-full max-w-4xl text-center">
                         <h2 className="text-xl font-bold mb-6 text-gray-900 dark:text-white">Prueba nuestras otras herramientas</h2>
                         <div className="flex flex-col sm:flex-row gap-6 justify-center">
                             <Link
