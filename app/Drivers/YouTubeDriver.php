@@ -79,6 +79,15 @@ class YouTubeDriver implements PublicacionDriver
         $publicacion->visualizaciones = isset($statistics['viewCount'])
             ? (int) $statistics['viewCount']
             : null;
+
+        $thumbnail = $snippet['thumbnails']['maxres']['url']
+            ?? $snippet['thumbnails']['standard']['url']
+            ?? $snippet['thumbnails']['high']['url']
+            ?? $snippet['thumbnails']['medium']['url']
+            ?? $snippet['thumbnails']['default']['url']
+            ?? null;
+
+        $publicacion->thumbnail = $thumbnail;
     }
 
     public function cargarComentarios(Publicacion $publicacion): void

@@ -25,6 +25,7 @@ class Publicacion extends Model
         'num_comentarios',
         'visualizaciones',
         'host_id',
+        'thumbnail',
     ];
 
     protected $casts = [
