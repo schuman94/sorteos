@@ -1,7 +1,7 @@
 import MainLayout from '@/Layouts/MainLayout';
 import Publicacion from '@/Components/Publicacion/Publicacion';
 import axios from '@/lib/axios';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Head, Link, usePage, router } from '@inertiajs/react';
 import { Ticket, LifeBuoy } from 'lucide-react';
 import BotonPrimario from '@/Components/Botones/BotonPrimario';
@@ -13,16 +13,19 @@ export default function Home() {
     const [error, setError] = useState(null);
     const { errors } = usePage().props;
 
-
     // e es el evento que desencadena la funcion.
-    const handleSearch = async (e) => {
+    const handleSearch = (e) => {
         e.preventDefault(); // Evita que el formulario recargue la pagina al hacer submit
+        buscarPublicacion(url);
+    };
+
+    const buscarPublicacion = async (urlABuscar) => {
         setLoading(true);
         setError(null);
         setPublicacion(null);
 
-        try {                                                            // forma simplificada de {url: url}
-            const response = await axios.post(route('publicacion.buscar'), { url });
+        try {
+            const response = await axios.post(route('publicacion.buscar'), { url: urlABuscar });
             setPublicacion(response.data); // response.data contiene el json que devuelve el metodo publicacion.buscar del controlador
         } catch (err) {
             if (err.response && err.response.data) {
@@ -43,10 +46,21 @@ export default function Home() {
     };
 
     const cargarComentarios = () => {
+        // Guardamos la URL en localStorage antes de hacer la petición protegida
+        localStorage.setItem('url_pendiente', publicacion.url);
         // Route::post('/sorteo', ...                 // aqui no se usa la forma simplificada porque debe llamarse url
         router.post(route('publicacion.comentarios'), { url: publicacion.url });
         // Pasamos la publicacion.url y no la variable url (de useState) por si el usuario escribe otra cosa en el input antes de darle a cargar comentarios
     };
+
+    useEffect(() => { // Recuperar los datos de la publicacion tras middleware auth
+        const urlPendiente = localStorage.getItem('url_pendiente');
+        if (urlPendiente) {
+            setUrl(urlPendiente); // restauramos el valor del input también
+            buscarPublicacion(urlPendiente);
+            localStorage.removeItem('url_pendiente'); // limpiamos después
+        }
+    }, []);
 
     return (
         <>
