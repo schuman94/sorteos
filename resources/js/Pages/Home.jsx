@@ -87,7 +87,7 @@ export default function Home() {
                     {/* Resultado */}
                     {publicacion && (
                         <>
-                            <div className="mt-12">
+                            <div className="mt-4">
                                 <Publicacion {...publicacion} />
                             </div>
                             <BotonPrimario onClick={cargarComentarios} className="mt-4">
@@ -98,7 +98,7 @@ export default function Home() {
                     )}
 
                     {/* Sección informativa */}
-                    <section className="mt-8 max-w-2xl text-left">
+                    <section className="mt-10 max-w-2xl text-left">
 
                         <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">¿Cómo funciona?</h2>
                         <ul className="list-disc pl-6 text-gray-700 dark:text-gray-300 text-sm space-y-2">

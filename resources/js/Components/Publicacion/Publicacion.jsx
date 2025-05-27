@@ -1,7 +1,7 @@
 import { formatearFechaCorta as ffc } from '@/utils/fecha';
 import { ThumbsUp, MessageCircle, Eye, User, Calendar, FileVideo } from 'lucide-react';
 
-export default function Publicacion({ autor, num_comentarios, likes, fecha_publicacion, titulo, visualizaciones }) {
+export default function Publicacion({ autor, num_comentarios, likes, fecha_publicacion, titulo, visualizaciones, thumbnail }) {
     return (
         <div className="max-w-md mx-auto mt-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-[#1cc2b5]">
             {/* Encabezado */}
@@ -10,10 +10,20 @@ export default function Publicacion({ autor, num_comentarios, likes, fecha_publi
                 <h2 className="text-xl font-semibold text-white">Publicación</h2>
             </div>
 
+            {/* Miniatura */}
+            {thumbnail && (
+                <img
+                    src={thumbnail}
+                    alt="Miniatura de la publicación"
+                    className="w-full h-auto max-h-60 object-cover border-b"
+                />
+            )}
+
             {/* Cuerpo */}
             <div className="p-5 text-gray-800 dark:text-gray-200 space-y-3 text-sm">
                 {titulo && (
-                    <p className="text-base font-medium text-gray-900 dark:text-white">{titulo}</p>
+                    <p className="text-base font-medium text-left text-gray-900 dark:text-white">{titulo}</p>
+
                 )}
 
                 <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
