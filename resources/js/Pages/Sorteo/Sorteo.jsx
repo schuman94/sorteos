@@ -57,6 +57,12 @@ export default function Sorteo({ publicacion }) {
         }
     }, [cuentaRegresiva]);
 
+    // Eliminar de localStorage la url, ya no la necesitamos, estamos autenticados
+    useEffect(() => {
+        localStorage.removeItem('url_pendiente');
+    }, []);
+
+
     const handleChange = (e) => {
         const { name, type, value, checked } = e.target;
         setFormData({
