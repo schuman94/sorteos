@@ -3,6 +3,7 @@ import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import GuestLayout from '@/Layouts/GuestLayout';
+import Checkbox from '@/Components/Checkbox';
 import { Head, Link, useForm } from '@inertiajs/react';
 
 export default function Register() {
@@ -11,10 +12,13 @@ export default function Register() {
         email: '',
         password: '',
         password_confirmation: '',
+        acepta_condiciones: false,
     });
 
     const submit = (e) => {
         e.preventDefault();
+
+        if (!data.acepta_condiciones) return;
 
         post(route('register'), {
             onFinish: () => reset('password', 'password_confirmation'),
@@ -100,6 +104,20 @@ export default function Register() {
                         message={errors.password_confirmation}
                         className="mt-2"
                     />
+                </div>
+
+                <div className="mt-4 flex items-start gap-2">
+                    <Checkbox
+                        id="acepta_condiciones"
+                        name="acepta_condiciones"
+                        checked={data.acepta_condiciones}
+                        onChange={(e) => setData('acepta_condiciones', e.target.checked)}
+                        required
+                    />
+                    <label htmlFor="acepta_condiciones" className="text-sm text-gray-600 dark:text-gray-300">
+                        Acepto que mi dirección de correo electrónico sea compartida con otros usuarios de la
+                        aplicación con fines de notificación en caso de resultar premiado.
+                    </label>
                 </div>
 
                 <div className="mt-4 flex items-center justify-end">
