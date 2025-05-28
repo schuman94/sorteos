@@ -73,7 +73,7 @@ export default function Home() {
                         <div className="bg-[#1cc2b5]/10 p-4 rounded-full">
                             <img src="/assets/logo-sorteillo.svg" alt="Sorteillo Logo" className="h-11 w-auto" />
                         </div>
-                        <h1 className="text-4xl font-bold text-gray-900 dark:text-white">Sorteo en redes</h1>
+                        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Sorteo en redes</h1>
                         <p className="max-w-xl text-base text-gray-600 dark:text-gray-400">
                             Elige un ganador entre los comentarios de un video/short de <strong>YouTube</strong> o un post de <strong>BlueSky</strong>. Próximamente disponible para posts de <strong>Instagram</strong>.
                         </p>
@@ -114,7 +114,7 @@ export default function Home() {
                     {/* Sección informativa */}
                     <section className="mt-10 max-w-2xl text-left">
 
-                        <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">¿Cómo funciona?</h2>
+                        <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">¿Cómo funciona?</h2>
                         <ul className="list-disc pl-6 text-gray-700 dark:text-gray-300 text-sm space-y-2">
                             <li>Introduce la URL de una publicación de YouTube o Bluesky.</li>
                             <li>Visualiza sus comentarios antes de iniciar el sorteo.</li>
@@ -143,7 +143,7 @@ export default function Home() {
                                     <Ticket className="w-5 h-5" />
                                     <span>Rascas</span>
                                 </div>
-                                <p className="text-sm text-gray-500 group-hover:text-white transition text-center">
+                                <p className="text-sm text-gray-600 group-hover:text-white transition text-center">
                                     Crea colecciones de rascas con premios ocultos y compártelos en tus redes sociales.
                                 </p>
                             </Link>
@@ -156,7 +156,7 @@ export default function Home() {
                                     <LifeBuoy className="w-5 h-5" />
                                     <span>Ruleta</span>
                                 </div>
-                                <p className="text-sm text-gray-500 group-hover:text-white transition text-center">
+                                <p className="text-sm text-gray-600 group-hover:text-white transition text-center">
                                     Introduce diferentes opciones y haz girar la ruleta. Guarda tus ruletas favoritas para reutilizarlas.
                                 </p>
                             </Link>

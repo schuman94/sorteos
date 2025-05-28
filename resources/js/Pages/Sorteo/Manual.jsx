@@ -109,7 +109,7 @@ export default function Manual() {
                         {/* Header con fondo y título */}
                         <div className="bg-[#1cc2b5] px-6 py-5 flex items-center gap-3">
                             <ScrollText className="w-8 h-8 text-white" />
-                            <h2 className="text-3xl font-semibold text-white">Sorteo Manual</h2>
+                            <h1 className="text-3xl font-semibold text-white">Sorteo Manual</h1>
                         </div>
 
                         <div className="p-6 space-y-6">
