@@ -48,7 +48,7 @@ export default function Comentarios() {
             {/* Cabecera turquesa */}
             <div className="bg-[#1cc2b5] px-6 py-4 flex items-center gap-2">
                 <MessageCircle className="w-5 h-5 text-white" />
-                <h2 className="text-lg sm:text-xl font-semibold text-white">Lista de comentarios</h2>
+                <h2 className="text-xl font-semibold text-white">Lista de comentarios</h2>
             </div>
             {/* Contenido */}
             <div className="p-6">

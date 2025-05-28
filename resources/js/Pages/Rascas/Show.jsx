@@ -56,7 +56,7 @@ export default function Show({ rasca }) {
 
             <div className="max-w-2xl mx-auto py-12 px-4 space-y-6">
 
-                <h1 className="text-3xl font-bold text-center text-gray-800">Rasca</h1>
+                <h1 className="text-2xl font-bold text-center text-gray-800">¡Rasca!</h1>
 
                 {/* Tarjeta principal */}
                 <div className="bg-white border rounded-lg shadow p-6 space-y-6">

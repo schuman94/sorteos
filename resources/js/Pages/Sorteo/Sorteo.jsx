@@ -109,7 +109,7 @@ export default function Sorteo({ publicacion }) {
                             >
                                 <div className="flex items-center gap-3">
                                     <SlidersHorizontal className="w-7 h-7 text-white" />
-                                    <h2 className="text-3xl font-semibold text-white">Opciones del Sorteo</h2>
+                                    <h2 className="text-xl font-semibold text-white">Opciones del Sorteo</h2>
                                 </div>
                                 <ChevronDown
                                     className={`w-6 h-6 text-white transition-transform ${mostrarOpciones ? 'rotate-180' : 'rotate-0'}`}
