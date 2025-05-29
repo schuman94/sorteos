@@ -10,6 +10,7 @@ export default function Create() {
         valor: '',
         descripcion: '',
         link: '',
+        image: null,
     });
 
     const handleSubmit = (e) => {
@@ -27,7 +28,7 @@ export default function Create() {
                     <h1 className="text-xl font-semibold text-white">Crear nuevo premio</h1>
                 </div>
 
-                <form onSubmit={handleSubmit} className="p-6 space-y-6">
+                <form onSubmit={handleSubmit} className="p-6 space-y-6" encType="multipart/form-data">
                     <div>
                         <label htmlFor="nombre" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                             Nombre
@@ -97,7 +98,19 @@ export default function Create() {
                         />
                         {errors.link && <p className="text-red-600 text-sm mt-1">{errors.link}</p>}
                     </div>
-
+                    <div>
+                        <label htmlFor="image" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Imagen (opcional)
+                        </label>
+                        <input
+                            type="file"
+                            id="image"
+                            accept="image/*"
+                            className="w-full px-4 py-2 border border-[#1cc2b5] rounded-md bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1cc2b5] focus:border-[#1cc2b5]"
+                            onChange={(e) => setData('image', e.target.files[0])}
+                        />
+                        {errors.image && <p className="text-red-600 text-sm mt-1">{errors.image}</p>}
+                    </div>
                     <div className="flex justify-end">
                         <BotonPrimario type="submit" disabled={processing}>
                             Guardar premio

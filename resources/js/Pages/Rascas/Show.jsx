@@ -60,10 +60,25 @@ export default function Show({ rasca }) {
 
                 {/* Tarjeta principal */}
                 <div className="bg-white border rounded-lg shadow p-6 space-y-6">
-                    <div className="space-y-2">
-                        <p><strong>Colección:</strong> {rasca.coleccion.nombre}</p>
-                        <p><strong>Rascas totales:</strong> {rasca.coleccion.total_rascas}</p>
+                    <div className="space-y-4">
+                        <div className="grid sm:grid-cols-2 gap-4 text-sm text-gray-800">
+                            <div>
+                                <p className="font-semibold text-gray-600">Colección:</p>
+                                <p>{rasca.coleccion.nombre}</p>
+                            </div>
+                            <div>
+                                <p className="font-semibold text-gray-600">Rascas totales:</p>
+                                <p>{rasca.coleccion.total_rascas}</p>
+                            </div>
+                        </div>
+
+                        {rasca.coleccion.descripcion && (
+                            <div className="bg-gray-50 border border-gray-200 rounded-md p-3 text-sm text-gray-700">
+                                <p className="whitespace-pre-line">{rasca.coleccion.descripcion}</p>
+                            </div>
+                        )}
                     </div>
+
 
                     <table className="min-w-full border text-sm">
                         <thead className="bg-[#1cc2b5] text-white">
@@ -77,19 +92,36 @@ export default function Show({ rasca }) {
                             {rasca.coleccion.premios.map((p, i) => (
                                 <tr key={i} className="hover:bg-gray-50">
                                     <td className="border px-3 py-2">
-                                        {p.link ? (
-                                            <a
-                                                href={p.link}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="text-blue-600 underline hover:text-blue-800"
-                                            >
-                                                {p.nombre}
-                                            </a>
-                                        ) : (
-                                            p.nombre
-                                        )}
+                                        <div className="flex items-center gap-3">
+                                            {p.thumbnail_url && (
+                                                <a
+                                                    href={p.link || '#'}
+                                                    target={p.link ? '_blank' : undefined}
+                                                    rel={p.link ? 'noopener noreferrer' : undefined}
+                                                    className="group"
+                                                >
+                                                    <img
+                                                        src={p.thumbnail_url}
+                                                        alt={`Miniatura de ${p.nombre}`}
+                                                        className="w-10 h-10 object-cover rounded-md transition-transform group-hover:scale-105"
+                                                    />
+                                                </a>
+                                            )}
+                                            {p.link ? (
+                                                <a
+                                                    href={p.link}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-blue-600 underline hover:text-blue-800"
+                                                >
+                                                    {p.nombre}
+                                                </a>
+                                            ) : (
+                                                <span>{p.nombre}</span>
+                                            )}
+                                        </div>
                                     </td>
+
                                     <td className="border px-3 py-2 text-right">{p.cantidad}</td>
                                     <td className="border px-3 py-2 text-right">{p.probabilidad.toFixed(2)}</td>
                                 </tr>
@@ -108,21 +140,32 @@ export default function Show({ rasca }) {
                                         <>
                                             <h2 className="text-xl font-semibold text-[#1cc2b5]">¡Premiado!</h2>
                                             <p><strong>Has ganado:</strong> {rasca.premio.nombre}</p>
-                                            <p>{rasca.premio.descripcion}</p>
+                                            {rasca.premio.descripcion && <p>{rasca.premio.descripcion}</p>}
                                             <p><strong>Proveedor:</strong> {rasca.premio.proveedor}</p>
+
+                                            {rasca.premio.thumbnail_url && (
+                                                <div className="mt-4 flex justify-center">
+                                                    <img
+                                                        src={rasca.premio.thumbnail_url}
+                                                        alt={`Miniatura de ${rasca.premio.nombre}`}
+                                                        className="w-32 h-32 object-cover rounded-lg border"
+                                                        />
+                                                </div>
+                                            )}
                                             {rasca.premio.link && (
                                                 <p>
                                                     <a
                                                         href={rasca.premio.link}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
-                                                        className="text-blue-600 underline"
+                                                        className="text-blue-600 underline hover:text-blue-800"
                                                     >
                                                         Ver premio
                                                     </a>
                                                 </p>
                                             )}
                                         </>
+
                                     ) : (
                                         <div className="flex items-center justify-center h-full">
                                             <p className="italic text-gray-700">Este rasca no ha sido premiado.</p>

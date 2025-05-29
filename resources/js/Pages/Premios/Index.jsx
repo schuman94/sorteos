@@ -7,7 +7,7 @@ import { formatearDinero as dinero } from '@/utils/dinero';
 export default function Index({ premios, filters, anyos }) {
     const columns = [
         {
-            header: 'Nombre',
+            header: 'Premio', // Antes: 'Nombre'
             accessorKey: 'nombre',
             cell: info => {
                 const row = info.row.original;
@@ -15,8 +15,15 @@ export default function Index({ premios, filters, anyos }) {
                     <Link
                         href={route('premios.show', row.id)}
                         preserveScroll
-                        className="text-blue-600 underline"
+                        className="flex items-center gap-3 text-blue-600 underline hover:text-blue-800"
                     >
+                        {row.thumbnail_url && (
+                            <img
+                                src={row.thumbnail_url}
+                                alt={`Miniatura de ${row.nombre}`}
+                                className="w-10 h-10 object-cover rounded-md"
+                            />
+                        )}
                         {row.nombre}
                     </Link>
                 );
@@ -51,8 +58,8 @@ export default function Index({ premios, filters, anyos }) {
                     >
                         Nuevo premio
                     </Link>
-
                 </div>
+
                 <TablaListado
                     data={premios}
                     columns={columns}

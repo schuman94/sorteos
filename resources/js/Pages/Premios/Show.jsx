@@ -4,7 +4,6 @@ import { useState } from 'react';
 import ModalEliminacion from '@/Components/ModalEliminacion';
 import { formatearDinero as dinero } from '@/utils/dinero';
 import { formatearFecha as ff } from '@/utils/fecha';
-import BotonPrimario from '@/Components/Botones/BotonPrimario';
 import BotonRojo from '@/Components/Botones/BotonRojo';
 import { Gift } from 'lucide-react';
 
@@ -29,7 +28,7 @@ export default function Show({ premio }) {
         <>
             <Head title={`Premio: ${premio.nombre}`} />
 
-            <div className="max-w-3xl mx-auto mt-12 bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+            <div className="max-w-3xl mx-auto mt-12 bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
                 {/* Cabecera */}
                 <div className="bg-[#1cc2b5] px-6 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
@@ -38,7 +37,6 @@ export default function Show({ premio }) {
                             {premio.nombre}
                         </h1>
                     </div>
-
                     <Link
                         href={route('premios.index')}
                         className="inline-block text-white font-medium text-sm hover:underline"
@@ -46,6 +44,24 @@ export default function Show({ premio }) {
                         Gestionar premios
                     </Link>
                 </div>
+
+                {/* Imagen */}
+                <div className="relative w-full h-72 bg-black overflow-hidden">
+                    {/* Fondo difuminado */}
+                    <img
+                        src={premio.imagen_url}
+                        alt="Fondo"
+                        className="absolute inset-0 w-full h-full object-cover blur-md scale-110 opacity-50"
+                    />
+
+                    {/* Imagen principal contenida */}
+                    <img
+                        src={premio.imagen_url}
+                        alt={premio.nombre}
+                        className="relative z-10 max-h-full max-w-full object-contain mx-auto h-full"
+                    />
+                </div>
+
 
                 {/* Cuerpo */}
                 <div className="p-6 space-y-4 text-sm text-gray-800 dark:text-gray-200">
@@ -61,27 +77,27 @@ export default function Show({ premio }) {
                     <div>
                         <span className="font-semibold">Valor:</span> {dinero(premio.valor)}
                     </div>
-                    <div>
-                        <span className="font-semibold">Descripción:</span>{' '}
-                        {premio.descripcion || (
-                            <span className="italic text-gray-400">Sin descripción</span>
-                        )}
-                    </div>
-                    <div>
-                        <span className="font-semibold">Link:</span>{' '}
-                        {premio.link ? (
+                    {premio.descripcion && (
+                        <div>
+                            <span className="font-semibold">Descripción:</span>{' '}
+                            {premio.descripcion}
+                        </div>
+                    )}
+
+                    {premio.link && (
+                        <div>
+                            <span className="font-semibold">Link:</span>{' '}
                             <a
                                 href={premio.link}
                                 className="text-[#1cc2b5] underline hover:text-[#17b0a6]"
                                 target="_blank"
                                 rel="noopener noreferrer"
                             >
-                                Ver enlace
+                                Ver enlace oficial
                             </a>
-                        ) : (
-                            <span className="italic text-gray-400">No disponible</span>
-                        )}
-                    </div>
+                        </div>
+                    )}
+
                     <div>
                         <span className="font-semibold">Creado:</span> {ff(premio.created_at)}
                     </div>

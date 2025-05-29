@@ -12,12 +12,16 @@ export default function ModalCrearPremio({ visible, onClose, onCrearPremio }) {
         descripcion: '',
         link: '',
     });
-
+    const [imagen, setImagen] = useState(null);
     const [error, setError] = useState('');
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
         setError('');
+    };
+
+    const handleFileChange = (e) => {
+        setImagen(e.target.files[0]);
     };
 
     const handleGuardar = async () => {
@@ -28,8 +32,15 @@ export default function ModalCrearPremio({ visible, onClose, onCrearPremio }) {
             return;
         }
 
+        const data = new FormData();
+        Object.entries(formData).forEach(([key, value]) => data.append(key, value));
+        if (imagen) data.append('image', imagen);
+
         try {
-            const response = await axios.post(route('premios.storeAndLoad'), formData);
+            const response = await axios.post(route('premios.storeAndLoad'), data, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+
             onCrearPremio?.(response.data);
             onClose();
         } catch (error) {
@@ -47,8 +58,8 @@ export default function ModalCrearPremio({ visible, onClose, onCrearPremio }) {
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 px-4">
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-lg overflow-hidden">
-                                <div className="bg-[#1cc2b5] px-6 py-4 flex items-center gap-3">
-                                     <Gift className="w-6 h-6 text-white" />
+                <div className="bg-[#1cc2b5] px-6 py-4 flex items-center gap-3">
+                    <Gift className="w-6 h-6 text-white" />
                     <h2 className="text-lg font-semibold text-white">Nuevo Premio</h2>
                 </div>
 
@@ -128,15 +139,24 @@ export default function ModalCrearPremio({ visible, onClose, onCrearPremio }) {
                         />
                     </div>
 
+                    <div>
+                        <label htmlFor="image" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Imagen (opcional)
+                        </label>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            id="image"
+                            onChange={handleFileChange}
+                            className="w-full px-4 py-2 border border-[#1cc2b5] rounded-md bg-white text-gray-800 focus:outline-none"
+                        />
+                    </div>
+
                     {error && <p className="text-red-600 text-sm">{error}</p>}
 
                     <div className="flex justify-end gap-2 pt-4">
-                        <BotonGris onClick={onClose}>
-                            Cancelar
-                        </BotonGris>
-                        <BotonPrimario onClick={handleGuardar}>
-                            Crear y añadir
-                        </BotonPrimario>
+                        <BotonGris onClick={onClose}>Cancelar</BotonGris>
+                        <BotonPrimario onClick={handleGuardar}>Crear y añadir</BotonPrimario>
                     </div>
                 </div>
             </div>

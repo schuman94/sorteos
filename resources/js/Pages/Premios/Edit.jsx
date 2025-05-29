@@ -2,19 +2,29 @@ import MainLayout from '@/Layouts/MainLayout';
 import { Head, useForm } from '@inertiajs/react';
 import BotonPrimario from '@/Components/Botones/BotonPrimario';
 import { PenSquare } from 'lucide-react';
+import { useRef } from 'react';
 
 export default function Edit({ premio }) {
-    const { data, setData, put, processing, errors } = useForm({
+    const fileInputRef = useRef();
+    const { data, setData, post, processing, errors } = useForm({
+        _method: 'put',
         nombre: premio.nombre || '',
         proveedor: premio.proveedor || '',
         valor: premio.valor || '',
         descripcion: premio.descripcion || '',
         link: premio.link || '',
+        image: null,
     });
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        put(route('premios.update', premio.id));
+        post(route('premios.update', premio.id), {
+            forceFormData: true,
+        });
+    };
+
+    const handleFileChange = (e) => {
+        setData('image', e.target.files[0]);
     };
 
     return (
@@ -33,7 +43,7 @@ export default function Edit({ premio }) {
                         <input
                             type="text"
                             id="nombre"
-                            className="w-full px-4 py-2 border border-[#1cc2b5] rounded-md bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1cc2b5] focus:border-[#1cc2b5]"
+                            className="w-full px-4 py-2 border border-[#1cc2b5] rounded-md bg-white text-gray-800"
                             value={data.nombre}
                             onChange={(e) => setData('nombre', e.target.value)}
                         />
@@ -45,7 +55,7 @@ export default function Edit({ premio }) {
                         <input
                             type="text"
                             id="proveedor"
-                            className="w-full px-4 py-2 border border-[#1cc2b5] rounded-md bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1cc2b5] focus:border-[#1cc2b5]"
+                            className="w-full px-4 py-2 border border-[#1cc2b5] rounded-md bg-white text-gray-800"
                             value={data.proveedor}
                             onChange={(e) => setData('proveedor', e.target.value)}
                         />
@@ -58,7 +68,7 @@ export default function Edit({ premio }) {
                             type="number"
                             step="0.01"
                             id="valor"
-                            className="w-full px-4 py-2 border border-[#1cc2b5] rounded-md bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1cc2b5] focus:border-[#1cc2b5]"
+                            className="w-full px-4 py-2 border border-[#1cc2b5] rounded-md bg-white text-gray-800"
                             value={data.valor}
                             onChange={(e) => setData('valor', e.target.value)}
                         />
@@ -69,7 +79,7 @@ export default function Edit({ premio }) {
                         <label htmlFor="descripcion" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Descripción</label>
                         <textarea
                             id="descripcion"
-                            className="w-full px-4 py-2 border border-[#1cc2b5] rounded-md bg-white text-gray-800 min-h-[100px] resize-y focus:outline-none focus:ring-2 focus:ring-[#1cc2b5] focus:border-[#1cc2b5]"
+                            className="w-full px-4 py-2 border border-[#1cc2b5] rounded-md bg-white text-gray-800 min-h-[100px] resize-y"
                             value={data.descripcion}
                             onChange={(e) => setData('descripcion', e.target.value)}
                         />
@@ -81,11 +91,35 @@ export default function Edit({ premio }) {
                         <input
                             type="url"
                             id="link"
-                            className="w-full px-4 py-2 border border-[#1cc2b5] rounded-md bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1cc2b5] focus:border-[#1cc2b5]"
+                            className="w-full px-4 py-2 border border-[#1cc2b5] rounded-md bg-white text-gray-800"
                             value={data.link}
                             onChange={(e) => setData('link', e.target.value)}
                         />
                         {errors.link && <p className="text-red-600 text-sm mt-1">{errors.link}</p>}
+                    </div>
+
+                    <div>
+                        <label htmlFor="image" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Imagen (opcional)</label>
+                        <input
+                            type="file"
+                            id="image"
+                            accept="image/*"
+                            ref={fileInputRef}
+                            onChange={handleFileChange}
+                            className="block w-full text-sm text-gray-700"
+                        />
+                        {errors.image && <p className="text-red-600 text-sm mt-1">{errors.image}</p>}
+
+                        {premio.imagen_url && (
+                            <div className="mt-4">
+                                <p className="text-sm text-gray-500 mb-1">Imagen actual:</p>
+                                <img
+                                    src={premio.thumbnail_url}
+                                    alt="Imagen actual del premio"
+                                    className="w-40 h-auto rounded-md border border-gray-300"
+                                />
+                            </div>
+                        )}
                     </div>
 
                     <div className="flex justify-end">
