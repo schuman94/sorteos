@@ -192,7 +192,7 @@ export default function Show({ coleccion, urls }) {
                             <table className="min-w-full text-sm bg-white shadow border border-[#1cc2b5] rounded-md overflow-hidden">
                                 <thead className="bg-[#1cc2b5] text-white">
                                     <tr>
-                                        <th className="px-3 py-2 text-left">Nombre</th>
+                                        <th className="px-3 py-2 text-left">Premio</th>
                                         <th className="px-3 py-2 text-left">Proveedor</th>
                                         <th className="px-3 py-2 text-right">Cantidad</th>
                                         <th className="px-3 py-2 text-right">Valor</th>
@@ -202,12 +202,24 @@ export default function Show({ coleccion, urls }) {
                                     {coleccion.premios.map((p, i) => (
                                         <tr key={i} className="hover:bg-gray-50">
                                             <td className="border-t border-gray-200 px-3 py-2">
-                                                <Link
-                                                    href={route('premios.show', p.id)}
-                                                    className="text-blue-600 underline hover:text-blue-800"
-                                                >
-                                                    {p.nombre}
-                                                </Link>
+                                                <div className="flex items-center gap-3">
+                                                    <Link
+                                                        href={route('premios.show', p.id)}
+                                                        className="flex items-center gap-3 group"
+                                                    >
+                                                        {p.thumbnail_url && (
+                                                            <img
+                                                                src={p.thumbnail_url}
+                                                                alt={`Miniatura de ${p.nombre}`}
+                                                                className="w-10 h-10 object-cover rounded-md transition-transform group-hover:scale-105"
+                                                            />
+                                                        )}
+                                                        <span className="text-blue-600 underline group-hover:text-blue-800">
+                                                            {p.nombre}
+                                                        </span>
+                                                    </Link>
+                                                </div>
+
                                             </td>
                                             <td className="border-t border-gray-200 px-3 py-2">{p.proveedor}</td>
                                             <td className="border-t border-gray-200 px-3 py-2 text-right">{p.cantidad}</td>
@@ -215,6 +227,7 @@ export default function Show({ coleccion, urls }) {
                                         </tr>
                                     ))}
                                 </tbody>
+
                                 <tfoot>
                                     <tr className="bg-gray-100 font-semibold text-gray-700">
                                         <td colSpan="3" className="px-3 py-2 text-right">Valor total:</td>
@@ -222,6 +235,7 @@ export default function Show({ coleccion, urls }) {
                                     </tr>
                                 </tfoot>
                             </table>
+
                         </div>
 
                     </div>

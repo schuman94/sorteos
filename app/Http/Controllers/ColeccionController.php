@@ -192,12 +192,13 @@ class ColeccionController extends Controller
                 $cantidad = $group->count();
 
                 return [
-                    'id'           => $premio->id,
-                    'nombre'       => $premio->nombre,
-                    'proveedor'    => $premio->proveedor,
-                    'link'         => $premio->link,
-                    'cantidad'     => $cantidad,
-                    'valor_total'  => $cantidad * $premio->valor,
+                    'id'            => $premio->id,
+                    'nombre'        => $premio->nombre,
+                    'proveedor'     => $premio->proveedor,
+                    'link'          => $premio->link,
+                    'cantidad'      => $cantidad,
+                    'valor_total'   => $cantidad * $premio->valor,
+                    'thumbnail_url' => $premio->thumbnail_url,
                 ];
             })
             ->values();

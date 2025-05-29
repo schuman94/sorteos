@@ -67,6 +67,7 @@ class RascaController extends Controller
                     'link' => $premio->link,
                     'cantidad' => $cantidad,
                     'probabilidad' => $probabilidad,
+                    'thumbnail_url'  => $premio->thumbnail_url,
                 ];
             })
             ->values();
@@ -78,15 +79,17 @@ class RascaController extends Controller
                 'es_propietario' => Auth::id() && $rasca->scratched_by === Auth::id(),
                 'coleccion' => [
                     'nombre'         => $coleccion->nombre,
+                    'descripcion'       => $coleccion->descripcion,
                     'abierta'        => $coleccion->abierta,
                     'total_rascas'   => $rascasTotales,
                     'premios'        => $premios,
                 ],
                 'premio' => $rasca->scratched_at && $rasca->premio ? [
-                    'nombre'       => $rasca->premio->nombre,
-                    'descripcion'  => $rasca->premio->descripcion,
-                    'proveedor'    => $rasca->premio->proveedor,
-                    'link'         => $rasca->premio->link,
+                    'nombre'        => $rasca->premio->nombre,
+                    'descripcion'   => $rasca->premio->descripcion,
+                    'proveedor'     => $rasca->premio->proveedor,
+                    'link'          => $rasca->premio->link,
+                    'thumbnail_url' => $rasca->premio->thumbnail_url,
                 ] : null,
             ],
         ]);
@@ -164,6 +167,7 @@ class RascaController extends Controller
             'proveedor'    => $rasca->premio?->proveedor,
             'coleccion'    => $rasca->coleccion?->nombre,
             'premio_link'  => $rasca->premio?->link,
+            'thumbnail_url' => $rasca->premio?->thumbnail_url,
         ]);
 
         return Inertia::render('Rascas/Premiados', [

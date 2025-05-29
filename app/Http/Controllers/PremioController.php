@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
+
 
 class PremioController extends Controller
 {
@@ -87,22 +91,21 @@ class PremioController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'nombre' => 'required|string|max:255|unique:premios,nombre',
-            'proveedor' => 'required|string|max:255',
-            'valor' => 'required|numeric|min:0',
-            'descripcion' => 'nullable|string|max:255',
-            'link' => 'nullable|url',
-        ]);
+        $premio = $this->guardarPremio($request);
 
-        $premio = new Premio($validated);
-        $premio->user()->associate(Auth::user());
-        $premio->save();
-
-        return redirect()->route('premios.show', $premio)->with('success', 'Premio creado correctamente.');
+        return redirect()
+            ->route('premios.show', $premio)
+            ->with('success', 'Premio creado correctamente.');
     }
 
     public function storeAndLoad(Request $request)
+    {
+        $premio = $this->guardarPremio($request);
+
+        return response()->json($premio);
+    }
+
+    private function guardarPremio(Request $request): Premio
     {
         $validated = $request->validate([
             'nombre' => 'required|string|max:255|unique:premios,nombre',
@@ -110,15 +113,32 @@ class PremioController extends Controller
             'valor' => 'required|numeric|min:0',
             'descripcion' => 'nullable|string|max:255',
             'link' => 'nullable|url',
+            'image' => 'nullable|image|max:2048',
         ]);
+
+        if ($request->hasFile('image')) {
+            $imageFile = $request->file('image');
+
+            // Imagen original
+            $path = $imageFile->store('public/premios', 's3');
+            Storage::disk('s3')->setVisibility($path, 'public');
+            $validated['imagen_url'] = Storage::disk('s3')->url($path);
+
+            // Thumbnail
+            $manager = new ImageManager(new Driver());
+            $thumbnail = $manager->read($imageFile)->cover(200, 200, 'center');
+
+            $thumbPath = 'public/thumbs/' . uniqid() . '.jpg';
+            Storage::disk('s3')->put($thumbPath, $thumbnail->toJpeg(80), 'public');
+            $validated['thumbnail_url'] = Storage::disk('s3')->url($thumbPath);
+        }
 
         $premio = new Premio($validated);
         $premio->user()->associate(Auth::user());
         $premio->save();
 
-        return response()->json($premio);
+        return $premio;
     }
-
 
     /**
      * Display the specified resource.
@@ -156,12 +176,43 @@ class PremioController extends Controller
             'valor' => 'required|numeric|min:0',
             'descripcion' => 'nullable|string',
             'link' => 'nullable|url',
+            'image' => 'nullable|image|max:2048',
         ]);
+
+        if ($request->hasFile('image')) {
+            // Eliminar imágenes anteriores si existen
+            if ($premio->imagen_url) {
+                $rutaOriginal = parse_url($premio->imagen_url, PHP_URL_PATH);
+                $rutaOriginal = ltrim($rutaOriginal, '/');
+                Storage::disk('s3')->delete($rutaOriginal);
+            }
+
+            if ($premio->thumbnail_url) {
+                $rutaThumb = parse_url($premio->thumbnail_url, PHP_URL_PATH);
+                $rutaThumb = ltrim($rutaThumb, '/');
+                Storage::disk('s3')->delete($rutaThumb);
+            }
+
+            // Subir nueva imagen
+            $imageFile = $request->file('image');
+            $path = $imageFile->store('public/premios', 's3');
+            Storage::disk('s3')->setVisibility($path, 'public');
+            $validated['imagen_url'] = Storage::disk('s3')->url($path);
+
+            // Crear nueva thumbnail
+            $manager = new ImageManager(new Driver());
+            $thumbnail = $manager->read($imageFile)->cover(200, 200, 'center');
+
+            $thumbPath = 'public/thumbs/' . uniqid() . '.jpg';
+            Storage::disk('s3')->put($thumbPath, (string) $thumbnail->toJpeg(80), 'public');
+            $validated['thumbnail_url'] = Storage::disk('s3')->url($thumbPath);
+        }
 
         $premio->update($validated);
 
         return redirect()->route('premios.show', $premio)->with('success', 'Premio actualizado correctamente.');
     }
+
 
     /**
      * Remove the specified resource from storage.
@@ -175,6 +226,16 @@ class PremioController extends Controller
             return back()->withErrors([
                 'premio' => 'No se puede eliminar el premio porque está asociado a uno o más rascas.',
             ]);
+        }
+
+        if ($premio->imagen_url) {
+            $rutaImagen = ltrim(parse_url($premio->imagen_url, PHP_URL_PATH), '/');
+            Storage::disk('s3')->delete($rutaImagen);
+        }
+
+        if ($premio->thumbnail_url) {
+            $rutaThumb = ltrim(parse_url($premio->thumbnail_url, PHP_URL_PATH), '/');
+            Storage::disk('s3')->delete($rutaThumb);
         }
 
         $premio->delete();

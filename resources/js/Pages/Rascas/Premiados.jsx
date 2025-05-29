@@ -32,17 +32,35 @@ export default function Premiados({ premiados, filters, anyos }) {
             accessorKey: 'premio',
             cell: info => {
                 const row = info.row.original;
-                return row.premio_link ? (
-                    <a
-                        href={row.premio_link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 underline hover:text-blue-800"
-                    >
-                        {row.premio}
-                    </a>
-                ) : (
-                    row.premio || ''
+                return (
+                    <div className="flex items-center gap-3">
+                        {row.thumbnail_url && (
+                            <a
+                                href={row.premio_link || '#'}
+                                target={row.premio_link ? '_blank' : undefined}
+                                rel={row.premio_link ? 'noopener noreferrer' : undefined}
+                                className="group"
+                            >
+                                <img
+                                    src={row.thumbnail_url}
+                                    alt={`Miniatura de ${row.premio}`}
+                                    className="w-10 h-10 object-cover rounded-md transition-transform group-hover:scale-105"
+                                />
+                            </a>
+                        )}
+                        {row.premio_link ? (
+                            <a
+                                href={row.premio_link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-600 underline hover:text-blue-800"
+                            >
+                                {row.premio}
+                            </a>
+                        ) : (
+                            <span>{row.premio || ''}</span>
+                        )}
+                    </div>
                 );
             }
         },
