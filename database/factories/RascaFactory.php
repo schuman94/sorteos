@@ -18,10 +18,10 @@ class RascaFactory extends Factory
      */
     public function definition(): array
     {
-        $coleccion = Coleccion::where('nombre', 'Rascas Nijuuni 2025')->first();
         return [
             'codigo' => (string) Str::uuid(),
-            'coleccion_id' => $coleccion->id,
+            'coleccion_id' => Coleccion::factory(),
+            'provided_at' => now(),
         ];
     }
 }
