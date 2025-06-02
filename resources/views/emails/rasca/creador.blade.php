@@ -17,6 +17,8 @@ de tu colección **{{ $rasca->coleccion->nombre ?? 'Colección desconocida' }}**
 **Código del rasca:**
 `{{ $rasca->codigo }}`
 
+Contacta con el ganador para gestionar el premio.
+
 **Email del usuario:** {{ $usuario->email }}
 
 ---

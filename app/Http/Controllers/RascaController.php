@@ -13,6 +13,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\RascaPremiadoUsuario;
 use App\Mail\RascaPremiadoCreador;
+use Illuminate\Support\Str;
 
 class RascaController extends Controller
 {
@@ -45,6 +46,11 @@ class RascaController extends Controller
      */
     public function show(string $codigo)
     {
+        // Validar que sea un UUID válido
+        if (!Str::isUuid($codigo)) {
+            abort(404);
+        }
+
         $rasca = Rasca::with(['coleccion.rascas.premio', 'premio'])->where('codigo', $codigo)->firstOrFail();
 
         if (is_null($rasca->provided_at)) {

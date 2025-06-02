@@ -33,7 +33,22 @@ export default function Sorteo({ publicacion }) {
     const [mostrarOpciones, setMostrarOpciones] = useState(true);
 
     const [mostrarConfetti, setMostrarConfetti] = useState(false);
-    const [width, height] = useWindowSize();
+    const [viewportWidth, setViewportWidth] = useState(window.innerWidth);
+    const [documentHeight, setDocumentHeight] = useState(document.body.scrollHeight);
+    useEffect(() => {
+        const handleResize = () => {
+            setViewportWidth(window.innerWidth);
+            setDocumentHeight(Math.max(
+                document.body.scrollHeight,
+                document.documentElement.scrollHeight
+            ));
+        };
+
+        handleResize();
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
 
     const validarFormulario = () => {
         const erroresTemp = {};
@@ -79,6 +94,7 @@ export default function Sorteo({ publicacion }) {
             const response = await axios.post(route('sorteo.iniciar'), formData);
             setGanadores(response.data.ganadores);
             setUrlHost(response.data.urlHost);
+            window.scrollTo({ top: 0 });
             setCuentaRegresiva(formData.cuenta_regresiva || 5);
             setMostrarGanadores(false);
         } catch (error) {
@@ -93,7 +109,11 @@ export default function Sorteo({ publicacion }) {
     return (
         <>
             <Head title="Sorteo" />
-            {mostrarConfetti && <Confetti width={width} height={height} />}
+            {mostrarConfetti && (
+                <div style={{ position: 'fixed', top: 0, left: 0, pointerEvents: 'none', zIndex: 50 }}>
+                    <Confetti width={viewportWidth} height={documentHeight} />
+                </div>
+            )}
             <div className="min-h-screen bg-gray-50 dark:bg-black text-black/70 dark:text-white/70 py-16 px-4">
                 {!ganadores ? (
                     <>

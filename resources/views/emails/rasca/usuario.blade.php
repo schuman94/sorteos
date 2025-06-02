@@ -20,6 +20,8 @@ Has conseguido un premio de la colección **{{ $rasca->coleccion->nombre }}**.
 </x-mail::button>
 @endif
 
+El creador de la colección contactará contigo a través de esta dirección de correo para gestionar el premio.
+
 ---
 
 **Código del rasca:**
