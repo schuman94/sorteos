@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
-use App\Models\Host;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -72,5 +71,21 @@ class UserController extends Controller
         $user->save();
 
         return redirect()->route('admin.users.show', $user)->with('success', 'Permisos de administrador retirados.');
+    }
+
+    public function destroy(User $user)
+    {
+        if ($user->is_admin) {
+            return redirect()->back()->with('error', 'Un administrador no puede ser eliminado.');
+        }
+
+        // Previene que un admin se elimine a sí mismo
+        if (Auth::id() === $user->id) {
+            return redirect()->back()->with('error', 'No puedes eliminar tu propia cuenta.');
+        }
+
+        $user->delete();
+
+        return redirect()->route('admin.users.index')->with('success', 'Usuario eliminado correctamente.');
     }
 }
