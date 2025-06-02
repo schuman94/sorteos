@@ -87,4 +87,40 @@ class UserController extends Controller
 
         return redirect()->route('admin.users.index')->with('success', 'Usuario eliminado correctamente.');
     }
+
+    public function eliminados(Request $request)
+    {
+        $query = User::onlyTrashed()->withCount('sorteos');
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'ilike', '%' . $search . '%')
+                    ->orWhere('email', 'ilike', '%' . $search . '%');
+            });
+        }
+
+        $sort = $request->input('sort', 'id');
+        $direction = $request->input('direction', 'asc');
+
+        if (in_array($sort, ['id', 'name', 'email', 'created_at', 'sorteos_count', 'is_admin'])) {
+            $query->orderBy($sort, $direction);
+        }
+
+        $users = $query->paginate(20)->withQueryString();
+
+        return Inertia::render('Admin/Users/Eliminados', [
+            'users' => $users,
+            'filters' => $request->only(['search', 'email', 'sort', 'direction']),
+        ]);
+    }
+
+
+    public function restaurar($id)
+    {
+        $user = User::onlyTrashed()->findOrFail($id);
+        $user->restore();
+
+        return redirect()->route('admin.users.show', $user)->with('success', 'Usuario restaurado correctamente.');
+    }
 }
