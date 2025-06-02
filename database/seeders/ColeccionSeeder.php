@@ -68,7 +68,9 @@ class ColeccionSeeder extends Seeder
         $camiseta = Premio::find(1);
         $sudadera = Premio::find(2);
 
-        Rasca::factory()->count(2)->create();
+        Rasca::factory()->count(2)->create([
+            'coleccion_id' => $coleccion->id,
+        ]);
 
         Rasca::create([
             'codigo' => (string) Str::uuid(),
@@ -85,7 +87,5 @@ class ColeccionSeeder extends Seeder
                 'premio_id' => $camiseta->id,
             ]);
         }
-
-
     }
 }

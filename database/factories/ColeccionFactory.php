@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,7 +18,10 @@ class ColeccionFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'nombre' => $this->faker->words(3, true),
+            'descripcion' => $this->faker->sentence(),
+            'abierta' => true,
+            'user_id' => User::factory(),
         ];
     }
 }
