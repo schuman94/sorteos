@@ -223,28 +223,25 @@ export default function MainLayout({ header, children }) {
                 </header>
             )}
 
-            <main className="flex-grow px-4 py-10 w-full">
-                <div className="max-w-5xl mx-auto space-y-6">
-                    {flash?.success && (
-                        <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded mb-6">
-                            {flash.success}
-                        </div>
-                    )}
-                    {flash?.warning && (
-                        <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded mb-6">
-                            {flash.warning}
-                        </div>
-                    )}
-                    {flash?.error && (
-                        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded mb-6">
-                            {flash.error}
-                        </div>
-                    )}
+            <main className="flex-grow w-full">
+                {flash?.success && (
+                    <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded mb-6">
+                        {flash.success}
+                    </div>
+                )}
+                {flash?.warning && (
+                    <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded mb-6">
+                        {flash.warning}
+                    </div>
+                )}
+                {flash?.error && (
+                    <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded mb-6">
+                        {flash.error}
+                    </div>
+                )}
 
-                    {children}
-                </div>
+                {children}
             </main>
-
 
             <footer className="bg-[#0a081e] text-white text-sm">
                 <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">

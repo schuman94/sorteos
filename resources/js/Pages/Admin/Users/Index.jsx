@@ -46,7 +46,15 @@ export default function Index({ users, filters }) {
         <>
             <Head title="Usuarios" />
             <div className="max-w-6xl mx-auto py-12 px-4 space-y-6">
-                <h1 className="text-2xl font-bold">Usuarios registrados</h1>
+                <div className="flex items-center justify-between mb-4">
+                    <h1 className="text-2xl font-bold">Usuarios registrados</h1>
+                    <Link
+                        href={route('admin.users.eliminados')}
+                        className="inline-flex items-center justify-center gap-2 px-6 py-2 rounded-md bg-[#1cc2b5] text-white font-semibold hover:bg-[#17b0a6] shadow-sm active:scale-95 transition-transform duration-100 ease-in-out"
+                    >
+                        Usuarios eliminados
+                    </Link>
+                </div>
 
                 <TablaListado
                     data={users}
@@ -55,8 +63,8 @@ export default function Index({ users, filters }) {
                     rutaIndex="admin.users.index"
                     placeholder="Buscar por nombre o email..."
                 />
-
             </div>
+
         </>
     );
 }

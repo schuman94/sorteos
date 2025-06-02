@@ -76,15 +76,20 @@ export default function TablaListado({ data, columns, filters, rutaIndex, placeh
                                 return (
                                     <th
                                         key={header.id}
-                                        className="px-4 py-2 cursor-pointer select-none text-white"
-                                        onClick={header.column.getToggleSortingHandler()}
+                                        className="px-4 py-2 text-white select-none"
+                                        onClick={header.column.columnDef.enableSorting !== false
+                                            ? header.column.getToggleSortingHandler()
+                                            : undefined}
                                     >
                                         <div className="inline-flex items-center gap-1">
                                             {flexRender(header.column.columnDef.header, header.getContext())}
-                                            {sorted === 'asc' && <ArrowUp className="w-4 h-4 text-white" />}
-                                            {sorted === 'desc' && <ArrowDown className="w-4 h-4 text-white" />}
-                                            {!sorted && <MoveVertical className="w-4 h-4 text-white" />}
+                                            {header.column.columnDef.enableSorting !== false && (
+                                                sorted === 'asc' ? <ArrowUp className="w-4 h-4 text-white" /> :
+                                                    sorted === 'desc' ? <ArrowDown className="w-4 h-4 text-white" /> :
+                                                        <MoveVertical className="w-4 h-4 text-white" />
+                                            )}
                                         </div>
+
                                     </th>
                                 );
                             })}
