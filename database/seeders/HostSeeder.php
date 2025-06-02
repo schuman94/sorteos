@@ -22,10 +22,5 @@ class HostSeeder extends Seeder
             'nombre' => 'Bluesky',
             'url' => 'https://bsky.app'
         ]);
-
-        Host::create([
-            'nombre' => 'Instagram',
-            'url' => 'https://www.instagram.com'
-        ]);
     }
 }

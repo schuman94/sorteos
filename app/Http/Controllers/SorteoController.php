@@ -94,6 +94,14 @@ class SorteoController extends Controller
         // Array con todos los participantes
         $participantes = array_merge($comentariosFiltrados, $participantesManuales);
 
+        if (count($participantes) === 0) {
+            return response()->json([
+                'errors' => [
+                    'participantes' => ['No hay participantes que cumplan los requisitos del sorteo.']
+                ]
+            ], 422);
+        }
+
         // Iniciamos la transacción
         DB::beginTransaction();
 

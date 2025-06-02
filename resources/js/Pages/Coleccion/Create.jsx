@@ -7,8 +7,9 @@ import BotonPrimario from '@/Components/Botones/BotonPrimario';
 import BotonRosa from '@/Components/Botones/BotonRosa';
 import BotonRojo from '@/Components/Botones/BotonRojo';
 import { TicketCheck } from 'lucide-react';
+import { formatearDinero } from '@/utils/dinero';
 
-export default function Index() {
+export default function Create() {
     const { errors } = usePage().props;
     const [nombre, setNombre] = useState('');
     const [descripcion, setDescripcion] = useState('');
@@ -65,7 +66,6 @@ export default function Index() {
             setEnviando(false);
         }
     };
-
 
     return (
         <>
@@ -145,9 +145,15 @@ export default function Index() {
                                         </BotonRojo>
                                     </div>
                                 ))}
+
+                                {/* Total acumulado */}
+                                <div className="flex justify-end items-center mt-4 text-sm font-semibold text-gray-800 dark:text-gray-200">
+                                    Total: {formatearDinero(premios.reduce((acc, p) => acc + p.premio.valor * p.cantidad, 0))}
+                                </div>
                             </div>
                         )}
                     </div>
+
 
                     {errors.premios && (
                         <div className="bg-red-100 border border-red-300 text-red-700 px-4 py-2 rounded text-sm">
@@ -181,4 +187,4 @@ export default function Index() {
     );
 }
 
-Index.layout = (page) => <MainLayout>{page}</MainLayout>;
+Create.layout = (page) => <MainLayout>{page}</MainLayout>;

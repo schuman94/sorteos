@@ -44,25 +44,23 @@ export default function Show({ premio }) {
                         Gestionar premios
                     </Link>
                 </div>
+                {premio.imagen_url && (
+                    <div className="relative w-full h-72 bg-black overflow-hidden">
+                        {/* Fondo difuminado */}
+                        <img
+                            src={premio.imagen_url}
+                            alt="Fondo"
+                            className="absolute inset-0 w-full h-full object-cover blur-md scale-110 opacity-50"
+                        />
 
-                {/* Imagen */}
-                <div className="relative w-full h-72 bg-black overflow-hidden">
-                    {/* Fondo difuminado */}
-                    <img
-                        src={premio.imagen_url}
-                        alt="Fondo"
-                        className="absolute inset-0 w-full h-full object-cover blur-md scale-110 opacity-50"
-                    />
-
-                    {/* Imagen principal contenida */}
-                    <img
-                        src={premio.imagen_url}
-                        alt={premio.nombre}
-                        className="relative z-10 max-h-full max-w-full object-contain mx-auto h-full"
-                    />
-                </div>
-
-
+                        {/* Imagen principal contenida */}
+                        <img
+                            src={premio.imagen_url}
+                            alt={premio.nombre}
+                            className="relative z-10 max-h-full max-w-full object-contain mx-auto h-full"
+                        />
+                    </div>
+                )}
                 {/* Cuerpo */}
                 <div className="p-6 space-y-4 text-sm text-gray-800 dark:text-gray-200">
                     {errorEliminar && (
@@ -86,7 +84,6 @@ export default function Show({ premio }) {
 
                     {premio.link && (
                         <div>
-                            <span className="font-semibold">Link:</span>{' '}
                             <a
                                 href={premio.link}
                                 className="text-[#1cc2b5] underline hover:text-[#17b0a6]"

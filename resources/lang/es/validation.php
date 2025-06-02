@@ -90,7 +90,7 @@ return [
     ],
     'string'               => 'El campo :attribute debe ser una cadena de texto.',
     'timezone'             => 'El campo :attribute debe ser una zona horaria válida.',
-    'unique'               => 'El campo :attribute ya ha sido registrado.',
+    'unique'               => 'El valor de :attribute ya está en uso. Debes usar uno diferente.',
     'url'                  => 'El campo :attribute debe ser una URL válida.',
     'uuid'                 => 'El campo :attribute debe ser un UUID válido.',
 ];

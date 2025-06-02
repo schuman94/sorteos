@@ -1,5 +1,5 @@
 import axios from '@/lib/axios';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import BotonPrimario from '@/Components/Botones/BotonPrimario';
 import BotonGris from '@/Components/Botones/BotonGris';
 import { Gift } from 'lucide-react';
@@ -24,6 +24,7 @@ export default function ModalCrearPremio({ visible, onClose, onCrearPremio }) {
         setImagen(e.target.files[0]);
     };
 
+
     const handleGuardar = async () => {
         const { nombre, proveedor, valor } = formData;
 
@@ -33,8 +34,20 @@ export default function ModalCrearPremio({ visible, onClose, onCrearPremio }) {
         }
 
         const data = new FormData();
-        Object.entries(formData).forEach(([key, value]) => data.append(key, value));
-        if (imagen) data.append('image', imagen);
+
+        // Asegurar que 'valor' se envíe como número
+        data.append('valor', parseFloat(valor));
+
+        // Añadir el resto de campos
+        Object.entries(formData).forEach(([key, value]) => {
+            if (key !== 'valor') {
+                data.append(key, value);
+            }
+        });
+
+        if (imagen) {
+            data.append('image', imagen);
+        }
 
         try {
             const response = await axios.post(route('premios.storeAndLoad'), data, {
@@ -45,13 +58,28 @@ export default function ModalCrearPremio({ visible, onClose, onCrearPremio }) {
             onClose();
         } catch (error) {
             console.error(error);
-            if (error.response?.data?.errors?.nombre) {
-                setError(error.response.data.errors.nombre[0]);
+            if (error.response?.data?.errors) {
+                const mensajes = Object.values(error.response.data.errors).flat();
+                setError(mensajes[0]); // Mostramos el primer error recibido
             } else {
                 setError('Hubo un error al guardar el premio.');
             }
         }
     };
+
+    useEffect(() => {
+        if (!visible) {
+            setFormData({
+                nombre: '',
+                proveedor: '',
+                valor: '',
+                descripcion: '',
+                link: '',
+            });
+            setImagen(null);
+            setError('');
+        }
+    }, [visible]);
 
     if (!visible) return null;
 

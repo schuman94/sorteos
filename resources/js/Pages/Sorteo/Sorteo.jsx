@@ -10,7 +10,6 @@ import { SlidersHorizontal, Sparkles, ChevronDown } from 'lucide-react';
 import BotonPrimario from '@/Components/Botones/BotonPrimario';
 import Checkbox from '@/Components/Checkbox';
 import Confetti from 'react-confetti';
-import { useWindowSize } from '@react-hook/window-size';
 
 export default function Sorteo({ publicacion }) {
     const [formData, setFormData] = useState({
@@ -31,6 +30,8 @@ export default function Sorteo({ publicacion }) {
     const [cuentaRegresiva, setCuentaRegresiva] = useState(null);
     const [errores, setErrores] = useState({});
     const [mostrarOpciones, setMostrarOpciones] = useState(true);
+    const [mensajeError, setMensajeError] = useState(null);
+
 
     const [mostrarConfetti, setMostrarConfetti] = useState(false);
     const [viewportWidth, setViewportWidth] = useState(window.innerWidth);
@@ -72,7 +73,7 @@ export default function Sorteo({ publicacion }) {
         }
     }, [cuentaRegresiva]);
 
-    // Eliminar de localStorage la url, ya no la necesitamos, estamos autenticados
+    // Eliminar de localStorage la url porque ya no la necesitamos, estamos autenticados
     useEffect(() => {
         localStorage.removeItem('url_pendiente');
     }, []);
@@ -90,8 +91,16 @@ export default function Sorteo({ publicacion }) {
         if (!validarFormulario()) return;
 
         setCargando(true);
+        setMensajeError(null);
+
         try {
             const response = await axios.post(route('sorteo.iniciar'), formData);
+
+            if (!response.data.ganadores || response.data.ganadores.length === 0) {
+                setMensajeError('Ningún participante cumple los requisitos del sorteo.');
+                return;
+            }
+
             setGanadores(response.data.ganadores);
             setUrlHost(response.data.urlHost);
             window.scrollTo({ top: 0 });
@@ -99,8 +108,12 @@ export default function Sorteo({ publicacion }) {
             setMostrarGanadores(false);
         } catch (error) {
             console.error("Error al iniciar el sorteo:", error);
-            const msg = error.response?.data?.error || error.response?.data?.message || 'Ocurrió un error al iniciar el sorteo';
-            alert(msg);
+            const msg =
+            error.response?.data?.errors?.participantes?.[0] ||
+            error.response?.data?.error ||
+            error.response?.data?.message ||
+            'Ocurrió un error al iniciar el sorteo';
+            setMensajeError(msg);
         } finally {
             setCargando(false);
         }
@@ -228,6 +241,11 @@ export default function Sorteo({ publicacion }) {
                                         {cargando ? 'Iniciando...' : 'Iniciar Sorteo'}
                                     </BotonPrimario>
                                 </div>
+                                {mensajeError && (
+                                    <div className="bg-red-100 border border-red-300 text-red-700 px-4 py-2 rounded text-sm">
+                                        {mensajeError}
+                                    </div>
+                                )}
                             </div>
                         </div>
 

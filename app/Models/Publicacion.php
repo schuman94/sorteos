@@ -52,7 +52,7 @@ class Publicacion extends Model
         $coincidencia = Dominio::where('nombre', $dominio)->with('host')->first();
 
         if (!$coincidencia || !$coincidencia->host) {
-            throw new \RuntimeException("No se ha encontrado un host asociado al dominio '{$dominio}'");
+            throw new \RuntimeException("La URL no es válida.");
         }
 
         return $coincidencia->host;
