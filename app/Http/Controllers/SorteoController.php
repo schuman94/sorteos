@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreSorteoRequest;
 use App\Http\Requests\UpdateSorteoRequest;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
@@ -16,7 +15,6 @@ use App\Models\Comentario;
 use App\Models\Host;
 use App\Models\Publicacion;
 use Illuminate\Support\Str;
-use Illuminate\Pagination\LengthAwarePaginator;
 
 class SorteoController extends Controller
 {
@@ -350,7 +348,7 @@ class SorteoController extends Controller
             ->orderByDesc('anyo')
             ->pluck('anyo');
 
-        $hosts = \App\Models\Host::select('id', 'nombre')->get();
+        $hosts = Host::select('id', 'nombre')->get();
 
         return [$sorteos, $anyos, $hosts];
     }

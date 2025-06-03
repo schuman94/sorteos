@@ -96,6 +96,9 @@ class RuletaController extends Controller
         Gate::authorize('update', $ruleta);
 
         $request->validate([
+            // El campo nombre debe ser único en la tabla ruletas, en la columna nombre, pero excluyendo la propia ruleta en cuestión,
+            // y solo comparando ruletas que pertenecen al usuario actual.
+                                                                        // excepto ella
             'nombre' => 'required|string|max:255|unique:ruletas,nombre,' . $ruleta->id . ',id,user_id,' . Auth::id(),
             'opciones' => 'required|array|min:1',
             'opciones.*' => 'string|max:255',

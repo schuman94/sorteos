@@ -68,13 +68,13 @@ class ColeccionController extends Controller
 
         return Inertia::render('Coleccion/Index', [
             'colecciones' => $colecciones,
-            'filters' => [
-                'search' => $search,
-                'anyo' => $anyo,
-                'sort' => $sort,
+            'anyos'       => $anyos,
+            'filters'     => [
+                'search'    => $search,
+                'anyo'      => $anyo,
+                'sort'      => $sort,
                 'direction' => $direction,
             ],
-            'anyos' => $anyos,
         ]);
     }
 
@@ -230,8 +230,8 @@ class ColeccionController extends Controller
 
         return Inertia::render('Coleccion/Edit', [
             'coleccion' => [
-                'id' => $coleccion->id,
-                'nombre' => $coleccion->nombre,
+                'id'          => $coleccion->id,
+                'nombre'      => $coleccion->nombre,
                 'descripcion' => $coleccion->descripcion,
             ],
         ]);
@@ -368,15 +368,15 @@ class ColeccionController extends Controller
         $rascas = $query->paginate(20)->withQueryString();
 
         return Inertia::render('Coleccion/Rascas', [
-            'rascas' => $rascas,
-            'filters' => [
-                'search' => $search,
-                'sort' => $sort,
+            'rascas'    => $rascas,
+            'filters'   => [
+                'search'    => $search,
+                'sort'      => $sort,
                 'direction' => $direction,
             ],
             'coleccion' => [
-                'id' => $coleccion->id,
-                'nombre' => $coleccion->nombre,
+                'id'        => $coleccion->id,
+                'nombre'    => $coleccion->nombre,
             ],
         ]);
     }
