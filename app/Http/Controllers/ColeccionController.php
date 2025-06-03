@@ -21,24 +21,16 @@ class ColeccionController extends Controller
      */
     public function index(Request $request)
     {
-        $colecciones = Auth::user()
-            ->colecciones()
-            ->withCount([
-                'rascas',
-                'rascas as total_proporcionados' => fn($q) => $q->whereNotNull('provided_at'),
-                'rascas as total_rascados' => fn($q) => $q->whereNotNull('scratched_at'),
-                'rascas as premios_obtenidos' => fn($q) => $q->whereNotNull('scratched_at')->whereNotNull('premio_id'),
-                'rascas as premios_totales' => fn($q) => $q->whereNotNull('premio_id'),
-            ])
-            ->select([
-                'colecciones.*',
-                DB::raw('(SELECT COALESCE(SUM(premios.valor), 0) FROM rascas JOIN premios ON premios.id = rascas.premio_id WHERE rascas.coleccion_id = colecciones.id) AS valor_total'),
-                DB::raw('(SELECT COUNT(*) FROM rascas WHERE rascas.coleccion_id = colecciones.id) AS rascas_count'),
-                DB::raw('(SELECT COUNT(*) FROM rascas WHERE rascas.coleccion_id = colecciones.id AND provided_at IS NOT NULL) AS total_proporcionados'),
-                DB::raw('(SELECT COUNT(*) FROM rascas WHERE rascas.coleccion_id = colecciones.id AND scratched_at IS NOT NULL) AS total_rascados'),
-                DB::raw('(SELECT COUNT(*) FROM rascas WHERE rascas.coleccion_id = colecciones.id AND premio_id IS NOT NULL) AS premios_totales'),
-                DB::raw('(SELECT COUNT(*) FROM rascas WHERE rascas.coleccion_id = colecciones.id AND scratched_at IS NOT NULL AND premio_id IS NOT NULL) AS premios_obtenidos'),
-            ]);
+        $colecciones = Auth::user()->colecciones()->select([
+            'colecciones.*',
+            DB::raw('(SELECT COUNT(*) FROM rascas WHERE rascas.coleccion_id = colecciones.id) AS rascas_count'),
+            DB::raw('(SELECT COUNT(*) FROM rascas WHERE rascas.coleccion_id = colecciones.id AND provided_at IS NOT NULL) AS total_proporcionados'),
+            DB::raw('(SELECT COUNT(*) FROM rascas WHERE rascas.coleccion_id = colecciones.id AND scratched_at IS NOT NULL) AS total_rascados'),
+            DB::raw('(SELECT COUNT(*) FROM rascas WHERE rascas.coleccion_id = colecciones.id AND premio_id IS NOT NULL) AS premios_totales'),
+            DB::raw('(SELECT COUNT(*) FROM rascas WHERE rascas.coleccion_id = colecciones.id AND scratched_at IS NOT NULL AND premio_id IS NOT NULL) AS premios_obtenidos'),
+            DB::raw('(SELECT COALESCE(SUM(premios.valor), 0) FROM rascas JOIN premios ON premios.id = rascas.premio_id WHERE rascas.coleccion_id = colecciones.id) AS valor_total'),
+        ]);
+
 
         // Filtros
         if ($search = $request->input('search')) {
@@ -100,38 +92,37 @@ class ColeccionController extends Controller
      */
     public function store(Request $request)
     {
-        $validatedData = $request->validate([
+        $validated = $request->validate([
             'nombre' => 'required|string|max:255',
             'descripcion' => 'required|string',
             'numeroRascas' => 'required|integer|min:1',
-            'premios' => 'required|array',
+            'premios' => 'required|array', // Para cada premio del array...
             'premios.*.premio_id' => 'required|exists:premios,id',
             'premios.*.cantidad' => 'required|integer|min:1',
         ]);
 
-        $totalPremios = collect($validatedData['premios'])->sum('cantidad');
+        $totalPremios = collect($validated['premios'])->sum('cantidad');
 
-        if ($totalPremios > $validatedData['numeroRascas']) {
+        if ($totalPremios > $validated['numeroRascas']) {
             return back()->withErrors([
-                'premios' => 'La cantidad total de premios no puede superar el número de rascas (' . $validatedData['numeroRascas'] . ').',
+                'premios' => 'La cantidad total de premios no puede superar el número de rascas (' . $validated['numeroRascas'] . ').',
             ])->withInput();
         }
 
         try {
             $coleccion = null;
 
-            DB::transaction(function () use ($validatedData, &$coleccion) {
-                $coleccion = new \App\Models\Coleccion();
-                $coleccion->nombre = $validatedData['nombre'];
-                $coleccion->descripcion = $validatedData['descripcion'];
+            DB::transaction(function () use ($validated, &$coleccion) {
+                $coleccion = new Coleccion();
+                $coleccion->nombre = $validated['nombre'];
+                $coleccion->descripcion = $validated['descripcion'];
                 $coleccion->user()->associate(Auth::user());
                 $coleccion->save();
 
-                $this->CrearRascas($coleccion, $validatedData['numeroRascas'], $validatedData['premios']);
+                $this->CrearRascas($coleccion, $validated['numeroRascas'], $validated['premios']);
             });
             return Inertia::location(route('colecciones.show', $coleccion));
         } catch (\Throwable $e) {
-            // Loguear si es necesario: Log::error($e);
             return back()->withErrors([
                 'general' => 'Ocurrió un error al crear la colección. Intenta de nuevo.',
             ])->withInput();

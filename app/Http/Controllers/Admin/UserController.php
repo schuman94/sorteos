@@ -115,7 +115,6 @@ class UserController extends Controller
         ]);
     }
 
-
     public function restaurar($id)
     {
         $user = User::onlyTrashed()->findOrFail($id);
