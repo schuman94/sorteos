@@ -269,6 +269,6 @@ class RascaController extends Controller
             ));
         }
 
-        return redirect()->route('rascas.show', $rasca->codigo)->with('success', 'Rascado correctamente.');
+        return redirect()->route('rascas.show', $rasca->codigo);
     }
 }
