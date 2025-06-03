@@ -260,9 +260,6 @@ class ColeccionController extends Controller
 
             return Inertia::location(route('colecciones.show', $coleccion));
         } catch (\Throwable $e) {
-            // Opcional: log error
-            // Log::error($e);
-
             return back()->withErrors([
                 'general' => 'Ocurrió un error al actualizar la colección. Intenta de nuevo.',
             ])->withInput();
@@ -273,7 +270,7 @@ class ColeccionController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Request $request, Coleccion $coleccion)
+    public function destroy(Coleccion $coleccion)
     {
         Gate::authorize('delete', $coleccion);
 
@@ -309,20 +306,18 @@ class ColeccionController extends Controller
             'cantidad' => 'required|integer|min:1|max:10000',
         ]);
 
-        $cantidadSolicitada = $validated['cantidad'];
-
         $rascasDisponibles = $coleccion->rascas()
             ->whereNull('provided_at')
             ->get()
             ->shuffle();
 
-        if ($rascasDisponibles->count() < $cantidadSolicitada) {
+        if ($rascasDisponibles->count() < $validated['cantidad']) {
             throw ValidationException::withMessages([
                 'cantidad' => 'Solo quedan ' . $rascasDisponibles->count() . ' rascas disponibles en esta colección.',
             ]);
         }
 
-        $rascasSeleccionados = $rascasDisponibles->take($cantidadSolicitada);
+        $rascasSeleccionados = $rascasDisponibles->take($validated['cantidad']);
 
         DB::transaction(function () use ($rascasSeleccionados) {
             foreach ($rascasSeleccionados as $rasca) {
@@ -352,9 +347,9 @@ class ColeccionController extends Controller
                 'rascas.codigo',
                 'rascas.provided_at',
                 'rascas.scratched_at',
+                'rascas.premio_id',
                 DB::raw("users.name as scratched_by"),
                 DB::raw("premios.nombre as premio"),
-                'rascas.premio_id'
             );
 
         // Filtro de búsqueda
