@@ -39,7 +39,7 @@ class BlueskyDriver implements PublicacionDriver
 
     public function cargarDatos(Publicacion $publicacion): void
     {
-        $service = app(BlueskyService::class); // Usa el singleton ya registrado
+        $service = app(BlueskyService::class);
         $post = $service->getPost($this->uri);
 
         // Validar que los datos clave están presentes

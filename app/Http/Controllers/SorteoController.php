@@ -15,6 +15,7 @@ use App\Models\Comentario;
 use App\Models\Host;
 use App\Models\Publicacion;
 use Illuminate\Support\Str;
+use App\Models\User;
 
 class SorteoController extends Controller
 {
@@ -136,7 +137,7 @@ class SorteoController extends Controller
 
         return response()->json([
             'ganadores' => $this->obtenerGanadores($sorteo),
-            'urlHost' => $publicacion->host->url,
+            'urlHost'   => $publicacion->host->url,
         ]);
     }
 
@@ -293,13 +294,13 @@ class SorteoController extends Controller
             ->get()
             ->map(function ($g) use ($sorteo) {
                 return [
-                    'nombre' => $g->nombre_manual ?? $g->autor,
+                    'nombre'        => $g->nombre_manual ?? $g->autor,
                     'clasificacion' => $g->esSuplente ? 'suplente' : 'titular',
-                    'posicion' => $g->posicion,
-                    'comentario' => $g->texto ?? null,
-                    'likes' => $g->likes ?? null,
-                    'fecha' => $g->fecha ?? null,
-                    'sorteo_id' => $sorteo->id,
+                    'posicion'      => $g->posicion,
+                    'comentario'    => $g->texto ?? null,
+                    'likes'         => $g->likes ?? null,
+                    'fecha'         => $g->fecha ?? null,
+                    'sorteo_id'     => $sorteo->id,
                 ];
             })->toArray();
     }
@@ -333,13 +334,13 @@ class SorteoController extends Controller
             ->paginate(10)
             ->withQueryString()
             ->through(fn($sorteo) => [
-                'id' => $sorteo->id,
-                'url' => $sorteo->publicacion?->url,
-                'titulo' => $sorteo->publicacion?->titulo ?? $sorteo->nombre,
-                'tipo' => $sorteo->publicacion?->host?->nombre ?? 'Manual',
+                'id'                => $sorteo->id,
+                'url'               => $sorteo->publicacion?->url,
+                'titulo'            => $sorteo->publicacion?->titulo ?? $sorteo->nombre,
+                'tipo'              => $sorteo->publicacion?->host?->nombre ?? 'Manual',
                 'num_participantes' => $sorteo->num_participantes,
-                'created_at' => $sorteo->created_at,
-                'certificado' => $sorteo->codigo_certificado,
+                'created_at'        => $sorteo->created_at,
+                'certificado'       => $sorteo->codigo_certificado,
             ]);
 
         $anyos = $user->sorteos()
@@ -353,33 +354,31 @@ class SorteoController extends Controller
         return [$sorteos, $anyos, $hosts];
     }
 
-
-
     public function historial(Request $request)
     {
-        $user = auth()->user();
+        $user = Auth::user();
         [$sorteos, $anyos, $hosts] = $this->obtenerHistorial($request, $user);
 
         return Inertia::render('Sorteo/Historial', [
-            'sorteos' => $sorteos,
-            'anyos' => $anyos,
+            'sorteos'          => $sorteos,
+            'anyos'            => $anyos,
             'anyoSeleccionado' => $request->anyo,
             'tipoSeleccionado' => $request->tipo,
-            'hosts' => $hosts,
+            'hosts'            => $hosts,
         ]);
     }
 
-    public function historialAdmin(Request $request, \App\Models\User $user)
+    public function historialAdmin(Request $request, User $user)
     {
         [$sorteos, $anyos, $hosts] = $this->obtenerHistorial($request, $user);
 
         return Inertia::render('Admin/Users/Historial', [
-            'user' => $user,
-            'sorteos' => $sorteos,
-            'anyos' => $anyos,
-            'anyoSeleccionado' => $request->anyo,
-            'tipoSeleccionado' => $request->tipo,
-            'hosts' => $hosts,
+            'user'              => $user,
+            'sorteos'           => $sorteos,
+            'anyos'             => $anyos,
+            'anyoSeleccionado'  => $request->anyo,
+            'tipoSeleccionado'  => $request->tipo,
+            'hosts'             => $hosts,
         ]);
     }
 
@@ -402,28 +401,28 @@ class SorteoController extends Controller
 
         return Inertia::render('Sorteo/Show', [
             'sorteo' => [
-                'id' => $sorteo->id,
-                'url' => $publicacion?->url,
-                'urlHost' => $publicacion?->host?->url,
-                'titulo' => $sorteo->publicacion?->titulo ?? $sorteo->nombre, // Si es manual, usamos el nombre
-                'tipo' => $publicacion?->host?->nombre ?? 'Manual',
+                'id'                => $sorteo->id,
+                'url'               => $publicacion?->url,
+                'urlHost'           => $publicacion?->host?->url,
+                'titulo'            => $sorteo->publicacion?->titulo ?? $sorteo->nombre, // Si es manual, usamos el nombre
+                'tipo'              => $publicacion?->host?->nombre ?? 'Manual',
                 'num_participantes' => $sorteo->num_participantes,
-                'created_at' => $sorteo->created_at,
-                'user_id' => $sorteo->user_id,
-                'certificado' => $sorteo->codigo_certificado,
-                'filtro' => $sorteo->filtro ? [
-                    'mencion' => $sorteo->filtro->mencion,
-                    'hashtag' => $sorteo->filtro->hashtag,
+                'created_at'        => $sorteo->created_at,
+                'user_id'           => $sorteo->user_id,
+                'certificado'       => $sorteo->codigo_certificado,
+                'filtro'            => $sorteo->filtro ? [
+                    'mencion'                     => $sorteo->filtro->mencion,
+                    'hashtag'                     => $sorteo->filtro->hashtag,
                     'permitir_autores_duplicados' => $sorteo->filtro->permitir_autores_duplicados,
                 ] : null,
-                'ganadores' => $sorteo->ganadores->map(function ($g) {
+                'ganadores'         => $sorteo->ganadores->map(function ($g) {
                     return [
-                        'nombre' => $g->nombre_manual ?? $g->comentario?->autor,
+                        'nombre'        => $g->nombre_manual ?? $g->comentario?->autor,
                         'clasificacion' => $g->esSuplente ? 'suplente' : 'titular',
-                        'posicion' => $g->posicion,
-                        'comentario' => $g->comentario?->texto,
-                        'likes' => $g->comentario?->likes,
-                        'fecha' => $g->comentario?->fecha,
+                        'posicion'      => $g->posicion,
+                        'comentario'    => $g->comentario?->texto,
+                        'likes'         => $g->comentario?->likes,
+                        'fecha'         => $g->comentario?->fecha,
                     ];
                 })->sortBy('posicion')->values()
             ],
