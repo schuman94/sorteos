@@ -260,22 +260,22 @@ class RascaController extends Controller
             $premio = $rasca->premio;
 
             try {
-                Mail::to($usuario->email)->send(new RascaPremiadoUsuario(
+                Mail::to($usuario->email)->queue(new RascaPremiadoUsuario(
                     rasca: $rasca,
                     premio: $premio,
                 ));
             } catch (\Throwable $e) {
-                Log::error('Error al enviar correo al usuario premiado: ' . $e->getMessage());
+                Log::error('Error al encolar correo al usuario premiado: ' . $e->getMessage());
             }
 
             try {
-                Mail::to($coleccion->user->email)->send(new RascaPremiadoCreador(
+                Mail::to($coleccion->user->email)->queue(new RascaPremiadoCreador(
                     usuario: $usuario,
                     rasca: $rasca,
                     premio: $premio,
                 ));
             } catch (\Throwable $e) {
-                Log::error('Error al enviar correo al creador de la colección: ' . $e->getMessage());
+                Log::error('Error al encolar correo al creador de la colección: ' . $e->getMessage());
             }
         }
 
