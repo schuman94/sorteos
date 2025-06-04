@@ -25,12 +25,6 @@ export default function Show({ coleccion, urls }) {
         await navigator.clipboard.writeText(urls.join('\n'));
     };
 
-    const confirmarEliminacion = () => {
-        router.delete(route('colecciones.destroy', coleccion.id), {
-            preserveScroll: true,
-        });
-    };
-
     return (
         <>
             <Head title="Colección" />

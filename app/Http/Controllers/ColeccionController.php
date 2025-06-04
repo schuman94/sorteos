@@ -21,24 +21,16 @@ class ColeccionController extends Controller
      */
     public function index(Request $request)
     {
-        $colecciones = Auth::user()
-            ->colecciones()
-            ->withCount([
-                'rascas',
-                'rascas as total_proporcionados' => fn($q) => $q->whereNotNull('provided_at'),
-                'rascas as total_rascados' => fn($q) => $q->whereNotNull('scratched_at'),
-                'rascas as premios_obtenidos' => fn($q) => $q->whereNotNull('scratched_at')->whereNotNull('premio_id'),
-                'rascas as premios_totales' => fn($q) => $q->whereNotNull('premio_id'),
-            ])
-            ->select([
-                'colecciones.*',
-                DB::raw('(SELECT COALESCE(SUM(premios.valor), 0) FROM rascas JOIN premios ON premios.id = rascas.premio_id WHERE rascas.coleccion_id = colecciones.id) AS valor_total'),
-                DB::raw('(SELECT COUNT(*) FROM rascas WHERE rascas.coleccion_id = colecciones.id) AS rascas_count'),
-                DB::raw('(SELECT COUNT(*) FROM rascas WHERE rascas.coleccion_id = colecciones.id AND provided_at IS NOT NULL) AS total_proporcionados'),
-                DB::raw('(SELECT COUNT(*) FROM rascas WHERE rascas.coleccion_id = colecciones.id AND scratched_at IS NOT NULL) AS total_rascados'),
-                DB::raw('(SELECT COUNT(*) FROM rascas WHERE rascas.coleccion_id = colecciones.id AND premio_id IS NOT NULL) AS premios_totales'),
-                DB::raw('(SELECT COUNT(*) FROM rascas WHERE rascas.coleccion_id = colecciones.id AND scratched_at IS NOT NULL AND premio_id IS NOT NULL) AS premios_obtenidos'),
-            ]);
+        $colecciones = Auth::user()->colecciones()->select([
+            'colecciones.*',
+            DB::raw('(SELECT COUNT(*) FROM rascas WHERE rascas.coleccion_id = colecciones.id) AS rascas_count'),
+            DB::raw('(SELECT COUNT(*) FROM rascas WHERE rascas.coleccion_id = colecciones.id AND provided_at IS NOT NULL) AS total_proporcionados'),
+            DB::raw('(SELECT COUNT(*) FROM rascas WHERE rascas.coleccion_id = colecciones.id AND scratched_at IS NOT NULL) AS total_rascados'),
+            DB::raw('(SELECT COUNT(*) FROM rascas WHERE rascas.coleccion_id = colecciones.id AND premio_id IS NOT NULL) AS premios_totales'),
+            DB::raw('(SELECT COUNT(*) FROM rascas WHERE rascas.coleccion_id = colecciones.id AND scratched_at IS NOT NULL AND premio_id IS NOT NULL) AS premios_obtenidos'),
+            DB::raw('(SELECT COALESCE(SUM(premios.valor), 0) FROM rascas JOIN premios ON premios.id = rascas.premio_id WHERE rascas.coleccion_id = colecciones.id) AS valor_total'),
+        ]); // Usamos DB::raw para poder ordenar luego con orderBy de eloquent por esos campos.
+
 
         // Filtros
         if ($search = $request->input('search')) {
@@ -76,13 +68,13 @@ class ColeccionController extends Controller
 
         return Inertia::render('Coleccion/Index', [
             'colecciones' => $colecciones,
-            'filters' => [
-                'search' => $search,
-                'anyo' => $anyo,
-                'sort' => $sort,
+            'anyos'       => $anyos,
+            'filters'     => [
+                'search'    => $search,
+                'anyo'      => $anyo,
+                'sort'      => $sort,
                 'direction' => $direction,
             ],
-            'anyos' => $anyos,
         ]);
     }
 
@@ -100,38 +92,37 @@ class ColeccionController extends Controller
      */
     public function store(Request $request)
     {
-        $validatedData = $request->validate([
+        $validated = $request->validate([
             'nombre' => 'required|string|max:255',
             'descripcion' => 'required|string',
             'numeroRascas' => 'required|integer|min:1',
-            'premios' => 'required|array',
+            'premios' => 'required|array', // Para cada premio del array...
             'premios.*.premio_id' => 'required|exists:premios,id',
             'premios.*.cantidad' => 'required|integer|min:1',
         ]);
 
-        $totalPremios = collect($validatedData['premios'])->sum('cantidad');
+        $totalPremios = collect($validated['premios'])->sum('cantidad');
 
-        if ($totalPremios > $validatedData['numeroRascas']) {
+        if ($totalPremios > $validated['numeroRascas']) {
             return back()->withErrors([
-                'premios' => 'La cantidad total de premios no puede superar el número de rascas (' . $validatedData['numeroRascas'] . ').',
+                'premios' => 'La cantidad total de premios no puede superar el número de rascas (' . $validated['numeroRascas'] . ').',
             ])->withInput();
         }
 
         try {
             $coleccion = null;
 
-            DB::transaction(function () use ($validatedData, &$coleccion) {
-                $coleccion = new \App\Models\Coleccion();
-                $coleccion->nombre = $validatedData['nombre'];
-                $coleccion->descripcion = $validatedData['descripcion'];
+            DB::transaction(function () use ($validated, &$coleccion) {
+                $coleccion = new Coleccion();
+                $coleccion->nombre = $validated['nombre'];
+                $coleccion->descripcion = $validated['descripcion'];
                 $coleccion->user()->associate(Auth::user());
                 $coleccion->save();
 
-                $this->CrearRascas($coleccion, $validatedData['numeroRascas'], $validatedData['premios']);
+                $this->CrearRascas($coleccion, $validated['numeroRascas'], $validated['premios']);
             });
             return Inertia::location(route('colecciones.show', $coleccion));
         } catch (\Throwable $e) {
-            // Loguear si es necesario: Log::error($e);
             return back()->withErrors([
                 'general' => 'Ocurrió un error al crear la colección. Intenta de nuevo.',
             ])->withInput();
@@ -140,20 +131,21 @@ class ColeccionController extends Controller
 
     private function crearRascas(Coleccion $coleccion, $numRascas, $premios)
     {
-        $premiosSecuenciales = [];
+        // Obtenemos un array con todos los premios de forma secuencial
+        $listadoPremios = [];
         foreach ($premios as $premio) {
-            $premiosSecuenciales = array_merge($premiosSecuenciales, array_fill(0, $premio['cantidad'], $premio['premio_id']));
+            $listadoPremios = array_merge($listadoPremios, array_fill(0, $premio['cantidad'], $premio['premio_id']));
         }
 
         $rascas = [];
         for ($i = 0; $i < $numRascas; $i++) {
             $rasca = new Rasca();
-            $rasca->coleccion_id = $coleccion->id;
+            $rasca->coleccion()->associate($coleccion);
             $rasca->codigo = Str::uuid();
             $rasca->save();
 
-            if (!empty($premiosSecuenciales)) {
-                $premioId = array_pop($premiosSecuenciales);
+            if (!empty($listadoPremios)) {
+                $premioId = array_pop($listadoPremios);
                 $rasca->premio_id = $premioId;
                 $rasca->save();
             }
@@ -172,14 +164,13 @@ class ColeccionController extends Controller
     {
         Gate::authorize('view', $coleccion);
 
-        // Cargar contadores agregados
-        $coleccion->loadCount([
-            'rascas as total_rascas' => fn($q) => $q,
-            'rascas as rascas_restantes' => fn($q) => $q->whereNull('provided_at'),
-            'rascas as total_proporcionados' => fn($q) => $q->whereNotNull('provided_at'),
-            'rascas as total_rascados' => fn($q) => $q->whereNotNull('scratched_at'),
-            'rascas as premios_obtenidos' => fn($q) => $q->whereNotNull('scratched_at')->whereNotNull('premio_id'),
-        ]);
+        $total_rascas = $coleccion->rascas()->count();
+        $rascas_restantes = $coleccion->rascas()->whereNull('provided_at')->count();
+        $total_proporcionados = $coleccion->rascas()->whereNotNull('provided_at')->count();
+        $total_rascados = $coleccion->rascas()->whereNotNull('scratched_at')->count();
+        $total_premios = $coleccion->rascas()->whereNotNull('premio_id')->count();
+        $premios_obtenidos = $coleccion->rascas()->whereNotNull('scratched_at')->whereNotNull('premio_id')->count();
+        $premios_restantes = $total_premios - $premios_obtenidos;
 
         // Agrupar premios con cantidad y valor total
         $premios = $coleccion->rascas()
@@ -203,12 +194,8 @@ class ColeccionController extends Controller
             })
             ->values();
 
-        // Calcular totales
         $valor_total = $premios->sum('valor_total');
-        $total_premios = $coleccion->rascas()->whereNotNull('premio_id')->count();
-        $premios_restantes = max(0, $total_premios - $coleccion->premios_obtenidos);
 
-        // Devolver vista con datos explícitos
         return Inertia::render('Coleccion/Show', [
             'coleccion' => [
                 'id'                => $coleccion->id,
@@ -219,11 +206,11 @@ class ColeccionController extends Controller
                 'user_id'           => $coleccion->user_id,
                 'abierta'           => $coleccion->abierta,
 
-                'total_rascas' => $coleccion->total_rascas,
-                'rascas_restantes'     => $coleccion->rascas_restantes,
-                'total_proporcionados' => $coleccion->total_proporcionados,
-                'total_rascados'       => $coleccion->total_rascados,
-                'premios_obtenidos'    => $coleccion->premios_obtenidos,
+                'total_rascas'         => $total_rascas,
+                'rascas_restantes'     => $rascas_restantes,
+                'total_proporcionados' => $total_proporcionados,
+                'total_rascados'       => $total_rascados,
+                'premios_obtenidos'    => $premios_obtenidos,
 
                 'premios'           => $premios,
                 'valor_total'       => $valor_total,
@@ -243,8 +230,8 @@ class ColeccionController extends Controller
 
         return Inertia::render('Coleccion/Edit', [
             'coleccion' => [
-                'id' => $coleccion->id,
-                'nombre' => $coleccion->nombre,
+                'id'          => $coleccion->id,
+                'nombre'      => $coleccion->nombre,
                 'descripcion' => $coleccion->descripcion,
             ],
         ]);
@@ -273,9 +260,6 @@ class ColeccionController extends Controller
 
             return Inertia::location(route('colecciones.show', $coleccion));
         } catch (\Throwable $e) {
-            // Opcional: log error
-            // Log::error($e);
-
             return back()->withErrors([
                 'general' => 'Ocurrió un error al actualizar la colección. Intenta de nuevo.',
             ])->withInput();
@@ -286,7 +270,7 @@ class ColeccionController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Request $request, Coleccion $coleccion)
+    public function destroy(Coleccion $coleccion)
     {
         Gate::authorize('delete', $coleccion);
 
@@ -322,20 +306,18 @@ class ColeccionController extends Controller
             'cantidad' => 'required|integer|min:1|max:10000',
         ]);
 
-        $cantidadSolicitada = $validated['cantidad'];
-
         $rascasDisponibles = $coleccion->rascas()
             ->whereNull('provided_at')
             ->get()
             ->shuffle();
 
-        if ($rascasDisponibles->count() < $cantidadSolicitada) {
+        if ($rascasDisponibles->count() < $validated['cantidad']) {
             throw ValidationException::withMessages([
                 'cantidad' => 'Solo quedan ' . $rascasDisponibles->count() . ' rascas disponibles en esta colección.',
             ]);
         }
 
-        $rascasSeleccionados = $rascasDisponibles->take($cantidadSolicitada);
+        $rascasSeleccionados = $rascasDisponibles->take($validated['cantidad']);
 
         DB::transaction(function () use ($rascasSeleccionados) {
             foreach ($rascasSeleccionados as $rasca) {
@@ -365,9 +347,9 @@ class ColeccionController extends Controller
                 'rascas.codigo',
                 'rascas.provided_at',
                 'rascas.scratched_at',
+                'rascas.premio_id',
                 DB::raw("users.name as scratched_by"),
                 DB::raw("premios.nombre as premio"),
-                'rascas.premio_id'
             );
 
         // Filtro de búsqueda
@@ -386,15 +368,15 @@ class ColeccionController extends Controller
         $rascas = $query->paginate(20)->withQueryString();
 
         return Inertia::render('Coleccion/Rascas', [
-            'rascas' => $rascas,
-            'filters' => [
-                'search' => $search,
-                'sort' => $sort,
+            'rascas'    => $rascas,
+            'filters'   => [
+                'search'    => $search,
+                'sort'      => $sort,
                 'direction' => $direction,
             ],
             'coleccion' => [
-                'id' => $coleccion->id,
-                'nombre' => $coleccion->nombre,
+                'id'        => $coleccion->id,
+                'nombre'    => $coleccion->nombre,
             ],
         ]);
     }
@@ -417,6 +399,6 @@ class ColeccionController extends Controller
         $coleccion->abierta = !$coleccion->abierta;
         $coleccion->save();
 
-        return back()->with('success', 'Estado de la colección actualizado.');
+        return back();
     }
 }

@@ -31,7 +31,7 @@ class UserController extends Controller
         $users = $query->paginate(20)->withQueryString();
 
         return Inertia::render('Admin/Users/Index', [
-            'users' => $users,
+            'users'   => $users,
             'filters' => $request->only(['search', 'email', 'sort', 'direction']),
         ]);
     }
@@ -110,11 +110,10 @@ class UserController extends Controller
         $users = $query->paginate(20)->withQueryString();
 
         return Inertia::render('Admin/Users/Eliminados', [
-            'users' => $users,
+            'users'   => $users,
             'filters' => $request->only(['search', 'email', 'sort', 'direction']),
         ]);
     }
-
 
     public function restaurar($id)
     {

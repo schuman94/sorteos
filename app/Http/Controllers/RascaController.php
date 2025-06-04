@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\RascaPremiadoUsuario;
 use App\Mail\RascaPremiadoCreador;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 class RascaController extends Controller
 {
@@ -54,7 +55,8 @@ class RascaController extends Controller
         $rasca = Rasca::with(['coleccion.rascas.premio', 'premio'])->where('codigo', $codigo)->firstOrFail();
 
         if (is_null($rasca->provided_at)) {
-            abort(403, 'Este rasca no ha sido proporcionado.');
+            // abort(403, 'Este rasca no ha sido proporcionado.');
+            abort(404); // No hay que dar pistas de que este rasca existe.
         }
 
         $coleccion = $rasca->coleccion;
@@ -69,11 +71,11 @@ class RascaController extends Controller
                 $probabilidad = round(($cantidad / $rascasTotales) * 100, 2);
 
                 return [
-                    'nombre' => $premio->nombre,
-                    'link' => $premio->link,
-                    'cantidad' => $cantidad,
-                    'probabilidad' => $probabilidad,
-                    'thumbnail_url'  => $premio->thumbnail_url,
+                    'nombre'        => $premio->nombre,
+                    'link'          => $premio->link,
+                    'cantidad'      => $cantidad,
+                    'probabilidad'  => $probabilidad,
+                    'thumbnail_url' => $premio->thumbnail_url,
                 ];
             })
             ->values();
@@ -85,7 +87,7 @@ class RascaController extends Controller
                 'es_propietario' => Auth::id() && $rasca->scratched_by === Auth::id(),
                 'coleccion' => [
                     'nombre'         => $coleccion->nombre,
-                    'descripcion'       => $coleccion->descripcion,
+                    'descripcion'    => $coleccion->descripcion,
                     'abierta'        => $coleccion->abierta,
                     'total_rascas'   => $rascasTotales,
                     'premios'        => $premios,
@@ -108,7 +110,7 @@ class RascaController extends Controller
             ->whereNotNull('scratched_at')
             ->where('scratched_by', Auth::id());
 
-        // Filtro de búsqueda
+        // Filtro de búsqueda por texto
         if ($search = $request->input('search')) {
             $rascasQuery->where(function ($q) use ($search) {
                 $q->whereHas('premio', function ($q2) use ($search) {
@@ -166,25 +168,25 @@ class RascaController extends Controller
 
         // Mapear
         $final = $paginated->through(fn($rasca) => [
-            'id'           => $rasca->id,
-            'codigo'       => $rasca->codigo,
-            'scratched_at' => $rasca->scratched_at,
-            'premio'       => $rasca->premio?->nombre,
-            'proveedor'    => $rasca->premio?->proveedor,
-            'coleccion'    => $rasca->coleccion?->nombre,
-            'premio_link'  => $rasca->premio?->link,
+            'id'            => $rasca->id,
+            'codigo'        => $rasca->codigo,
+            'scratched_at'  => $rasca->scratched_at,
+            'premio'        => $rasca->premio?->nombre,
+            'proveedor'     => $rasca->premio?->proveedor,
+            'coleccion'     => $rasca->coleccion?->nombre,
+            'premio_link'   => $rasca->premio?->link,
             'thumbnail_url' => $rasca->premio?->thumbnail_url,
         ]);
 
         return Inertia::render('Rascas/Premiados', [
             'premiados' => $final,
-            'filters' => [
-                'search' => $search,
-                'anyo' => $anyo,
-                'sort' => $sort,
+            'anyos'     => $anyos,
+            'filters'   => [
+                'search'    => $search,
+                'anyo'      => $anyo,
+                'sort'      => $sort,
                 'direction' => $direction,
             ],
-            'anyos' => $anyos,
         ]);
     }
 
@@ -257,18 +259,26 @@ class RascaController extends Controller
         if ($premiado) {
             $premio = $rasca->premio;
 
-            Mail::to($usuario->email)->send(new RascaPremiadoUsuario(
-                rasca: $rasca,
-                premio: $premio,
-            ));
+            try {
+                Mail::to($usuario->email)->send(new RascaPremiadoUsuario(
+                    rasca: $rasca,
+                    premio: $premio,
+                ));
+            } catch (\Throwable $e) {
+                Log::error('Error al enviar correo al usuario premiado: ' . $e->getMessage());
+            }
 
-            Mail::to($coleccion->user->email)->send(new RascaPremiadoCreador(
-                usuario: $usuario,
-                rasca: $rasca,
-                premio: $premio,
-            ));
+            try {
+                Mail::to($coleccion->user->email)->send(new RascaPremiadoCreador(
+                    usuario: $usuario,
+                    rasca: $rasca,
+                    premio: $premio,
+                ));
+            } catch (\Throwable $e) {
+                Log::error('Error al enviar correo al creador de la colección: ' . $e->getMessage());
+            }
         }
 
-        return redirect()->route('rascas.show', $rasca->codigo)->with('success', 'Rascado correctamente.');
+        return redirect()->route('rascas.show', $rasca->codigo);
     }
 }
