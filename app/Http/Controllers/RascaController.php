@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\RascaPremiadoUsuario;
 use App\Mail\RascaPremiadoCreador;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 class RascaController extends Controller
 {
@@ -258,16 +259,24 @@ class RascaController extends Controller
         if ($premiado) {
             $premio = $rasca->premio;
 
-            Mail::to($usuario->email)->send(new RascaPremiadoUsuario(
-                rasca: $rasca,
-                premio: $premio,
-            ));
+            try {
+                Mail::to($usuario->email)->send(new RascaPremiadoUsuario(
+                    rasca: $rasca,
+                    premio: $premio,
+                ));
+            } catch (\Throwable $e) {
+                Log::error('Error al enviar correo al usuario premiado: ' . $e->getMessage());
+            }
 
-            Mail::to($coleccion->user->email)->send(new RascaPremiadoCreador(
-                usuario: $usuario,
-                rasca: $rasca,
-                premio: $premio,
-            ));
+            try {
+                Mail::to($coleccion->user->email)->send(new RascaPremiadoCreador(
+                    usuario: $usuario,
+                    rasca: $rasca,
+                    premio: $premio,
+                ));
+            } catch (\Throwable $e) {
+                Log::error('Error al enviar correo al creador de la colección: ' . $e->getMessage());
+            }
         }
 
         return redirect()->route('rascas.show', $rasca->codigo);
