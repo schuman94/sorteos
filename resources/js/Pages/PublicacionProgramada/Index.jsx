@@ -8,22 +8,35 @@ import { formatearFecha as ff } from '@/utils/fecha';
 export default function Index({ publicaciones, coleccion }) {
     const [modalVisible, setModalVisible] = useState(false);
     const [idAEliminar, setIdAEliminar] = useState(null);
+    const [modoMasivo, setModoMasivo] = useState(false);
 
     const confirmarEliminacion = (id) => {
         setIdAEliminar(id);
+        setModoMasivo(false);
+        setModalVisible(true);
+    };
+
+    const confirmarEliminacionMasiva = () => {
+        setModoMasivo(true);
         setModalVisible(true);
     };
 
     const cancelarEliminacion = () => {
         setModalVisible(false);
         setIdAEliminar(null);
+        setModoMasivo(false);
     };
 
     const eliminar = () => {
-        if (!idAEliminar) return;
-        router.delete(route('publicaciones.destroy', idAEliminar), {
-            onSuccess: () => cancelarEliminacion(),
-        });
+        if (modoMasivo) {
+            router.delete(route('publicaciones.eliminarTodas', coleccion.id), {
+                onSuccess: cancelarEliminacion,
+            });
+        } else if (idAEliminar) {
+            router.delete(route('publicaciones.destroy', idAEliminar), {
+                onSuccess: cancelarEliminacion,
+            });
+        }
     };
 
     const cambiarPagina = (url) => {
@@ -35,9 +48,22 @@ export default function Index({ publicaciones, coleccion }) {
 
     return (
         <>
-            <Head title="Publicaciones Programadas" />
+            <Head title={'Publicaciones'} />
             <div className="max-w-4xl mx-auto p-6 space-y-6">
-                <h1 className="text-2xl font-bold text-gray-800">Tus publicaciones programadas</h1>
+                <div className="flex justify-between items-center">
+                    <h1 className="text-2xl font-bold text-gray-800">
+                        Publicaciones programadas de {coleccion.nombre}
+                    </h1>
+
+                    {publicaciones.data.length > 0 && (
+                        <button
+                            onClick={confirmarEliminacionMasiva}
+                            className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
+                        >
+                            Eliminar todas
+                        </button>
+                    )}
+                </div>
 
                 {publicaciones.data.length === 0 ? (
                     <p className="text-gray-500">No hay publicaciones programadas.</p>
@@ -69,7 +95,11 @@ export default function Index({ publicaciones, coleccion }) {
 
             <ModalEliminacion
                 visible={modalVisible}
-                mensaje="Esta acción no se puede deshacer."
+                mensaje={
+                    modoMasivo
+                        ? '¿Seguro que deseas eliminar todas las publicaciones programadas de esta colección? Esta acción no se puede deshacer.'
+                        : 'Esta acción no se puede deshacer.'
+                }
                 onConfirmar={eliminar}
                 onCancelar={cancelarEliminacion}
             />

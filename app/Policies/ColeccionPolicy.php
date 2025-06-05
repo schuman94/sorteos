@@ -63,4 +63,9 @@ class ColeccionPolicy
     {
         return false;
     }
+
+    public function eliminarProgramadas(User $user, Coleccion $coleccion): bool
+    {
+        return $user->id === $coleccion->user_id;
+    }
 }

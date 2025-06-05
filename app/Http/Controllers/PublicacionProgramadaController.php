@@ -130,9 +130,23 @@ class PublicacionProgramadaController extends Controller
      */
     public function destroy(PublicacionProgramada $publicacion)
     {
-        Gate::authorize('update', $publicacion);
+        Gate::authorize('delete', $publicacion);
         $publicacion->delete();
 
         return back()->with('success', 'Publicación eliminada correctamente.');
+    }
+
+    public function destroyAll(Coleccion $coleccion)
+    {
+        Gate::authorize('eliminarProgramadas', $coleccion);
+
+        Auth::user()
+            ->publicacionesProgramadas()
+            ->where('coleccion_id', $coleccion->id)
+            ->where('publicado', false)
+            ->where('fallido', false)
+            ->delete();
+
+        return back()->with('success', 'Todas las publicaciones han sido eliminadas.');
     }
 }
