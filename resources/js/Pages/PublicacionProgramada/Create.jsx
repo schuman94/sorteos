@@ -3,7 +3,7 @@ import MainLayout from '@/Layouts/MainLayout';
 import BotonPrimario from '@/Components/Botones/BotonPrimario';
 import { useEffect, useState } from 'react';
 
-export default function Create({ urls, coleccionId }) {
+export default function Create({ urls, coleccion }) {
     const [mostrarIntervalo, setMostrarIntervalo] = useState(urls.length > 1);
 
     const { data, setData, post, processing, errors } = useForm({
@@ -12,7 +12,7 @@ export default function Create({ urls, coleccionId }) {
         intervalo: 1,
         unidad_intervalo: 'horas',
         urls,
-        coleccion_id: coleccionId,
+        coleccion_id: coleccion.id,
     });
 
     useEffect(() => {
@@ -26,10 +26,13 @@ export default function Create({ urls, coleccionId }) {
 
     return (
         <>
-            <Head title="Programar publicación en Bluesky" />
+            <Head title="Programar publicación" />
 
             <div className="max-w-2xl mx-auto p-6 space-y-6">
-                <h1 className="text-2xl font-bold text-gray-800 text-center">Programar publicaciones</h1>
+                <h1 className="text-2xl font-bold text-gray-800 text-center">
+                    Programar publicaciones de la colección: <span className="text-[#1cc2b5]">{coleccion.nombre}</span>
+                </h1>
+
 
                 <form onSubmit={handleSubmit} className="space-y-6 bg-white border p-6 rounded shadow-sm">
                     <div>
@@ -106,7 +109,7 @@ export default function Create({ urls, coleccionId }) {
                     </div>
 
                     <BotonPrimario type="submit" disabled={processing}>
-                        Programar publicaciones
+                        Programar
                     </BotonPrimario>
                 </form>
             </div>
