@@ -128,14 +128,22 @@ export default function Show({ coleccion, urls }) {
                     </div>
                 </div>
 
-                <div className="text-center">
+                <div className="flex flex-col sm:flex-row justify-center gap-4 text-center mt-6">
                     <Link
                         href={route('colecciones.rascasProporcionados', coleccion.id)}
                         className="inline-block bg-[#1cc2b5] hover:bg-[#17b0a6] text-white font-semibold py-2 px-6 rounded-md shadow-sm active:scale-95 transition-transform duration-100 ease-in-out"
                     >
                         Ver rascas proporcionados
                     </Link>
+
+                    <Link
+                        href={route('publicaciones.index', { coleccion_id: coleccion.id })}
+                        className="inline-block bg-[#1cc2b5] hover:bg-[#17b0a6] text-white font-semibold py-2 px-6 rounded-md shadow-sm active:scale-95 transition-transform duration-100 ease-in-out"
+                    >
+                        Ver publicaciones programadas
+                    </Link>
                 </div>
+
 
                 {coleccion.abierta && coleccion.rascas_restantes > 0 && (
                     <form onSubmit={obtenerRascas} className="bg-white border rounded-lg p-6 space-y-6 shadow-sm">
@@ -182,7 +190,10 @@ export default function Show({ coleccion, urls }) {
                                 onClick={() =>
                                     router.visit(route('publicaciones.create'), {
                                         method: 'get',
-                                        data: { urls },
+                                        data: {
+                                            urls,
+                                            coleccion_id: coleccion.id,
+                                        },
                                         preserveScroll: true,
                                     })
                                 }

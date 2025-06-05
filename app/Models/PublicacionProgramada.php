@@ -20,6 +20,11 @@ class PublicacionProgramada extends Model
         'error_mensaje',
     ];
 
+    protected $casts = [
+        'fecha_programada' => 'datetime',
+    ];
+
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -28,5 +33,10 @@ class PublicacionProgramada extends Model
     public function host()
     {
         return $this->belongsTo(Host::class);
+    }
+
+    public function coleccion()
+    {
+        return $this->belongsTo(Coleccion::class);
     }
 }

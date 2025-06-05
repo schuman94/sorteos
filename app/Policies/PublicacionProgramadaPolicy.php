@@ -21,7 +21,7 @@ class PublicacionProgramadaPolicy
      */
     public function view(User $user, PublicacionProgramada $publicacionProgramada): bool
     {
-        return false;
+        return $user->id === $publicacionProgramada->user_id;
     }
 
     /**
@@ -37,7 +37,7 @@ class PublicacionProgramadaPolicy
      */
     public function update(User $user, PublicacionProgramada $publicacionProgramada): bool
     {
-        return false;
+        return $user->id === $publicacionProgramada->user_id;
     }
 
     /**
@@ -45,7 +45,7 @@ class PublicacionProgramadaPolicy
      */
     public function delete(User $user, PublicacionProgramada $publicacionProgramada): bool
     {
-        return false;
+        return $user->id === $publicacionProgramada->user_id;
     }
 
     /**

@@ -98,8 +98,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/mis-rascas-premiados', [RascaController::class, 'premiados'])->name('rascas.premiados');
 });
 
-
-Route::post('/publicaciones/programar', [PublicacionProgramadaController::class, 'store'])->middleware(['auth'])->name('publicaciones.programar');
-Route::get('/publicaciones/programar', [PublicacionProgramadaController::class, 'create'])->middleware(['auth'])->name('publicaciones.create');
+Route::middleware('auth')->group(function () {
+    Route::get('/publicaciones/programar', [PublicacionProgramadaController::class, 'create'])->name('publicaciones.create');
+    Route::post('/publicaciones/programar', [PublicacionProgramadaController::class, 'store'])->name('publicaciones.programar');
+    Route::get('/publicaciones-programadas', [PublicacionProgramadaController::class, 'index'])->name('publicaciones.index');
+    Route::delete('/publicaciones-programadas/{publicacion}', [PublicacionProgramadaController::class, 'destroy'])->name('publicaciones.destroy');
+});
 
 require __DIR__ . '/auth.php';

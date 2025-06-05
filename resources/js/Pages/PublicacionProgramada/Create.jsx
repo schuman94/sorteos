@@ -1,14 +1,23 @@
 import { useForm, Head, router } from '@inertiajs/react';
 import MainLayout from '@/Layouts/MainLayout';
 import BotonPrimario from '@/Components/Botones/BotonPrimario';
+import { useEffect, useState } from 'react';
 
-export default function Create({ urls }) {
+export default function Create({ urls, coleccionId }) {
+    const [mostrarIntervalo, setMostrarIntervalo] = useState(urls.length > 1);
+
     const { data, setData, post, processing, errors } = useForm({
         mensaje_base: '¡Nuevo rasca disponible!',
         inicio: '',
-        intervalo: 24,
+        intervalo: 1,
+        unidad_intervalo: 'horas',
         urls,
+        coleccion_id: coleccionId,
     });
+
+    useEffect(() => {
+        setMostrarIntervalo(urls.length > 1);
+    }, [urls]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -49,23 +58,42 @@ export default function Create({ urls }) {
                         )}
                     </div>
 
-                    <div>
-                        <label className="block font-medium text-gray-700">Intervalo entre publicaciones (horas)</label>
-                        <input
-                            type="number"
-                            value={data.intervalo}
-                            onChange={(e) => setData('intervalo', parseInt(e.target.value))}
-                            min={1}
-                            max={168}
-                            className="border rounded px-3 py-2 mt-1 w-32"
-                        />
-                        {errors.intervalo && (
-                            <p className="text-sm text-red-600 mt-1">{errors.intervalo}</p>
-                        )}
-                    </div>
+                    {mostrarIntervalo && (
+                        <>
+                            <div>
+                                <label className="block font-medium text-gray-700">Intervalo entre publicaciones</label>
+                                <input
+                                    type="number"
+                                    value={data.intervalo}
+                                    onChange={(e) => setData('intervalo', parseInt(e.target.value))}
+                                    min={1}
+                                    max={10080}
+                                    className="border rounded px-3 py-2 mt-1 w-32"
+                                />
+                                {errors.intervalo && (
+                                    <p className="text-sm text-red-600 mt-1">{errors.intervalo}</p>
+                                )}
+                            </div>
+
+                            <div>
+                                <label className="block font-medium text-gray-700">Unidad del intervalo</label>
+                                <select
+                                    value={data.unidad_intervalo}
+                                    onChange={(e) => setData('unidad_intervalo', e.target.value)}
+                                    className="border rounded px-3 py-2 mt-1 w-32"
+                                >
+                                    <option value="horas">Horas</option>
+                                    <option value="minutos">Minutos</option>
+                                </select>
+                                {errors.unidad_intervalo && (
+                                    <p className="text-sm text-red-600 mt-1">{errors.unidad_intervalo}</p>
+                                )}
+                            </div>
+                        </>
+                    )}
 
                     <div>
-                        <label className="block font-medium text-gray-700">URLs a publicar</label>
+                        <label className="block font-medium text-gray-700">Rascas a publicar</label>
                         <textarea
                             readOnly
                             value={urls.join('\n')}
