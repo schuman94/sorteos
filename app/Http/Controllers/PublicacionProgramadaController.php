@@ -52,11 +52,11 @@ class PublicacionProgramadaController extends Controller
         ]);
 
         $host = Host::where('nombre', 'Bluesky')->first();
-        $inicio = Carbon::parse($validated['inicio']);
+        $inicio = Carbon::parse($validated['inicio'], 'Europe/Madrid')->setTimezone('UTC');
 
         foreach ($validated['urls'] as $i => $url) {
             $publicacion = new PublicacionProgramada();
-            $publicacion->mensaje = $validated['mensaje_base'] . "\n" . $url;
+             $publicacion->mensaje = trim($validated['mensaje_base']) . "\n\n🔗 " . $url;
             $publicacion->fecha_programada = $inicio->copy()->addHours($validated['intervalo'] * $i);
             $publicacion->publicado = false;
             $publicacion->fallido = false;
