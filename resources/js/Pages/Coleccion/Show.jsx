@@ -128,14 +128,22 @@ export default function Show({ coleccion, urls }) {
                     </div>
                 </div>
 
-                <div className="text-center">
+                <div className="flex flex-col sm:flex-row justify-center gap-4 text-center mt-6">
                     <Link
                         href={route('colecciones.rascasProporcionados', coleccion.id)}
                         className="inline-block bg-[#1cc2b5] hover:bg-[#17b0a6] text-white font-semibold py-2 px-6 rounded-md shadow-sm active:scale-95 transition-transform duration-100 ease-in-out"
                     >
                         Ver rascas proporcionados
                     </Link>
+
+                    <Link
+                        href={route('publicaciones.index', { coleccion_id: coleccion.id })}
+                        className="inline-block bg-[#1cc2b5] hover:bg-[#17b0a6] text-white font-semibold py-2 px-6 rounded-md shadow-sm active:scale-95 transition-transform duration-100 ease-in-out"
+                    >
+                        Ver publicaciones programadas
+                    </Link>
                 </div>
+
 
                 {coleccion.abierta && coleccion.rascas_restantes > 0 && (
                     <form onSubmit={obtenerRascas} className="bg-white border rounded-lg p-6 space-y-6 shadow-sm">
@@ -169,15 +177,34 @@ export default function Show({ coleccion, urls }) {
                             className="w-full border rounded p-2 font-mono text-sm"
                             value={urls.join('\n')}
                         />
-                        <BotonAzul
-                            onClick={copiarAlPortapapeles}
-                            className="active:scale-95 transition duration-100 ease-in-out"
-                        >
-                            Copiar
-                        </BotonAzul>
 
+                        <div className="flex gap-4">
+                            <BotonAzul
+                                onClick={copiarAlPortapapeles}
+                                className="active:scale-95 transition duration-100 ease-in-out"
+                            >
+                                Copiar
+                            </BotonAzul>
+
+                            <BotonPrimario
+                                onClick={() =>
+                                    router.visit(route('publicaciones.create'), {
+                                        method: 'get',
+                                        data: {
+                                            urls,
+                                            coleccion_id: coleccion.id,
+                                        },
+                                        preserveScroll: true,
+                                    })
+                                }
+                                className="active:scale-95 transition duration-100 ease-in-out"
+                            >
+                                Programar en Bluesky
+                            </BotonPrimario>
+                        </div>
                     </div>
                 )}
+
 
                 {coleccion.premios?.length > 0 && (
                     <div className="bg-white border rounded-lg p-6 shadow-sm">

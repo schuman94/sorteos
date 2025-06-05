@@ -25,4 +25,9 @@ class Coleccion extends Model
     {
         return $this->hasMany(Rasca::class);
     }
+
+    public function publicacionesProgramadas()
+    {
+        return $this->hasMany(PublicacionProgramada::class);
+    }
 }

@@ -85,4 +85,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Premio::class);
     }
+
+    public function publicacionesProgramadas()
+    {
+        return $this->hasMany(PublicacionProgramada::class);
+    }
 }

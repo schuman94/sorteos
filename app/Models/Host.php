@@ -18,4 +18,8 @@ class Host extends Model
     {
         return $this->hasMany(Publicacion::class);
     }
+
+    public function publicacionesProgramadas() {
+        return $this->hasMany(PublicacionProgramada::class);
+    }
 }

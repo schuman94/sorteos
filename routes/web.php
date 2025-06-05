@@ -10,6 +10,7 @@ use App\Http\Controllers\PremioController;
 use App\Http\Controllers\RascaController;
 use App\Http\Controllers\RuletaController;
 use App\Http\Middleware\AdminMiddleware;
+use App\Http\Controllers\PublicacionProgramadaController;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -95,6 +96,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/rascas/{codigo}', [RascaController::class, 'show'])->name('rascas.show');
     Route::put('/rascar/{codigo}', [RascaController::class, 'rascar'])->name('rascas.rascar');
     Route::get('/mis-rascas-premiados', [RascaController::class, 'premiados'])->name('rascas.premiados');
+});
+
+Route::middleware('auth')->group(function () {
+    Route::get('/publicaciones/programar', [PublicacionProgramadaController::class, 'create'])->name('publicaciones.create');
+    Route::post('/publicaciones/programar', [PublicacionProgramadaController::class, 'store'])->name('publicaciones.programar');
+    Route::get('/publicaciones-programadas', [PublicacionProgramadaController::class, 'index'])->name('publicaciones.index');
+    Route::delete('/publicaciones-programadas/todas/{coleccion}', [PublicacionProgramadaController::class, 'destroyAll'])->name('publicaciones.eliminarTodas');
+    Route::delete('/publicaciones-programadas/{publicacion}', [PublicacionProgramadaController::class, 'destroy'])->name('publicaciones.destroy');
 });
 
 require __DIR__ . '/auth.php';

@@ -2,11 +2,12 @@
 
 namespace App\Policies;
 
+use App\Models\PublicacionProgramada;
 use App\Models\Coleccion;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
-class ColeccionPolicy
+class PublicacionProgramadaPolicy
 {
     /**
      * Determine whether the user can view any models.
@@ -19,9 +20,9 @@ class ColeccionPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Coleccion $coleccion): bool
+    public function view(User $user, PublicacionProgramada $publicacionProgramada): bool
     {
-        return $user->id === $coleccion->user_id;
+        return $user->id === $publicacionProgramada->user_id;
     }
 
     /**
@@ -35,23 +36,23 @@ class ColeccionPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Coleccion $coleccion): bool
+    public function update(User $user, PublicacionProgramada $publicacionProgramada): bool
     {
-        return $user->id === $coleccion->user_id;
+        return $user->id === $publicacionProgramada->user_id;
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Coleccion $coleccion): bool
+    public function delete(User $user, PublicacionProgramada $publicacionProgramada): bool
     {
-        return $user->id === $coleccion->user_id;
+        return $user->id === $publicacionProgramada->user_id;
     }
 
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, Coleccion $coleccion): bool
+    public function restore(User $user, PublicacionProgramada $publicacionProgramada): bool
     {
         return false;
     }
@@ -59,13 +60,8 @@ class ColeccionPolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, Coleccion $coleccion): bool
+    public function forceDelete(User $user, PublicacionProgramada $publicacionProgramada): bool
     {
         return false;
-    }
-
-    public function eliminarProgramadas(User $user, Coleccion $coleccion): bool
-    {
-        return $user->id === $coleccion->user_id;
     }
 }

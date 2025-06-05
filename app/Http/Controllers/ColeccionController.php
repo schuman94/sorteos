@@ -326,7 +326,10 @@ class ColeccionController extends Controller
             }
         });
 
-        $urls = $rascasSeleccionados->map(fn($rasca) => route('rascas.show', $rasca->codigo))->all();
+        $urls = [];
+        foreach ($rascasSeleccionados as $rasca) {
+            $urls[] = route('rascas.show', $rasca->codigo);
+        }
 
         return redirect()
             ->route('colecciones.show', $coleccion)
