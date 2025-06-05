@@ -39,6 +39,18 @@ class BlueskyService
         $this->authToken = $response['accessJwt'];
     }
 
+
+    public function getToken(): string
+    {
+        $this->authenticate();
+        return $this->authToken;
+    }
+
+    public function getHandle(): string
+    {
+        return $this->handle;
+    }
+
     /**
      * Devuelve los datos de una publicación a partir de su URI Bluesky.
      */
@@ -83,5 +95,24 @@ class BlueskyService
         }
 
         return $response->json()['thread']['replies'] ?? [];
+    }
+
+    public function publicar(string $mensaje): void
+    {
+        $this->authenticate();
+
+        $response = Http::withToken($this->authToken)->post("{$this->baseUrl}/com.atproto.repo.createRecord", [
+            'repo' => $this->handle,
+            'collection' => 'app.bsky.feed.post',
+            'record' => [
+                'text' => $mensaje,
+                'createdAt' => now()->toISOString(),
+                '$type' => 'app.bsky.feed.post',
+            ],
+        ]);
+
+        if (!$response->ok()) {
+            throw new \RuntimeException('Error al publicar: ' . $response->body());
+        }
     }
 }

@@ -10,6 +10,7 @@ use App\Http\Controllers\PremioController;
 use App\Http\Controllers\RascaController;
 use App\Http\Controllers\RuletaController;
 use App\Http\Middleware\AdminMiddleware;
+use App\Http\Controllers\PublicacionProgramadaController;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -96,5 +97,9 @@ Route::middleware('auth')->group(function () {
     Route::put('/rascar/{codigo}', [RascaController::class, 'rascar'])->name('rascas.rascar');
     Route::get('/mis-rascas-premiados', [RascaController::class, 'premiados'])->name('rascas.premiados');
 });
+
+
+Route::post('/publicaciones/programar', [PublicacionProgramadaController::class, 'store'])->middleware(['auth'])->name('publicaciones.programar');
+Route::get('/publicaciones/programar', [PublicacionProgramadaController::class, 'create'])->middleware(['auth'])->name('publicaciones.create');
 
 require __DIR__ . '/auth.php';

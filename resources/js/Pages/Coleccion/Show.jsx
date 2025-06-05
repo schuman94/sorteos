@@ -169,15 +169,31 @@ export default function Show({ coleccion, urls }) {
                             className="w-full border rounded p-2 font-mono text-sm"
                             value={urls.join('\n')}
                         />
-                        <BotonAzul
-                            onClick={copiarAlPortapapeles}
-                            className="active:scale-95 transition duration-100 ease-in-out"
-                        >
-                            Copiar
-                        </BotonAzul>
 
+                        <div className="flex gap-4">
+                            <BotonAzul
+                                onClick={copiarAlPortapapeles}
+                                className="active:scale-95 transition duration-100 ease-in-out"
+                            >
+                                Copiar
+                            </BotonAzul>
+
+                            <BotonPrimario
+                                onClick={() =>
+                                    router.visit(route('publicaciones.create'), {
+                                        method: 'get',
+                                        data: { urls },
+                                        preserveScroll: true,
+                                    })
+                                }
+                                className="active:scale-95 transition duration-100 ease-in-out"
+                            >
+                                Programar en Bluesky
+                            </BotonPrimario>
+                        </div>
                     </div>
                 )}
+
 
                 {coleccion.premios?.length > 0 && (
                     <div className="bg-white border rounded-lg p-6 shadow-sm">
