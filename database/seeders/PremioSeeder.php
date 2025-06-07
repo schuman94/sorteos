@@ -39,7 +39,7 @@ class PremioSeeder extends Seeder
         ]);
 
         Premio::factory()
-            ->count(58)
+            ->count(38)
             ->create([
                 'user_id' => $sergio->id,
             ]);
