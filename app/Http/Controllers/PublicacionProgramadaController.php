@@ -41,7 +41,7 @@ class PublicacionProgramadaController extends Controller
     public function create(Request $request)
     {
         $urls = $request->input('urls', []);
-        $coleccionId = $request->input('coleccion_id');
+        $coleccion = Coleccion::findOrFail($request->input('coleccion_id'));
 
         if (empty($urls)) {
             return redirect()->back()->withErrors(['urls' => 'No se proporcionaron URLs.']);
@@ -49,7 +49,7 @@ class PublicacionProgramadaController extends Controller
 
         return Inertia::render('PublicacionProgramada/Create', [
             'urls' => $urls,
-            'coleccionId' => $coleccionId,
+            'coleccion' => $coleccion,
         ]);
     }
 

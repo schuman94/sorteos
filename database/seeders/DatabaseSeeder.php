@@ -20,6 +20,8 @@ class DatabaseSeeder extends Seeder
             DominioSeeder::class,
             PremioSeeder::class,
             ColeccionSeeder::class,
+            RuletaSeeder::class,
+            SorteoSeeder::class,
         ]);
     }
 }

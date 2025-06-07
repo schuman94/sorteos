@@ -17,7 +17,12 @@ class GanadorFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'sorteo_id' => null, // se asigna desde el seeder
+            'nombre_manual' => $this->faker->firstName(),
+            'esSuplente' => false, // solo titulares en este caso
+            'posicion' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
         ];
     }
 }

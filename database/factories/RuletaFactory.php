@@ -17,7 +17,13 @@ class RuletaFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'nombre' => fake()->words(2, true),
+            'user_id' => null, // se asigna en el seeder
+            'opciones' => json_encode(
+                collect(range(1, 5))->map(fn() => fake()->words(2, true))->toArray()
+            ),
+            'created_at' => now(),
+            'updated_at' => now(),
         ];
     }
 }
