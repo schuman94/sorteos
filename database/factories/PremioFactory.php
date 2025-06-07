@@ -29,7 +29,7 @@ class PremioFactory extends Factory
         ];
 
         return [
-            'nombre' => fake()->words(2, true),
+            'nombre' => fake()->words(4, true),
             'valor' => fake()->randomFloat(2, 5, 500),
             'proveedor' => fake()->company(),
             'descripcion' => fake()->sentence(),
