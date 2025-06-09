@@ -16,18 +16,14 @@ Vagrant.configure("2") do |config|
     # PHP 8.2 y dependencias Laravel
     sudo add-apt-repository ppa:ondrej/php -y
     sudo apt-get update
-    sudo apt-get install -y php8.2 php8.2-cli php8.2-common php8.2-mbstring php8.2-xml php8.2-mysql php8.2-pgsql php8.2-curl php8.2-bcmath php8.2-zip php8.2-gd php8.2-readline
+    sudo apt-get install -y php8.2 php8.2-cli php8.2-common php8.2-mbstring php8.2-xml php8.2-mysql php8.2-pgsql php8.2-curl php8.2-bcmath php8.2-zip php8.2-gd php8.2-readline php8.2-intl
 
     # Apache
     sudo apt-get install -y apache2 libapache2-mod-php8.2
     sudo a2enmod rewrite
 
-    # PostgreSQL 15
+    # PostgreSQL 14
     sudo apt-get install -y postgresql postgresql-contrib
-    sudo -u postgres psql -c "CREATE ROLE vagrant LOGIN PASSWORD 'vagrant';"
-    sudo -u postgres psql -c "ALTER ROLE vagrant CREATEDB;"
-    echo "local   all             all                                     trust" | sudo tee /etc/postgresql/15/main/pg_hba.conf > /dev/null
-    sudo systemctl restart postgresql
 
     # Node 18 con NVM
     export NVM_DIR="/home/vagrant/.nvm"
